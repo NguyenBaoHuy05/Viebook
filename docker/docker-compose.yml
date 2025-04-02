@@ -1,8 +1,25 @@
 services:
+  frontend:
+    build:
+      context: ../frontend  # Context là thư mục frontend
+      dockerfile: ../docker/frontend.Dockerfile
+    container_name: viebook-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../frontend:/usr/src/app  # Đồng bộ code từ host vào container
+      - /usr/src/app/node_modules  # Giữ node_modules trong container
+    networks:
+      - app-network
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend
+
   backend:
     build:
-      context: ./docker
-      dockerfile: backend.Dockerfile
+      context: ../backend
+      dockerfile: ../docker/backend.Dockerfile
     container_name: viebook-backend
     ports:
       - "8000:8000"
@@ -19,23 +36,6 @@ services:
       - DB_PASSWORD=
     depends_on:
       - db
-
-  frontend:
-    build:
-      context: ./docker
-      dockerfile: frontend.Dockerfile
-    container_name: viebook-frontend
-    ports:
-      - "3000:3000"
-    volumes:
-      - ../frontend:/usr/src/app
-      - /usr/src/app/node_modules
-    networks:
-      - app-network
-    environment:
-      - NEXT_PUBLIC_API_URL=http://backend:8000
-    depends_on:
-      - backend
 
   db:
     image: mysql:8.0
