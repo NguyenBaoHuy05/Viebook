@@ -1,0 +1,72 @@
+services:
+  backend:
+    build:
+      context: ./docker
+      dockerfile: backend.Dockerfile
+    container_name: viebook-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../backend:/var/www
+    networks:
+      - app-network
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=viebook
+      - DB_USERNAME=root
+      - DB_PASSWORD=
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./docker
+      dockerfile: frontend.Dockerfile
+    container_name: viebook-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - app-network
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend
+
+  db:
+    image: mysql:8.0
+    container_name: viebook-db
+    environment:
+      MYSQL_ROOT_PASSWORD: mypassword
+      MYSQL_DATABASE: viebook
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-network
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: viebook-phpmyadmin
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local
