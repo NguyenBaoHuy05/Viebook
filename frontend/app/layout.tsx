@@ -12,7 +12,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
 export const metadata: Metadata = {
   title: "Viebook",
   description: "Mạng xã hội cho người Việt",
