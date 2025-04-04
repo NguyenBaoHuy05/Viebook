@@ -9,9 +9,6 @@ jobs:
   send_webhook:
     runs-on: ubuntu-latest
     steps:
-      - name: Kiểm tra URL Webhook
-        run: echo "Webhook URL: ${{ secrets.DISCORD_WEBHOOK_URL }}"
-
       - name: Gửi JSON đến Webhook
         run: |
           curl -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
