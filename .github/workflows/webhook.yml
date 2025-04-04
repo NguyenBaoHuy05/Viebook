@@ -14,11 +14,10 @@ jobs:
           curl -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
                -H "Content-Type: application/json" \
                -d '{
-                 "content": "🚀 **New Push in Viebook repo!**",
                  "username": "GitHub Notifier",
                  "embeds": [{
-                   "title": "📌 Repository Update",
-                   "description": "**👤 Pushed by:** '${{ github.actor }}'\n**📝 Commit Message:** '${{ github.event.head_commit.message }}'",
+                   "title": "🚀 New Push in Viebook repo!",
+                   "description": "**👤 Pushed by:** ${{ github.actor }}\n**📝 Commit Message:** ${{ github.event.head_commit.message }}",
                    "url": "https://github.com/${{ github.repository }}/commits",
                    "color": 16776960
                  }]
