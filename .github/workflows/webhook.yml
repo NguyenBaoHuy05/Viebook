@@ -11,14 +11,14 @@ jobs:
     steps:
       - name: Gửi JSON đến Webhook
         run: |
-          curl -X POST "https://discord.com/api/webhooks/1356632923276578879/FmqYAt-zX-9swesToe5iA3iy_hRtRhEgc48yLuBf8M8LDVNkB41bJcB83LSzP3Q0HvOB" \
-               -H "Content-Type: application/json" \
-               -d '{
-                 "username": "GitHub Notifier",
-                 "embeds": [{
-                   "title": "🚀 New Push in Viebook repo!",
-                   "description": "**👤 Pushed by:** ${{ github.actor }}\n**📝 Commit Message:** ${{ github.event.head_commit.message }}",
-                   "url": "https://github.com/${{ github.repository }}/commits",
-                   "color": 16776960
-                 }]
-               }'
+          curl -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \       
+             -H "Content-Type: application/json" \
+             -d '{
+               "username": "GitHub Notifier",
+               "embeds": [{
+                 "title": "🚀 New Push in Viebook repo!",
+                 "description": "**👤 Pushed by:** ${{ github.actor }}\n**📝 Commit Message:** ${{ github.event.head_commit.message }}",
+                 "url": "https://github.com/${{ github.repository }}/commits",
+                 "color": 16776960
+               }]
+             }'
