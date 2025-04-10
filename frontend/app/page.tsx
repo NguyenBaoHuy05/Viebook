@@ -3,9 +3,9 @@ import { title } from "process";
 function page() {
   return (
     <div className="mt-25">
-      <div className="grid grid-cols-3">
+      <div className="grid grid-cols-4">
         <div className="col-span-1">a</div>
-        <div className="col-span-1">
+        <div className="col-span-2">
           <Post
             post={{
               name: "Con dog",
@@ -19,6 +19,7 @@ function page() {
             }}
           />
         </div>
+
         <div className="col-span-1">c</div>
       </div>
     </div>
