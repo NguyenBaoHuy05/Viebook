@@ -17,7 +17,9 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('avatar')->nullable();
+            $table->string('profile_picture')->nullable();
+            $table->text('bio')->nullable();
+            $table->string('location')->nullable();
             $table->integer('count_follow')->default(0);
             $table->rememberToken();
             $table->timestamps();
@@ -40,19 +42,19 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('post_id')->constrained('posts')->onDelete('cascade');
             $table->timestamps();
-            ;
             $table->text('content');
             $table->unsignedBigInteger('parent_comment_id')->nullable();
             $table->foreign('parent_comment_id')->references('id')->on('comments')->onDelete('cascade');
         });
 
         Schema::create('follows', function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger('follower_id');
             $table->unsignedBigInteger('followee_id');
-            $table->timestamp('create_at')->useCurrent();
-            $table->primary(['follower_id', 'followee_id']);
+            $table->timestamps();
             $table->foreign('follower_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('followee_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unique(['follower_id', 'followee_id']);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -65,8 +67,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('post_id')->constrained('posts')->onDelete('cascade');
-            $table->timestamp('create_at')->useCurrent();
             $table->string('react_type');
+            $table->timestamps();
         });
 
         Schema::create('notifications', function (Blueprint $table) {
@@ -76,7 +78,7 @@ return new class extends Migration {
             $table->string('type');
             $table->unsignedBigInteger('target_id')->nullable();
             $table->boolean('isRead')->default(false);
-            $table->timestamp('create_at')->useCurrent();
+            $table->timestamps();
         });
 
         Schema::create('sessions', function (Blueprint $table) {

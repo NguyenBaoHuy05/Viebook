@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
 {
+    use HasFactory;
     protected $fillable = ['actor_id', 'user_id', 'type', 'target_id', 'isRead'];
 
     public function actor()
