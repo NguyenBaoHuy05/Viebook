@@ -58,15 +58,16 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
-// Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-//     Route::apiResource('posts', PostController::class);
-//     Route::post('posts/{post}/react', [PostReactController::class, 'store']);
-//     Route::delete('posts/{post}/react', [PostReactController::class, 'destroy']);
-//     Route::post('posts/{post}/comments', [CommentController::class, 'store']);
-//     Route::get('posts/{post}/comments', [CommentController::class, 'index']);
-//     Route::post('users/{user}/follow', [FollowController::class, 'follow']);
-//     Route::delete('users/{user}/follow', [FollowController::class, 'unfollow']);
-//     Route::get('users/{user}/followers', [FollowController::class, 'followers']);
-//     Route::get('notifications', [NotificationController::class, 'index']);
-//     Route::put('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
-// });
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    // Route::apiResource('posts', PostController::class);
+    // Route::post('posts/{post}/react', [PostReactController::class, 'store']);
+    // Route::delete('posts/{post}/react', [PostReactController::class, 'destroy']);
+    // Route::post('posts/{post}/comments', [CommentController::class, 'store']);
+    // Route::get('posts/{post}/comments', [CommentController::class, 'index']);
+    Route::post('users/{user}/follow', [FollowController::class, 'follow']);
+    Route::delete('users/{user}/follow', [FollowController::class, 'unfollow']);
+    Route::get('users/{user}/followers', [FollowController::class, 'followers']);
+    Route::post('notifications', [NotificationController::class, 'store']);
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::put('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+});
