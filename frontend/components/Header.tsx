@@ -1,3 +1,4 @@
+"use client";
 import { IoMdHome } from "react-icons/io";
 import { IoPeople } from "react-icons/io5";
 import { CgProfile } from "react-icons/cg";
