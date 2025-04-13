@@ -20,7 +20,6 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-
     try {
       await axios.get("/sanctum/csrf-cookie");
       const response = await axios.post("/api/register", {
