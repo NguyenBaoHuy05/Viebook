@@ -3,12 +3,16 @@ import { useState } from "react";
 import { FaFacebook } from "react-icons/fa";
 import Link from "next/link";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withXSRFToken = true;
 
 export default function SignupPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -16,10 +20,12 @@ export default function SignupPage() {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    setLoading(true);
 
     try {
       await axios.get("/sanctum/csrf-cookie");
@@ -29,16 +35,23 @@ export default function SignupPage() {
         password: formData.password,
         password_confirmation: formData.confirmPassword,
       });
-      console.log("Registration successful:", response.data);
+      toast.success("Đăng ký thành công! Đang chuyển hướng...");
+      setTimeout(() => {
+        router.push("/login");
+      }, 1500);
     } catch (error: any) {
       if (error.response?.status === 422) {
         setErrors(error.response.data.errors);
+        toast.error("Vui lòng kiểm tra lại thông tin đăng ký");
       } else {
         console.error(
           "Registration failed:",
           error.response?.data || error.message
         );
+        toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,7 +71,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center mt-10">
+    <div className="min-h-screen flex items-center justify-center mt-10">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
         <div className="text-center">
           <FaFacebook size={50} className="mx-auto text-blue-600" />
@@ -84,9 +97,10 @@ export default function SignupPage() {
                 name="name"
                 type="text"
                 required
+                disabled={loading}
                 className={`rounded-lg relative block w-full px-3 py-3 border ${
                   errors.name ? "border-red-500" : "border-gray-300"
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
                 placeholder="Họ và tên"
                 value={formData.name}
                 onChange={handleChange}
@@ -101,9 +115,10 @@ export default function SignupPage() {
                 name="email"
                 type="email"
                 required
+                disabled={loading}
                 className={`rounded-lg relative block w-full px-3 py-3 border ${
                   errors.email ? "border-red-500" : "border-gray-300"
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
                 placeholder="Email"
                 value={formData.email}
                 onChange={handleChange}
@@ -118,9 +133,10 @@ export default function SignupPage() {
                 name="password"
                 type="password"
                 required
+                disabled={loading}
                 className={`rounded-lg relative block w-full px-3 py-3 border ${
                   errors.password ? "border-red-500" : "border-gray-300"
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
                 placeholder="Mật khẩu"
                 value={formData.password}
                 onChange={handleChange}
@@ -137,11 +153,12 @@ export default function SignupPage() {
                 name="confirmPassword"
                 type="password"
                 required
+                disabled={loading}
                 className={`rounded-lg relative block w-full px-3 py-3 border ${
                   errors.password_confirmation
                     ? "border-red-500"
                     : "border-gray-300"
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
                 placeholder="Xác nhận mật khẩu"
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -156,9 +173,21 @@ export default function SignupPage() {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+              disabled={loading}
+              className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white ${
+                loading
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200`}
             >
-              Đăng ký
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Đang xử lý...</span>
+                </div>
+              ) : (
+                "Đăng ký"
+              )}
             </button>
           </div>
         </form>
