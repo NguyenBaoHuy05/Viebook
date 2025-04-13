@@ -1,3 +1,4 @@
+"use client";
 import { IoMdHome } from "react-icons/io";
 import { IoPeople } from "react-icons/io5";
 import { CgProfile } from "react-icons/cg";
@@ -8,7 +9,7 @@ function Header() {
   return (
     <>
       <div>
-        <div className="grid grid-cols-5 py-3 px-5 border-2 rounded-4xl bg-white fixed right-10 left-10 top-0">
+        <div className="grid grid-cols-5 py-3 px-5 border-2 bg-white fixed w-screen right-0 top-0">
           <div className="col-span-1 mt-auto ml-1 flex gap-5 items-center">
             <FaFacebook
               size={50}

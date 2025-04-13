@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://localhost:8000";
+axios.defaults.baseURL = "http://localhost:8000/api";
 axios.defaults.withXSRFToken = true;
 
 export default function SignupPage() {
@@ -25,21 +25,31 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+<<<<<<< HEAD
     setLoading(true);
 
+=======
+    const tempData = { ...formData };
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+>>>>>>> f092fb9fbfb0882a6acc6e1c9858237b0382d236
     try {
-      await axios.get("/sanctum/csrf-cookie");
-      const response = await axios.post("/api/register", {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        password_confirmation: formData.confirmPassword,
+      const response = await axios.post("/register", {
+        name: tempData.name,
+        email: tempData.email,
+        password: tempData.password,
+        password_confirmation: tempData.confirmPassword,
       });
       toast.success("Đăng ký thành công! Đang chuyển hướng...");
       setTimeout(() => {
         router.push("/login");
       }, 1500);
     } catch (error: any) {
+      setFormData(tempData);
       if (error.response?.status === 422) {
         setErrors(error.response.data.errors);
         toast.error("Vui lòng kiểm tra lại thông tin đăng ký");
