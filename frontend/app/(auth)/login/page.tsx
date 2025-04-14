@@ -2,23 +2,19 @@
 import { useState } from "react";
 import { FaFacebook } from "react-icons/fa";
 import Link from "next/link";
-import axios from "axios";
+import axios from "@/lib/axiosConfig";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://localhost:8000";
-axios.defaults.withXSRFToken = true;
-
-export default function SignupPage() {
+export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    remember: false,
   });
+
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
 
@@ -29,25 +25,21 @@ export default function SignupPage() {
 
     try {
       await axios.get("/sanctum/csrf-cookie");
-      const response = await axios.post("/api/register", {
-        name: formData.name,
+      const response = await axios.post("/api/login", {
         email: formData.email,
         password: formData.password,
-        password_confirmation: formData.confirmPassword,
+        remember: formData.remember,
       });
-      toast.success("Đăng ký thành công! Đang chuyển hướng...");
+      toast.success("Đăng nhập thành công! Đang chuyển hướng...");
       setTimeout(() => {
-        router.push("/login");
+        router.push("/");
       }, 1500);
     } catch (error: any) {
       if (error.response?.status === 422) {
         setErrors(error.response.data.errors);
-        toast.error("Vui lòng kiểm tra lại thông tin đăng ký");
+        toast.error("Vui lòng kiểm tra lại thông tin đăng nhập");
       } else {
-        console.error(
-          "Registration failed:",
-          error.response?.data || error.message
-        );
+        console.error("Login failed:", error.response?.data || error.message);
         toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau");
       }
     } finally {
@@ -71,20 +63,20 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center mt-10">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center mt-10">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
         <div className="text-center">
           <FaFacebook size={50} className="mx-auto text-blue-600" />
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Tạo tài khoản Viebook
+            Đăng nhập vào Viebook
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Đã có tài khoản?{" "}
+            Hoặc{" "}
             <Link
-              href="/login"
+              href="/signup"
               className="font-medium text-blue-600 hover:text-blue-500"
             >
-              Đăng nhập
+              tạo tài khoản mới
             </Link>
           </p>
         </div>
@@ -93,47 +85,30 @@ export default function SignupPage() {
           <div className="rounded-md space-y-4">
             <div>
               <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                disabled={loading}
-                className={`rounded-lg relative block w-full px-3 py-3 border ${
-                  errors.name ? "border-red-500" : "border-gray-300"
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                placeholder="Họ và tên"
-                value={formData.name}
-                onChange={handleChange}
-              />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name[0]}</p>
-              )}
-            </div>
-            <div>
-              <input
                 id="email"
                 name="email"
                 type="email"
-                required
                 disabled={loading}
-                className={`rounded-lg relative block w-full px-3 py-3 border ${
-                  errors.email ? "border-red-500" : "border-gray-300"
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                required
+                className={`
+                    rounded-lg relative block w-full px-3 py-3 border 
+                    ${errors.email ? "border-red-500" : "border-gray-300"}
+                  placeholder-gray-500 text-gray-900 focus:outline-none
+                  focus:ring-blue-500 focus:border-blue-500 focus:z-10 
+                    sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed
+                 `}
                 placeholder="Email"
                 value={formData.email}
                 onChange={handleChange}
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email[0]}</p>
-              )}
             </div>
             <div>
               <input
                 id="password"
                 name="password"
                 type="password"
-                required
                 disabled={loading}
+                required
                 className={`rounded-lg relative block w-full px-3 py-3 border ${
                   errors.password ? "border-red-500" : "border-gray-300"
                 } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
@@ -141,35 +116,37 @@ export default function SignupPage() {
                 value={formData.password}
                 onChange={handleChange}
               />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.password[0]}
-                </p>
-              )}
-            </div>
-            <div>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                required
-                disabled={loading}
-                className={`rounded-lg relative block w-full px-3 py-3 border ${
-                  errors.password_confirmation
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                placeholder="Xác nhận mật khẩu"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
-              {errors.password_confirmation && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.password_confirmation[0]}
-                </p>
-              )}
             </div>
           </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                id="remember-me"
+                name="remember-me"
+                type="checkbox"
+                checked={formData.remember}
+                onChange={handleChange}
+                className="h-4 w-4 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="remember-me"
+                className="ml-2 block text-sm text-gray-900"
+              >
+                Ghi nhớ đăng nhập
+              </label>
+            </div>
+
+            <div className="text-sm">
+              <a
+                href="#"
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                Quên mật khẩu?
+              </a>
+            </div>
+          </div>
+
           <div>
             <button
               type="submit"
@@ -186,7 +163,7 @@ export default function SignupPage() {
                   <span>Đang xử lý...</span>
                 </div>
               ) : (
-                "Đăng ký"
+                "Đăng nhập"
               )}
             </button>
           </div>

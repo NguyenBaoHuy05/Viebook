@@ -8,6 +8,9 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\RegisterRequest;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ForgetRequest;
+
 
 class AuthController extends Controller
 {
@@ -33,22 +36,22 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
             'token' => $token,
-            'user' => $user,
-            'message' => 'Registration successful. Please check your email to verify your account.',
-        ], 201);
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ]
+        ]);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $validated = $request->validated();
 
         $user = User::where('email', $validated['email'])->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            return response()->json(['message' => 'Tài khoản hoặc mật khẩu không đúng.'], 401);
         }
 
         // Kiểm tra xem email đã được xác minh chưa
@@ -61,10 +64,15 @@ class AuthController extends Controller
                 'email' => $user->email,
             ], 403);
         }
+        $remember = $request->boolean('remember');
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token', expiresAt: $remember ? now()->addDays(30) : now()->addSeconds(10))->plainTextToken;
 
-        return response()->json(['token' => $token, 'user' => $user]);
+        return response()->json(['token' => $token, 'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ]]);
     }
 
     public function logout(Request $request)
@@ -72,6 +80,18 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Logged out']);
     }
+    public function forget(ForgetRequest $request)
+    {
+        $validated = $request->validated();
 
+        $user = User::where('email', $validated['email'])->first();
 
+        if (!$user) {
+            return response()->json(['message' => 'Email chưa đăng ký tài khoản.'], 401);
+        }
+
+        return response()->json(['user' => [
+            'email' => $user->email,
+        ]]);
+    }
 }
