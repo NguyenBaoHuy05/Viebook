@@ -12,70 +12,112 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ForgetRequest;
 use Illuminate\Support\Facades\Password;
 use App\Http\Requests\ResetPasswordRequest;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
+use App\Http\Requests\VerifyEmailRequest;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ResendVerificationRequest;
 
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-        $validated = $request->validated();
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password'],
-        ]);
-
         try {
-            Log::info('Triggering Registered event for user: ' . $user->email);
+            $validated = $request->validated();
+
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => bcrypt($validated['password']),
+            ]);
+
             event(new Registered($user));
-            Log::info('Registered event triggered for user: ' . $user->email);
-        } catch (\Exception $e) {
-            Log::error('Failed to trigger Registered event: ' . $e->getMessage());
-            throw $e; // Ném lỗi để debug
-        }
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-        return response()->json([
-            'token' => $token,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ]
-        ]);
-    }
-
-    public function login(LoginRequest $request)
-    {
-        $validated = $request->validated();
-
-        $user = User::where('email', $validated['email'])->first();
-
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
-            return response()->json(['message' => 'Tài khoản hoặc mật khẩu không đúng.'], 401);
-        }
-
-        // Kiểm tra xem email đã được xác minh chưa
-        if (!$user->hasVerifiedEmail()) {
-            // Tùy chọn: Gửi lại email xác minh
-            $user->sendEmailVerificationNotification();
 
             return response()->json([
-                'message' => 'Email not verified. Please verify your email to login.',
-                'email' => $user->email,
-            ], 403);
+                'message' => 'Đăng ký thành công. Vui lòng kiểm tra email để xác minh tài khoản.',
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Register error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['message' => 'Đã có lỗi xảy ra. Vui lòng thử lại sau.'], 500);
         }
-        $remember = $request->boolean('remember');
+    }
+    public function verifyEmail(VerifyEmailRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $user = User::find($validated['id']);
 
-        $token = $user->createToken('auth_token', expiresAt: $remember ? now()->addDays(30) : now()->addSeconds(10))->plainTextToken;
+            if (!$user) {
+                return response()->json(['message' => 'Người dùng không tồn tại.'], 404);
+            }
+            if ($user->hasVerifiedEmail()) {
+                return response()->json(['message' => 'Email đã được xác minh trước đó.'], 200);
+            }
 
-        return response()->json(['token' => $token, 'user' => [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-        ]]);
+            if (sha1($user->email) !== $validated['hash']) {
+                return response()->json(['message' => 'Liên kết xác minh không hợp lệ.'], 422);
+            }
+
+            $user->markEmailAsVerified();
+            event(new Verified($user));
+
+            return response()->json(['message' => 'Email đã được xác minh thành công.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Đã có lỗi xảy ra. Vui lòng thử lại sau!'], 500);
+        }
+    }
+    public function resendVerification(ResendVerificationRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            Log::info('Resend verification request', ['email' => $validated['email']]);
+
+            $user = User::where('email', $validated['email'])->first();
+            if (!$user) {
+                return response()->json(['message' => 'Email không tồn tại.'], 422);
+            }
+
+            if ($user->hasVerifiedEmail()) {
+                return response()->json(['message' => 'Email đã được xác minh.'], 422);
+            }
+
+            $user->sendEmailVerificationNotification();
+            return response()->json(['message' => 'Email xác minh đã được gửi lại.'], 200);
+        } catch (\Exception $e) {
+            Log::error('Resend verification error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['message' => 'Đã có lỗi xảy ra. Vui lòng thử lại sau.'], 500);
+        }
+    }
+    public function login(LoginRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            Log::info('Login request', ['email' => $validated['email']]);
+
+            if (!Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
+                return response()->json(['message' => 'Thông tin đăng nhập không chính xác.'], 401);
+            }
+
+            //Comment bên dưới để ide hiểu rõ Auth ở đây là instance của user
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            if (!$user->hasVerifiedEmail()) {
+                return response()->json(['message' => 'Vui lòng xác minh email trước khi đăng nhập.'], 403);
+            }
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return response()->json([
+                'token' => $token,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Login error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['message' => 'Đã có lỗi xảy ra. Vui lòng thử lại sau.'], 500);
+        }
     }
 
     public function logout(Request $request)
@@ -100,29 +142,41 @@ class AuthController extends Controller
     }
     public function reset(ResetPasswordRequest $request)
     {
-        if (!URL::hasValidSignature($request)) {
-            return response()->json(['message' => 'Liên kết không hợp lệ.'], 403);
-        }
-        $validated = $request->validated();
+        try {
+            Log::info('Request all:', $request->all());
 
-        $status = Password::reset(
-            [
+            $validated = $request->validated();
+            Log::info('Password reset attempt', [
                 'email' => $validated['email'],
-                'password' => $validated['password'],
-                'password_confirmation' => $validated['password_confirmation'],
                 'token' => $validated['token'],
-            ],
-            function ($user, $password) {
-                $user->password = bcrypt($password);
-                $user->save();
-                $user->tokens()->delete(); // Xóa token Sanctum
+            ]);
+
+            $status = Password::reset(
+                [
+                    'email' => $validated['email'],
+                    'password' => $validated['password'],
+                    'token' => $validated['token'],
+                ],
+                function ($user, $password) {
+                    $user->forceFill([
+                        'password' => Hash::make($password),
+                    ])->save();
+                    $user->tokens()->delete(); // Xóa token Sanctum
+                }
+            );
+
+            if ($status === Password::PASSWORD_RESET) {
+                return response()->json(['message' => 'Mật khẩu đã được đặt lại thành công.'], 200);
             }
-        );
 
-        if ($status === Password::PASSWORD_RESET) {
-            return response()->json(['message' => 'Mật khẩu đã được đặt lại thành công.']);
+            Log::warning('Password reset failed', ['status' => $status]);
+            return response()->json(['message' => __($status)], 422);
+        } catch (\Exception $e) {
+            Log::error('Password reset error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['message' => 'Đã có lỗi xảy ra. Vui lòng thử lại sau.'], 500);
         }
-
-        return response()->json(['message' => __($status)], 400);
     }
 }

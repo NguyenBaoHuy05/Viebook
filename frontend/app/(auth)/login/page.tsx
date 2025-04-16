@@ -12,7 +12,6 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    remember: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -25,22 +24,28 @@ export default function LoginPage() {
 
     try {
       await axios.get("/sanctum/csrf-cookie");
-      const response = await axios.post("/api/login", {
-        email: formData.email,
-        password: formData.password,
-        remember: formData.remember,
-      });
-      toast.success("Đăng nhập thành công! Đang chuyển hướng...");
+      const response = await axios.post("/api/login", formData);
+      localStorage.setItem("auth_token", response.data.token);
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${response.data.token}`;
+      toast.success("Đăng nhập thành công!");
       setTimeout(() => {
-        router.push("/");
+        router.push("/home");
       }, 1500);
     } catch (error: any) {
       if (error.response?.status === 422) {
         setErrors(error.response.data.errors);
         toast.error("Vui lòng kiểm tra lại thông tin đăng nhập");
+      } else if (error.response?.status === 401) {
+        toast.error("Thông tin đăng nhập không chính xác!");
+      } else if (error.response?.status === 403) {
+        toast.error("Vui lòng xác minh email trước khi đăng nhập!");
+        setTimeout(() => {
+          router.push("/verify-email-resend");
+        }, 2000);
       } else {
-        console.error("Login failed:", error.response?.data || error.message);
-        toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau");
+        toast.error(error.response?.data?.message || "Đã có lỗi xảy ra!");
       }
     } finally {
       setLoading(false);
@@ -147,7 +152,8 @@ export default function LoginPage() {
                   id="remember-me"
                   name="remember"
                   type="checkbox"
-                  checked={formData.remember}
+                  // checked={formData.remember}
+                  checked={false}
                   onChange={handleChecked}
                   className="h-4 w-4 border-gray-300 rounded"
                 />
@@ -161,7 +167,7 @@ export default function LoginPage() {
 
               <div className="text-sm">
                 <Link
-                  href="/forget_password"
+                  href="/forget-password"
                   className="font-medium text-blue-600 hover:text-blue-500"
                 >
                   Quên mật khẩu?

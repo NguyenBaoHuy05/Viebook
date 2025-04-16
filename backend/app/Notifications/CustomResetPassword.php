@@ -26,10 +26,14 @@ class CustomResetPassword extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $frontendUrl = config('app.frontend_url') . '/reset-password?token=' . $this->token . '&email=' . urlencode($notifiable->email);
+        $url = config('app.frontend_url') . '/reset-password?token=' . $this->token . '&email=' . urlencode($notifiable->email);
 
-        return (new MailMessage)
-            ->subject('Đặt Lại Mật Khẩu')
-            ->view('emails.reset-password', ['url' => $frontendUrl, 'email' => $notifiable->email]);
+        $mail = (new MailMessage)
+            ->view('emails.reset-password', ['url' => $url, 'email' => $notifiable->email])
+            ->subject('Đặt Lại Mật Khẩu');
+
+        Log::info('Password reset email prepared for: ' . $notifiable->email, ['url' => $url]);
+
+        return $mail;
     }
 }

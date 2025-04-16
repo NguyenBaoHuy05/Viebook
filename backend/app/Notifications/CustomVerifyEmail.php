@@ -22,28 +22,20 @@ class CustomVerifyEmail extends Notification
     {
         Log::info('Preparing to send verification email to: ' . $notifiable->email);
 
-        $expiration = Carbon::now()->addMinutes(60);
-        $url = $this->verificationUrl($notifiable, $expiration);
+        $url = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $notifiable->getKey(), 'hash' => sha1($notifiable->getEmailForVerification())]
+        );
 
-        // Sử dụng view tùy chỉnh thay vì template mặc định
+        $frontendUrl = config('app.frontend_url') . '/verify-email?url=' . urlencode($url);
+
         $mail = (new MailMessage)
-            ->view('emails.verify', ['url' => $url, 'email' => $notifiable->email])
+            ->view('emails.verify', ['url' => $frontendUrl, 'email' => $notifiable->email])
             ->subject('Xác Minh Địa Chỉ Email');
 
         Log::info('Verification email prepared for: ' . $notifiable->email);
 
         return $mail;
-    }
-
-    protected function verificationUrl($notifiable, $expiration)
-    {
-        return URL::temporarySignedRoute(
-            'verification.verify',
-            $expiration,
-            [
-                'id' => $notifiable->getKey(),
-                'hash' => sha1($notifiable->getEmailForVerification()),
-            ]
-        );
     }
 }

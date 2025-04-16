@@ -48,8 +48,8 @@ export default function ResetPasswordPage() {
     try {
       await axios.get("/sanctum/csrf-cookie");
       const response = await axios.post("/api/reset", {
-        email,
         token,
+        email,
         password: formData.password,
         password_confirmation: formData.password_confirmation,
       });
@@ -164,7 +164,7 @@ export default function ResetPasswordPage() {
               </div>
               <div>
                 <input
-                  id="password"
+                  id="password_confirmation"
                   name="password_confirmation"
                   type="password"
                   disabled={loading}

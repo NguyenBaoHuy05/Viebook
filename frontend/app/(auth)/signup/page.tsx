@@ -13,7 +13,7 @@ export default function SignupPage() {
     name: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    password_confirmation: "",
   });
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
@@ -25,25 +25,16 @@ export default function SignupPage() {
 
     try {
       await axios.get("/sanctum/csrf-cookie");
-      const response = await axios.post("/api/register", {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        password_confirmation: formData.confirmPassword,
-      });
-      toast.success("Đăng ký thành công! Đang chuyển hướng...");
+      await axios.post("/api/register", formData);
+      toast.success("Đăng ký thành công! Vui lòng kiểm tra email để xác minh.");
       setTimeout(() => {
         router.push("/login");
       }, 1500);
     } catch (error: any) {
       if (error.response?.status === 422) {
         setErrors(error.response.data.errors);
-        toast.error("Vui lòng kiểm tra lại thông tin đăng ký");
+        toast.error("Vui lòng kiểm tra lại thông tin!");
       } else {
-        console.error(
-          "Registration failed:",
-          error.response?.data || error.message
-        );
         toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau");
       }
     } finally {
@@ -154,7 +145,7 @@ export default function SignupPage() {
               <div>
                 <input
                   id="confirmPassword"
-                  name="confirmPassword"
+                  name="password_confirmation"
                   type="password"
                   required
                   disabled={loading}
@@ -164,7 +155,7 @@ export default function SignupPage() {
                       : "border-gray-300"
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
                   placeholder="Xác nhận mật khẩu"
-                  value={formData.confirmPassword}
+                  value={formData.password_confirmation}
                   onChange={handleChange}
                 />
                 {errors.password_confirmation && (

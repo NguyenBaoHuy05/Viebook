@@ -11,58 +11,58 @@ use App\Http\Controllers\NotificationController;
 use Illuminate\Auth\Events\Verified;
 use App\Models\User;
 
-// Xóa middleware 'auth:sanctum'
-Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
-    $user = User::findOrFail($id);
+// // Xóa middleware 'auth:sanctum'
+// Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
+//     $user = User::findOrFail($id);
 
-    if (!$request->hasValidSignature()) {
-        return response()->json(['message' => 'Invalid or expired verification link'], 400);
-    }
+//     if (!$request->hasValidSignature()) {
+//         return response()->json(['message' => 'Invalid or expired verification link'], 400);
+//     }
 
-    if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-        return response()->json(['message' => 'Invalid verification link'], 400);
-    }
+//     if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+//         return response()->json(['message' => 'Invalid verification link'], 400);
+//     }
 
-    if ($user->hasVerifiedEmail()) {
-        return response()->json(['message' => 'Email already verified'], 400);
-    }
+//     if ($user->hasVerifiedEmail()) {
+//         return response()->json(['message' => 'Email already verified'], 400);
+//     }
 
-    if ($user->markEmailAsVerified()) {
-        event(new Verified($user));
-    }
+//     if ($user->markEmailAsVerified()) {
+//         event(new Verified($user));
+//     }
 
-    // Trả về thông điệp xác minh thành công
-    return response()->json(['message' => 'Verified email completed'], 200);
-})->name('verification.verify');
-Route::post('/email/resend', function (Request $request) {
-    $validated = $request->validate([
-        'email' => 'required|email|exists:users,email',
-    ]);
+//     // Trả về thông điệp xác minh thành công
+//     return response()->json(['message' => 'Verified email completed'], 200);
+// })->name('verification.verify');
+// Route::post('/email/resend', function (Request $request) {
+//     $validated = $request->validate([
+//         'email' => 'required|email|exists:users,email',
+//     ]);
 
-    $user = User::where('email', $validated['email'])->first();
+//     $user = User::where('email', $validated['email'])->first();
 
-    if ($user->hasVerifiedEmail()) {
-        return response()->json(['message' => 'Email already verified'], 400);
-    }
+//     if ($user->hasVerifiedEmail()) {
+//         return response()->json(['message' => 'Email already verified'], 400);
+//     }
 
-    $user->sendEmailVerificationNotification();
+//     $user->sendEmailVerificationNotification();
 
-    $timeEnd = 60; // Thời gian hết hạn của link (phù hợp với CustomVerifyEmail)
-    return response()->json(['message' => 'Verification email resent. The link expires in ' . $timeEnd . ' minutes.']);
-});
-Route::middleware('auth:sanctum')->get('/email/verified', function (Request $request) {
-    return response()->json([
-        'verified' => $request->user()->hasVerifiedEmail(),
-    ]);
-});
+//     $timeEnd = 60; // Thời gian hết hạn của link (phù hợp với CustomVerifyEmail)
+//     return response()->json(['message' => 'Verification email resent. The link expires in ' . $timeEnd . ' minutes.']);
+// });
+// Route::middleware('auth:sanctum')->get('/email/verified', function (Request $request) {
+//     return response()->json([
+//         'verified' => $request->user()->hasVerifiedEmail(),
+//     ]);
+// });
 
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::middleware('throttle:60,1')->group(function () {
-    Route::post('/forget', [AuthController::class, 'forget']);
-    Route::post('/reset', [AuthController::class, 'reset'])->name('password.reset');
-});
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forget', [AuthController::class, 'forget'])->middleware('throttle:5,60');
+Route::post('/reset', [AuthController::class, 'reset'])->name('password.reset');
+Route::post('/verify-email', [AuthController::class, 'verifyEmail'])->name('verification.verify');
+Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
 
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
