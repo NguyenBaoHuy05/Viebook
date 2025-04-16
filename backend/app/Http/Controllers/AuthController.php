@@ -143,7 +143,6 @@ class AuthController extends Controller
     public function reset(ResetPasswordRequest $request)
     {
         try {
-            Log::info('Request all:', $request->all());
 
             $validated = $request->validated();
             Log::info('Password reset attempt', [
