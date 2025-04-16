@@ -7,72 +7,43 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    remember: false,
-  });
+  const [email, setEmail] = useState("");
 
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
 
+  const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setEmail(value);
+    if (errors.email) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.email;
+        return newErrors;
+      });
+    }
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
     setLoading(true);
-
     try {
-      await axios.get("/sanctum/csrf-cookie");
-      const response = await axios.post("/api/login", {
-        email: formData.email,
-        password: formData.password,
-        remember: formData.remember,
-      });
-      toast.success("Đăng nhập thành công! Đang chuyển hướng...");
-      setTimeout(() => {
-        router.push("/");
-      }, 1500);
+      await axios.post("/api/forget", { email });
+      toast.success("Liên kết đặt lại mật khẩu đã được gửi đến email của bạn!");
+      setEmail("");
     } catch (error: any) {
       if (error.response?.status === 422) {
         setErrors(error.response.data.errors);
-        toast.error("Vui lòng kiểm tra lại thông tin đăng nhập");
+        toast.error("Vui lòng kiểm tra lại email!");
+      } else if (error.response?.status === 500) {
+        toast.error("Lỗi hệ thống. Vui lòng thử lại sau!");
       } else {
-        console.error("Login failed:", error.response?.data || error.message);
-        toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau");
+        toast.error(error.response?.data?.message || "Đã có lỗi xảy ra!");
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    if (errors[name]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
-  const handleChecked = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-    if (errors[name]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
     }
   };
 
@@ -86,19 +57,19 @@ export default function LoginPage() {
             lan tỏa yêu thương đến với mọi người!
           </h3>
         </div>
-        <div className="max-w-md shadow-[0_0_10px_10px_rgba(110,219,246,0.5)] w-full space-y-8 p-8 bg-gray-100 rounded-xl">
+        <div className=" max-w-md h-fit shadow-[0px_5px_20px_5px_rgba(0,123,255,0.2)] w-full space-y-8 p-8 bg-gray-100 rounded-xl">
           <div className="text-center">
             <FaFacebook size={50} className="mx-auto text-blue-600" />
             <h2 className="mt-6 text-3xl font-bold text-gray-900">
-              Đăng nhập vào Viebook
+              Quên mật khẩu
             </h2>
             <p className="mt-2 text-sm text-gray-600">
               Hoặc{" "}
               <Link
-                href="/signup"
+                href="/login"
                 className="font-medium text-blue-600 hover:text-blue-500"
               >
-                tạo tài khoản mới
+                đăng nhập lại
               </Link>
             </p>
           </div>
@@ -120,52 +91,9 @@ export default function LoginPage() {
                       sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed
                    `}
                   placeholder="Email"
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={email}
+                  onChange={handleEmail}
                 />
-              </div>
-              <div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  disabled={loading}
-                  required
-                  className={`rounded-lg relative block w-full px-3 py-3 border ${
-                    errors.password ? "border-red-500" : "border-gray-300"
-                  } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                  placeholder="Mật khẩu"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember"
-                  type="checkbox"
-                  checked={formData.remember}
-                  onChange={handleChecked}
-                  className="h-4 w-4 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-900"
-                >
-                  Ghi nhớ đăng nhập
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <Link
-                  href="/forget_password"
-                  className="font-medium text-blue-600 hover:text-blue-500"
-                >
-                  Quên mật khẩu?
-                </Link>
               </div>
             </div>
 
@@ -185,7 +113,7 @@ export default function LoginPage() {
                     <span>Đang xử lý...</span>
                   </div>
                 ) : (
-                  "Đăng nhập"
+                  "Gửi email xác thực"
                 )}
               </button>
             </div>

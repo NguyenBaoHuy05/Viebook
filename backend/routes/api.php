@@ -55,9 +55,15 @@ Route::middleware('auth:sanctum')->get('/email/verified', function (Request $req
         'verified' => $request->user()->hasVerifiedEmail(),
     ]);
 });
+
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/login', [AuthController::class, 'forget']);
+Route::middleware('throttle:60,1')->group(function () {
+    Route::post('/forget', [AuthController::class, 'forget']);
+    Route::post('/reset', [AuthController::class, 'reset'])->name('password.reset');
+});
+
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {

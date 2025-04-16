@@ -10,7 +10,10 @@ use App\Http\Requests\RegisterRequest;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ForgetRequest;
-
+use Illuminate\Support\Facades\Password;
+use App\Http\Requests\ResetPasswordRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 
 class AuthController extends Controller
 {
@@ -82,16 +85,44 @@ class AuthController extends Controller
     }
     public function forget(ForgetRequest $request)
     {
+        try {
+            $validated = $request->validated();
+            Log::info('Forget password request', ['email' => $validated['email']]);
+            $status = Password::sendResetLink(['email' => $validated['email']]);
+            if ($status === Password::RESET_LINK_SENT) {
+                return response()->json(['message' => 'Liên kết đặt lại mật khẩu đã được gửi đến email của bạn.']);
+            }
+            return response()->json(['message' => __($status)], 400);
+        } catch (\Exception $e) {
+            Log::error('Forget password error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['message' => 'Đã xảy ra lỗi, vui lòng thử lại sau.'], 500);
+        }
+    }
+    public function reset(ResetPasswordRequest $request)
+    {
+        if (!URL::hasValidSignature($request)) {
+            return response()->json(['message' => 'Liên kết không hợp lệ.'], 403);
+        }
         $validated = $request->validated();
 
-        $user = User::where('email', $validated['email'])->first();
+        $status = Password::reset(
+            [
+                'email' => $validated['email'],
+                'password' => $validated['password'],
+                'password_confirmation' => $validated['password_confirmation'],
+                'token' => $validated['token'],
+            ],
+            function ($user, $password) {
+                $user->password = bcrypt($password);
+                $user->save();
+                $user->tokens()->delete(); // Xóa token Sanctum
+            }
+        );
 
-        if (!$user) {
-            return response()->json(['message' => 'Email chưa đăng ký tài khoản.'], 401);
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json(['message' => 'Mật khẩu đã được đặt lại thành công.']);
         }
 
-        return response()->json(['user' => [
-            'email' => $user->email,
-        ]]);
+        return response()->json(['message' => __($status)], 400);
     }
 }
