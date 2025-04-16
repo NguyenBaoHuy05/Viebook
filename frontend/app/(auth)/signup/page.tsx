@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = "http://localhost:8000";
+axios.defaults.withXSRFToken = true;
 export default function SignupPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({

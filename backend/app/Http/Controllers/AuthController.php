@@ -47,7 +47,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $validated = $request->validated();
-
+        
         $user = User::where('email', $validated['email'])->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
@@ -62,11 +62,11 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Email not verified. Please verify your email to login.',
                 'email' => $user->email,
-            ], 403);
+            ], 403);    
         }
         $remember = $request->boolean('remember');
 
-        $token = $user->createToken('auth_token', expiresAt: $remember ? now()->addDays(30) : now()->addSeconds(10))->plainTextToken;
+        $token = $user->createToken('auth_token', expiresAt: $remember ? now()->addDays(30) : now()->addDays(30))->plainTextToken;
 
         return response()->json(['token' => $token, 'user' => [
             'id' => $user->id,

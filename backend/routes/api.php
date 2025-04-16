@@ -57,7 +57,7 @@ Route::middleware('auth:sanctum')->get('/email/verified', function (Request $req
 });
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/login', [AuthController::class, 'forget']);
+Route::post('/forget-password', [AuthController::class, 'forget']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
@@ -72,4 +72,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('notifications', [NotificationController::class, 'store']);
     Route::get('notifications', [NotificationController::class, 'index']);
     Route::put('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+});
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
 });

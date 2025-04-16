@@ -6,7 +6,9 @@ import axios from "@/lib/axiosConfig";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = "http://localhost:8000";
+axios.defaults.withXSRFToken = true;
 export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -30,14 +32,26 @@ export default function LoginPage() {
         password: formData.password,
         remember: formData.remember,
       });
+      localStorage.setItem("token", response.data.token);
       toast.success("Đăng nhập thành công! Đang chuyển hướng...");
       setTimeout(() => {
-        router.push("/");
+        router.push("/home");
       }, 1500);
     } catch (error: any) {
       if (error.response?.status === 422) {
         setErrors(error.response.data.errors);
         toast.error("Vui lòng kiểm tra lại thông tin đăng nhập");
+      } else if (error.response?.status === 401) {
+        setErrors({
+          email: [error.response.data.message],
+          password: [error.response.data.message],
+        });
+        toast.error(error.response.data.message);
+      } else if (error.response?.status === 403) {
+        setErrors({
+          email: [error.response.data.message],
+        });
+        toast.error(error.response.data.message);
       } else {
         console.error("Login failed:", error.response?.data || error.message);
         toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau");
@@ -48,10 +62,10 @@ export default function LoginPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
     if (errors[name]) {
       setErrors((prev) => {
@@ -101,6 +115,9 @@ export default function LoginPage() {
                 value={formData.email}
                 onChange={handleChange}
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email[0]}</p>
+              )}
             </div>
             <div>
               <input
@@ -116,6 +133,11 @@ export default function LoginPage() {
                 value={formData.password}
                 onChange={handleChange}
               />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.password[0]}
+                </p>
+              )}
             </div>
           </div>
 
@@ -123,7 +145,7 @@ export default function LoginPage() {
             <div className="flex items-center">
               <input
                 id="remember-me"
-                name="remember-me"
+                name="remember"
                 type="checkbox"
                 checked={formData.remember}
                 onChange={handleChange}
