@@ -28,6 +28,7 @@ export default function LoginPage() {
       const response = await axios.post("/api/login", formData);
       // Lưu token vào cookie
       const { token } = response.data;
+      localStorage.setItem("token", token);
       const maxAge = formData.remember ? 30 * 24 * 60 * 60 : 60 * 60; // 30 ngày hoặc 1 giờ
       const isProduction = process.env.NODE_ENV === "production";
       document.cookie = `auth_token=${token}; path=/; max-age=${maxAge}; SameSite=Strict${

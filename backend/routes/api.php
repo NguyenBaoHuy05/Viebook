@@ -63,7 +63,15 @@ Route::post('/forget', [AuthController::class, 'forget'])->middleware('throttle:
 Route::post('/reset', [AuthController::class, 'reset'])->name('password.reset');
 Route::post('/verify-email', [AuthController::class, 'verifyEmail'])->name('verification.verify');
 Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
-
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return response()->json([
+        'user' => [
+            'id' => $request->user()->id,
+            'name' => $request->user()->name,   
+            'email' => $request->user()->email,
+        ]
+    ]);
+});
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
