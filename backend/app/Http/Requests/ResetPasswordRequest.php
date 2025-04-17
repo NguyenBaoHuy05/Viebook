@@ -29,8 +29,8 @@ class ResetPasswordRequest extends FormRequest
                 'email',
                 'not_regex:/@example\.com$/i', // Không cho phép email từ @example.com
             ],
-            'password' => ['required', 'confirmed', 'min:8'],
             'token' => ['required'],
+            'password' => ['required', 'confirmed', 'min:8'],
         ];
     }
     public function messages()

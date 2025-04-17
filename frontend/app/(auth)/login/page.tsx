@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    remember: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -25,10 +26,14 @@ export default function LoginPage() {
     try {
       await axios.get("/sanctum/csrf-cookie");
       const response = await axios.post("/api/login", formData);
-      localStorage.setItem("auth_token", response.data.token);
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${response.data.token}`;
+      // Lưu token vào cookie
+      const { token } = response.data;
+      const maxAge = formData.remember ? 30 * 24 * 60 * 60 : 60 * 60; // 30 ngày hoặc 1 giờ
+      const isProduction = process.env.NODE_ENV === "production";
+      document.cookie = `auth_token=${token}; path=/; max-age=${maxAge}; SameSite=Strict${
+        isProduction ? "; Secure" : ""
+      }`;
+
       toast.success("Đăng nhập thành công!");
       setTimeout(() => {
         router.push("/home");
@@ -152,8 +157,7 @@ export default function LoginPage() {
                   id="remember-me"
                   name="remember"
                   type="checkbox"
-                  // checked={formData.remember}
-                  checked={false}
+                  checked={formData.remember}
                   onChange={handleChecked}
                   className="h-4 w-4 border-gray-300 rounded"
                 />

@@ -12,33 +12,11 @@ export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
-
-  const [formData, setFormData] = useState({
-    password: "",
-    password_confirmation: "",
-  });
+  const [password, setPassword] = useState("");
+  const [password_confirmation, setPasswordConfirmation] = useState("");
 
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
-  const [isTokenValid, setIsTokenValid] = useState(0);
-
-  useEffect(() => {
-    if (token && email) {
-      axios
-        .get(`/api/reset?token=${token}&email=${email}`)
-        .then((response) => {
-          setIsTokenValid(1);
-          toast.success(response.data.message);
-        })
-        .catch((error) => {
-          setIsTokenValid(2);
-          setErrors(error.response?.data?.errors || {});
-          toast.error(
-            error.response?.data?.message || "Liên kết không hợp lệ!"
-          );
-        });
-    }
-  }, [token, email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,12 +24,13 @@ export default function ResetPasswordPage() {
     setLoading(true);
 
     try {
+      console.log({ email, token, password, password_confirmation });
       await axios.get("/sanctum/csrf-cookie");
       const response = await axios.post("/api/reset", {
         token,
         email,
-        password: formData.password,
-        password_confirmation: formData.password_confirmation,
+        password,
+        password_confirmation,
       });
       toast.success("Đổi mật khẩu thành công! Đang chuyển hướng...");
       setTimeout(() => {
@@ -71,49 +50,11 @@ export default function ResetPasswordPage() {
       setLoading(false);
     }
   };
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    if (errors[name]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
 
   if (!token || !email) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <p className="text-red-500">Liên kết không hợp lệ. Vui lòng thử lại.</p>
-      </div>
-    );
-  }
-
-  if (isTokenValid === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <Loader2 className="animate-spin h-8 w-8 text-blue-600" />
-      </div>
-    );
-  }
-
-  if (isTokenValid === 1) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-red-500">
-          Liên kết không hợp lệ hoặc đã hết hạn.{" "}
-          <Link
-            href="/forgot-password"
-            className="text-blue-600 hover:underline"
-          >
-            Thử lại
-          </Link>
-        </p>
       </div>
     );
   }
@@ -154,12 +95,10 @@ export default function ResetPasswordPage() {
                   type="password"
                   disabled={loading}
                   required
-                  className={`rounded-lg relative block w-full px-3 py-3 border ${
-                    errors.password ? "border-red-500" : "border-gray-300"
-                  } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                  className={`rounded-lg relative block w-full px-3 py-3 border  placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
                   placeholder="Mật khẩu mới"
-                  value={formData.password}
-                  onChange={handleChange}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <div>
@@ -170,11 +109,13 @@ export default function ResetPasswordPage() {
                   disabled={loading}
                   required
                   className={`rounded-lg relative block w-full px-3 py-3 border ${
-                    errors.password ? "border-red-500" : "border-gray-300"
+                    errors.password_confirmation
+                      ? "border-red-500"
+                      : "border-gray-300"
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
                   placeholder="Nhập lại mật khẩu"
-                  value={formData.password_confirmation}
-                  onChange={handleChange}
+                  value={password_confirmation}
+                  onChange={(e) => setPasswordConfirmation(e.target.value)}
                 />
               </div>
             </div>
@@ -184,7 +125,14 @@ export default function ResetPasswordPage() {
                 type="submit"
                 className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
               >
-                Cập nhật mật khẩu
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Đang xử lý...</span>
+                  </div>
+                ) : (
+                  "Cập nhập mật khẩu"
+                )}
               </button>
             </div>
           </form>

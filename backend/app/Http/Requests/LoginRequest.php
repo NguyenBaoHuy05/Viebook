@@ -34,6 +34,7 @@ class LoginRequest extends FormRequest
                 'min:8',
                 'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', // Phải có ít nhất 1 chữ in hoa và 1 số
             ],
+            'remember' => ['nullable', 'boolean'],
         ];
     }
 

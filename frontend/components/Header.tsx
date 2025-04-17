@@ -5,6 +5,7 @@ import { CgProfile } from "react-icons/cg";
 import { IoMdNotifications } from "react-icons/io";
 import { Input } from "@/components/ui/input";
 import { FaFacebook } from "react-icons/fa";
+import Logout from "./Button/Logout";
 function Header() {
   return (
     <>
@@ -40,6 +41,7 @@ function Header() {
               size={40}
               className="absolute right-0 cursor-pointer transition-transform hover:scale-130"
             />
+            <Logout />
           </div>
         </div>
       </div>

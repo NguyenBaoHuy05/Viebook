@@ -17,6 +17,7 @@ use App\Http\Requests\VerifyEmailRequest;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ResendVerificationRequest;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -105,7 +106,12 @@ class AuthController extends Controller
                 return response()->json(['message' => 'Vui lòng xác minh email trước khi đăng nhập.'], 403);
             }
 
-            $token = $user->createToken('auth_token')->plainTextToken;
+            $remember = $request->boolean('remember', false);
+            $user->tokens()->delete();
+
+            // Tạo token mới với thời gian hết hạn tùy thuộc vào remember
+            $tokenExpiration = $remember ? now()->addDays(30) : now()->addHour();
+            $token = $user->createToken('auth_token', ['*'], $tokenExpiration)->plainTextToken;
             return response()->json([
                 'token' => $token,
                 'user' => [
@@ -122,8 +128,25 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logged out']);
+        try {
+            // Kiểm tra user qua guard sanctum
+            $user = Auth::guard('sanctum')->user();
+            if (!$user) {
+                Log::warning('Logout attempt without authenticated user', [
+                    'token' => $request->bearerToken(),
+                ]);
+                return response()->json(['message' => 'Chưa đăng nhập hoặc token không hợp lệ.'], 401);
+            }
+            /** @var \App\Models\User $user */
+            $user->tokens()->delete();
+            return response()->json(['message' => 'Đăng xuất thành công'], 200);
+        } catch (\Exception $e) {
+            Log::error('Logout error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['message' => 'Đã có lỗi xảy ra. Vui lòng thử lại'], 500);
+        }
     }
     public function forget(ForgetRequest $request)
     {
@@ -149,6 +172,14 @@ class AuthController extends Controller
                 'email' => $validated['email'],
                 'token' => $validated['token'],
             ]);
+            $tokenData = DB::table('password_reset_tokens')
+                ->where('email', $validated['email'])
+                ->first();
+
+            if (!$tokenData) {
+                Log::warning('No token found for email', ['email' => $validated['email']]);
+                return response()->json(['message' => 'Token không hợp lệ hoặc đã hết hạn.'], 422);
+            }
 
             $status = Password::reset(
                 [
