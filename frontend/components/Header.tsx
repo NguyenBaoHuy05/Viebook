@@ -10,7 +10,7 @@ function Header() {
   return (
     <>
       <div>
-        <div className="grid grid-cols-5 py-3 px-5 border-2 bg-white fixed w-screen right-0 top-0">
+        <div className="grid grid-cols-5 py-3 px-5 border-2 bg-white fixed w-screen right-0 top-0 z-50">
           <div className="col-span-1 mt-auto ml-1 flex gap-5 items-center">
             <FaFacebook
               size={50}

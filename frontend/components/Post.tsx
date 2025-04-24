@@ -5,6 +5,7 @@ import { FaCommentAlt } from "react-icons/fa";
 import { FaShare } from "react-icons/fa";
 import iPost from "@/app/interfaces/post";
 import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 function Post({ post }: { post: iPost }) {
   const [isLiked, setIsLiked] = useState(false);
@@ -16,16 +17,13 @@ function Post({ post }: { post: iPost }) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 p-4 mb-4">
+    <div className="bg-gray-50 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-200 p-4 mb-4">
       <div className="flex items-center gap-3 mb-4">
-        <Image
-          src={post.logo}
-          width={35}
-          height={35}
-          sizes="35"
-          alt="avatar"
-          className="rounded-full object-cover w-10 h-10"
-        />
+        <Avatar>
+          <AvatarImage src={post.logo} alt="avt" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+
         <div className="flex flex-col">
           <span className="font-semibold text-gray-900 text-lg">
             {post.name}
