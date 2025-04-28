@@ -2,38 +2,57 @@
 
 import { useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import axios from "@/lib/axiosConfig";
 import { Loader2 } from "lucide-react";
-axios.defaults.baseURL = "http://localhost:8000";
+import { useUser } from "@/context/UserContext";
+
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+  const { userId, setUserId } = useUser();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const localUserId = localStorage.getItem("userId");
+
     if (!token) {
       router.push("/login");
       return;
     }
 
-    axios
-      .get("/api/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(() => setLoading(false))
-      .catch(() => {
+    // Nếu localStorage đã có userId → dùng luôn
+    if (localUserId) {
+      setUserId(localUserId);
+      console.log("User ID từ localStorage:", userId);
+      setLoading(false);
+      return;
+    }
+
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("/api/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUserId(res.data.id);
+        localStorage.setItem("userId", res.data.id);
+      } catch (error) {
         localStorage.removeItem("token");
         router.push("/login");
-      });
-  }, [router]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (loading) {
+    fetchUser();
+  }, [router, setUserId]);
+
+  if (loading || !userId) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white">
         <div className="flex items-center gap-2">
@@ -45,4 +64,4 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   return <>{children}</>;
-}
+};

@@ -6,6 +6,7 @@ import axios from "@/lib/axiosConfig";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,6 +28,8 @@ export default function LoginPage() {
       await axios.get("/sanctum/csrf-cookie");
       const response = await axios.post("/api/login", formData);
       // Lưu token vào cookie
+      const { id } = response.data.user;
+      localStorage.setItem("userId", id);
       const { token } = response.data;
       localStorage.setItem("token", token);
       const maxAge = formData.remember ? 30 * 24 * 60 * 60 : 60 * 60; // 30 ngày hoặc 1 giờ

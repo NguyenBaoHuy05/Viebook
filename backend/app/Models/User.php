@@ -28,6 +28,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
     public function sendEmailVerificationNotification()
     {
         $this->notify(new CustomVerifyEmail());
@@ -35,5 +39,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomResetPassword($token));
+    }
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class, 'conversation_user');
+    }
+    public function postsReact()
+    {
+        return $this->hasMany(PostReact::class);
+    }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }
