@@ -27,33 +27,23 @@ export default function Chat() {
   }, [messages]);
 
   useEffect(() => {
-    console.log("User ID:", userId);
-
-    // Tạo kênh và lắng nghe sự kiện
     const channel = echo.channel(`chat.${conversationId}`);
-    // Kiểm tra kết nối thành công
-    channel.on("pusher:subscription_succeeded", () => {
-      console.log("Subscription successful"); // Đảm bảo rằng đăng ký kênh thành công
-    });
+    /* Code comment để test kết nối */
 
-    // Kiểm tra lỗi khi đăng ký kênh
-    channel.on("pusher:subscription_error", (err: any) => {
-      console.log("Subscription error:", err); // Kiểm tra lỗi khi đăng ký kênh
-    });
-
-    // Kiểm tra lỗi WebSocket
-    channel.error((err: any) => {
-      console.log("WebSocket error:", err); // Kiểm tra lỗi WebSocket
-    });
-    // Lắng nghe sự kiện "message.sent"
+    // channel
+    //   .subscribed(() => {
+    //     console.log("Đã kết nối đến kênh:", conversationId);
+    //   })
+    //   .error((err: any) => {
+    //     console.error("Lỗi kết nối đến kênh:", err);
+    //   });
     channel.listen(".message.sent", (e: any) => {
-      console.log("Message received:", e); // Kiểm tra xem có nhận được tin nhắn không
       setMessages((prev) => [
         ...prev,
         {
           id: e.message.id,
           user_id:
-            e.message.sender_id === userId
+            e.message.user_id == userId
               ? "Tôi"
               : `User ${e.message.sender_name}`,
           content: e.message.content,
@@ -61,18 +51,23 @@ export default function Chat() {
       ]);
     });
 
-    // Cleanup khi component unmount
     return () => {
       channel.stopListening(".message.sent");
     };
-  }, [conversationId, userId]); // Phụ thuộc vào conversationId và userId để cập nhật khi chúng thay đổi
+  }, [conversationId, userId]);
 
   useEffect(() => {
     axios
       .get(`/api/${conversationId}/messages`)
       .then((res) => {
         console.log("Tin nhắn:", res.data);
-        setMessages(res.data);
+        setMessages(
+          res.data.map((msg: any) => ({
+            id: msg.id,
+            user_id: msg.user_id == userId ? "Tôi" : `User ${msg.user_id}`,
+            content: msg.content,
+          }))
+        );
       })
       .catch((err) => {
         console.error("Lỗi lấy tin nhắn:", err);
@@ -85,7 +80,7 @@ export default function Chat() {
 
     const fakeMessage: Message = {
       id: Date.now(),
-      user_id: String(userId) || "Unknown",
+      user_id: "Tôi",
       content: input,
     };
 
@@ -98,15 +93,13 @@ export default function Chat() {
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // <-- phải có cái này!
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
     } catch (err: any) {
       console.error("Lỗi gửi tin nhắn:", err.message);
     }
-
-    setMessages((prev) => [...prev, fakeMessage]);
     setInput("");
   };
 
@@ -137,7 +130,7 @@ export default function Chat() {
               <div
                 key={msg.id}
                 className={`p-2 rounded-md fit-content ${
-                  msg.user_id === "Bạn"
+                  msg.user_id === "Tôi"
                     ? "bg-blue-300 text-right self-end"
                     : "bg-gray-300 text-left self-start"
                 }`}
