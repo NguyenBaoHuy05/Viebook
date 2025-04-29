@@ -34,12 +34,11 @@ export default function Logout() {
   };
 
   return (
-    <button
+    <div
       onClick={handleLogout}
-      disabled={loading}
-      className="text-black hover:text-blue-200 disabled:opacity-50"
+      className="border-hidden text-black hover:text-blue-200 disabled:opacity-50"
     >
       {loading ? "Đang xử lý..." : "Đăng xuất"}
-    </button>
+    </div>
   );
 }
