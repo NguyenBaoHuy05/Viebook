@@ -15,6 +15,7 @@ export default function Logout() {
       await axios.get("/sanctum/csrf-cookie");
       await axios.post("/api/logout");
       document.cookie = "auth_token=; path=/; max-age=0; SameSite=Strict";
+      localStorage.removeItem("userId");
       localStorage.removeItem("auth_token");
       toast.success("Đăng xuất thành công!");
       setTimeout(() => {

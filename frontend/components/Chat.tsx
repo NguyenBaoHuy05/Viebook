@@ -42,9 +42,10 @@ export default function Chat() {
       ]);
     });
     channel.listen(".message.DelOrStore", (e: any) => {
+      console.log("Tin nhắn mới:", e.message);
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.id === e.message.id
+          msg.id == e.message.id
             ? { ...msg, is_deleted: e.message.is_deleted }
             : msg
         )
