@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/{userId}/send', [MessageController::class, 'sendMessage']);
     Route::get('/{conversationId}/messages', [MessageController::class, 'getMessages']);
+    Route::delete('/messages/{id}/{check}', [MessageController::class, 'destroy']);
 });
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('users/{user}/follow', [FollowController::class, 'follow']);

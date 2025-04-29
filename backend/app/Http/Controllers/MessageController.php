@@ -7,6 +7,7 @@ use App\Events\MessageSent;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Events\MessageDeletedOrRestored;
 
 class MessageController extends Controller
 {
@@ -34,8 +35,22 @@ class MessageController extends Controller
     {
         $messages = Message::where('conversation_id', $request->conversationId)
             ->orderBy('created_at', 'asc')
-            ->get(['id', 'user_id', 'content']);
+            ->get(['id', 'user_id', 'content', 'is_deleted']);
 
         return response()->json($messages);
+    }
+    public function destroy($id, $check)
+    {
+        $message = Message::find($id);
+        if (!$message) {
+            Log::error("Tin nhắn không tồn tại!");
+            return response()->json(['error' => 'Tin nhắn không tồn tại!'], 404);
+        }
+        $message->update([
+            'is_deleted' => $check
+        ]);
+        Log::info($message);
+        broadcast(new MessageDeletedOrRestored($message))->toOthers();
+        return response()->json(['success' => 'Message updated successfully.']);
     }
 }

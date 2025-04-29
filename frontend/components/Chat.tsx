@@ -10,6 +10,8 @@ interface Message {
   id: number;
   user_id: string;
   content: string;
+  is_read?: boolean;
+  is_deleted?: boolean;
 }
 
 export default function Chat() {
@@ -28,31 +30,29 @@ export default function Chat() {
 
   useEffect(() => {
     const channel = echo.channel(`chat.${conversationId}`);
-    /* Code comment để test kết nối */
-
-    // channel
-    //   .subscribed(() => {
-    //     console.log("Đã kết nối đến kênh:", conversationId);
-    //   })
-    //   .error((err: any) => {
-    //     console.error("Lỗi kết nối đến kênh:", err);
-    //   });
     channel.listen(".message.sent", (e: any) => {
       setMessages((prev) => [
         ...prev,
         {
           id: e.message.id,
           user_id:
-            e.message.user_id == userId
-              ? "Tôi"
-              : `User ${e.message.sender_name}`,
+            e.message.user_id == userId ? "Tôi" : `User ${e.message.user_id}`,
           content: e.message.content,
         },
       ]);
     });
-
+    channel.listen(".message.DelOrStore", (e: any) => {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === e.message.id
+            ? { ...msg, is_deleted: e.message.is_deleted }
+            : msg
+        )
+      );
+    });
     return () => {
       channel.stopListening(".message.sent");
+      channel.stopListening(".message.DelOrStore");
     };
   }, [conversationId, userId]);
 
@@ -60,12 +60,12 @@ export default function Chat() {
     axios
       .get(`/api/${conversationId}/messages`)
       .then((res) => {
-        console.log("Tin nhắn:", res.data);
         setMessages(
           res.data.map((msg: any) => ({
             id: msg.id,
             user_id: msg.user_id == userId ? "Tôi" : `User ${msg.user_id}`,
             content: msg.content,
+            is_deleted: msg.is_deleted,
           }))
         );
       })
@@ -77,12 +77,6 @@ export default function Chat() {
 
   const handleSend = async () => {
     if (!input.trim()) return;
-
-    const fakeMessage: Message = {
-      id: Date.now(),
-      user_id: "Tôi",
-      content: input,
-    };
 
     try {
       await axios.post(
@@ -103,9 +97,25 @@ export default function Chat() {
     setInput("");
   };
 
+  const handleDelete = async (id: number, check: boolean) => {
+    const confirmDelete = confirm(
+      `Bạn có chắc chắn muốn ${check ? "xóa" : "khôi phục"} tin nhắn này?`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`/api/messages/${id}/${check ? 1 : 0}`);
+      setMessages((prev) =>
+        prev.map((msg) => (msg.id === id ? { ...msg, is_deleted: check } : msg))
+      );
+    } catch (error) {
+      console.error("Lỗi:", error);
+      alert("Lỗi khi xóa hoặc khôi phục tin nhắn");
+    }
+  };
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      {/* Nút mở chat */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
@@ -115,34 +125,55 @@ export default function Chat() {
         </button>
       )}
 
-      {/* Hộp chat */}
       {isOpen && (
         <div className="bg-white w-80 h-96 rounded-xl shadow-2xl flex flex-col">
-          {/* Header */}
           <div className="bg-blue-600 text-white px-4 py-2 rounded-t-xl flex justify-between items-center">
             <span>Chat</span>
             <button onClick={() => setIsOpen(false)}>✕</button>
           </div>
 
-          {/* Nội dung chat */}
           <div className="flex-1 flex flex-col overflow-y-auto px-4 py-2 space-y-2">
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`p-2 rounded-md fit-content ${
+                className={`p-2 rounded-md max-w-[80%] ${
                   msg.user_id === "Tôi"
                     ? "bg-blue-300 text-right self-end"
                     : "bg-gray-300 text-left self-start"
                 }`}
               >
                 <p className="text-sm font-medium">{msg.user_id}</p>
-                <p className="text-sm">{msg.content}</p>
+                {msg.is_deleted ? (
+                  <p className="text-sm italic text-gray-500">
+                    Tin nhắn đã xóa
+                  </p>
+                ) : (
+                  <p className="text-sm mt-1">{msg.content}</p>
+                )}
+
+                {msg.user_id === "Tôi" && (
+                  <div className="flex gap-2 text-xs mt-1 justify-end">
+                    <button
+                      className="text-red-600 hover:underline"
+                      onClick={() => handleDelete(msg.id, true)}
+                    >
+                      Xóa
+                    </button>
+                    {msg.is_deleted && (
+                      <button
+                        className="text-blue-600 hover:underline"
+                        onClick={() => handleDelete(msg.id, false)}
+                      >
+                        Khôi phục
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input chat */}
           <div className="border-t p-2 flex items-center gap-2">
             <input
               type="text"
