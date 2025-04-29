@@ -19,7 +19,7 @@ export default function ProtectedLayout({
     <div className="antialiased px-15">
       <UserProvider>
         <ProtectedRoute>
-          {/* <Header /> */}
+          <Header />
           {children}
           <Chat />
         </ProtectedRoute>
