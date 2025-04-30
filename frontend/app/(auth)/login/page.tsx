@@ -25,19 +25,9 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await axios.get("/sanctum/csrf-cookie");
+      await axios.get("/sanctum/csrf-cookie"); // nếu dùng Sanctum
       const response = await axios.post("/api/login", formData);
-      // Lưu token vào cookie
-      const { id } = response.data.user;
-      localStorage.setItem("userId", id);
-      const { token } = response.data;
-      localStorage.setItem("token", token);
-      const maxAge = formData.remember ? 30 * 24 * 60 * 60 : 60 * 60; // 30 ngày hoặc 1 giờ
-      const isProduction = process.env.NODE_ENV === "production";
-      document.cookie = `auth_token=${token}; path=/; max-age=${maxAge}; SameSite=Strict${
-        isProduction ? "; Secure" : ""
-      }`;
-
+      console.log(response.data);
       toast.success("Đăng nhập thành công!");
       setTimeout(() => {
         router.push("/home");

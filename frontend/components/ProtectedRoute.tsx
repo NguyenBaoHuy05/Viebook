@@ -16,33 +16,15 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const localUserId = localStorage.getItem("userId");
-
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-
-    // Nếu localStorage đã có userId → dùng luôn
-    if (localUserId) {
-      setUserId(localUserId);
-      console.log("User ID từ localStorage:", userId);
+    if (userId) {
       setLoading(false);
       return;
     }
-
     const fetchUser = async () => {
       try {
-        const res = await axios.get("/api/user", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get("/api/user");
         setUserId(res.data.id);
-        localStorage.setItem("userId", res.data.id);
       } catch (error) {
-        localStorage.removeItem("token");
         router.push("/login");
       } finally {
         setLoading(false);
@@ -52,7 +34,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     fetchUser();
   }, [router, setUserId]);
 
-  if (loading || !userId) {
+  if (loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white">
         <div className="flex items-center gap-2">

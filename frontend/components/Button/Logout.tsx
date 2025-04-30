@@ -1,29 +1,27 @@
 "use client";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "@/lib/axiosConfig";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useUser } from "@/context/UserContext";
 
 export default function Logout() {
+  const { setUserId } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
     setLoading(true);
     try {
-      await axios.get("/sanctum/csrf-cookie");
+      toast.loading("Đang đăng xuất");
       await axios.post("/api/logout");
-      document.cookie = "auth_token=; path=/; max-age=0; SameSite=Strict";
-      localStorage.removeItem("userId");
-      localStorage.removeItem("auth_token");
-      toast.success("Đăng xuất thành công!");
+      toast.dismiss();
+      setUserId(null);
       setTimeout(() => {
         router.push("/login");
       }, 1500);
+      toast.success("Đăng xuất thành công!");
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Đã có lỗi xảy ra khi đăng xuất.";
       console.error("Logout error:", error.response?.data);
       toast.error(
         error.response?.data?.message || "Đã có lỗi xảy ra khi đăng xuất."
@@ -36,9 +34,9 @@ export default function Logout() {
   return (
     <div
       onClick={handleLogout}
-      className="border-hidden text-black hover:text-blue-200 disabled:opacity-50"
+      className="cursor-pointer text-black hover:text-blue-200 disabled:opacity-50"
     >
-      {loading ? "Đang xử lý..." : "Đăng xuất"}
+      Đăng xuất
     </div>
   );
 }

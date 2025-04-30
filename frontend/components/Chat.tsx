@@ -80,18 +80,10 @@ export default function Chat() {
     if (!input.trim()) return;
 
     try {
-      await axios.post(
-        `/api/${userId}/send`,
-        {
-          conversation_id: conversationId,
-          content: input,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      await axios.post(`/api/${userId}/send`, {
+        conversation_id: conversationId,
+        content: input,
+      });
     } catch (err: any) {
       console.error("Lỗi gửi tin nhắn:", err.message);
     }

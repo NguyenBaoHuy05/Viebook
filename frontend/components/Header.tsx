@@ -8,6 +8,7 @@ import Logout from "./Button/Logout";
 import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
+import Link from "next/link";
 import {
   Popover,
   PopoverContent,
@@ -98,22 +99,30 @@ function Header() {
             )}
           </div>
           <div className="col-span-5 flex justify-center items-center gap-12">
-            <IoMdHome
-              size={32}
-              className="cursor-pointer transition-transform hover:scale-130"
-            />
-            <IoPeople
-              size={32}
-              className="cursor-pointer transition-transform hover:scale-130"
-            />
-            <CgProfile
-              size={32}
-              className="cursor-pointer transition-transform hover:scale-130"
-            />
-            <IoMdNotifications
-              size={32}
-              className="cursor-pointer transition-transform hover:scale-130"
-            />
+            <Link href="/home">
+              <IoMdHome
+                size={32}
+                className="cursor-pointer transition-transform hover:scale-130"
+              />
+            </Link>
+            <Link href="/people">
+              <IoPeople
+                size={32}
+                className="cursor-pointer transition-transform hover:scale-130"
+              />
+            </Link>
+            <Link href="/account">
+              <CgProfile
+                size={32}
+                className="cursor-pointer transition-transform hover:scale-130"
+              />
+            </Link>
+            <Link href="/notifications">
+              <IoMdNotifications
+                size={32}
+                className="cursor-pointer transition-transform hover:scale-130"
+              />
+            </Link>
           </div>
 
           <div className="col-span-1 relative flex justify-end items-center gap-4">
@@ -137,10 +146,7 @@ function Header() {
         </div>
       </div>
       {isOpen && (
-        <Command
-          onClick={() => setIsOpen(!isOpen)}
-          className="z-4 absolute h-fit top-4.5 ml-5 w-1/6 rounded-lg border shadow-md"
-        >
+        <Command className="focus z-4 absolute h-fit top-4.5 ml-5 w-1/6 rounded-lg border shadow-md">
           <CommandInput placeholder="Search..." />
           <CommandList></CommandList>
         </Command>
