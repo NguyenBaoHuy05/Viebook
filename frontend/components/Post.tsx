@@ -6,7 +6,6 @@ import { FaShare } from "react-icons/fa";
 import iPost from "@/app/interfaces/post";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 function Post({ post }: { post: iPost }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.reactCount);

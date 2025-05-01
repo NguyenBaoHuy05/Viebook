@@ -21,18 +21,19 @@ function Page() {
       setLoading(true);
       try {
         const res = await axios.get(`/api/posts?page=${currentPage}`);
+        console.log(res);
         const fetchedPosts: iPost[] = res.data.data.map((post: any) => ({
           id: post.id,
           name: post.user.name,
           logo: "/avt.jpg",
           title: post.title,
-          content: "/avt.jpg",
+          content: post.content,
           commentCount: post.comment_count,
           reactCount: post.react_count,
           shareCount: post.share_count,
           date: new Date(post.created_at).toLocaleDateString(),
         }));
-
+        console.log(fetchedPosts);
         setPosts((prevPosts) => {
           const newPosts = fetchedPosts.filter(
             (newPost) =>
