@@ -31,11 +31,4 @@ class MessageDeletedOrRestored implements ShouldBroadcast
     {
         return 'message.DelOrStore';
     }
-    public function broadcastWith()
-    {
-        return [
-            'id' => $this->message->id,
-            'is_deleted' => $this->message->is_deleted,
-        ];
-    }
 }

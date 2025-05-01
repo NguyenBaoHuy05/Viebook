@@ -10,23 +10,29 @@ declare global {
 
 window.Pusher = Pusher;
 
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+  return null;
+};
+
 const echo = new Echo({
   broadcaster: "reverb",
-  key: process.env.NEXT_PUBLIC_REVERB_APP_KEY,
-  wsHost: process.env.NEXT_PUBLIC_REVERB_HOST || window.location.hostname,
-  wsPort: process.env.NEXT_PUBLIC_REVERB_PORT || 6001,
-  wssPort: process.env.NEXT_PUBLIC_REVERB_PORT || 6001,
-  forceTLS: false,
-  encrypted: true,
-  disableStats: true,
-  enabledTransports: ["ws", "wss"],
-  authEndpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}/broadcasting/auth`,
+  key: process.env.NEXT_PUBLIC_REVERB_APP_KEY || "pbjtbqkgods0xbxtp81y",
+  wsHost: process.env.NEXT_PUBLIC_REVERB_HOST || "localhost",
+  wsPort: parseInt(process.env.NEXT_PUBLIC_REVERB_PORT || "8080"),
+  wssPort: parseInt(process.env.NEXT_PUBLIC_REVERB_PORT || "8080"),
+  forceTLS: (process.env.NEXT_PUBLIC_REVERB_SCHEME || "http") === "https",
+  enabledTransports: ["ws"],
+  authEndpoint: "/broadcasting/auth",
   auth: {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`, //
       Accept: "application/json",
+      "X-XSRF-TOKEN": getCookie("XSRF-TOKEN") || "",
     },
   },
+  withCredentials: true,
 });
 
 export default echo;

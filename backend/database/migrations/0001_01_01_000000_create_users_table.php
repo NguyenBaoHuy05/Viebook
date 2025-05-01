@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->text('bio')->nullable();
             $table->string('location')->nullable();
             $table->integer('count_follow')->default(0);
+
             $table->rememberToken();
             $table->timestamps();
         });

@@ -18,6 +18,7 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ResendVerificationRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cookie;
 
 class AuthController extends Controller
 {
@@ -112,14 +113,24 @@ class AuthController extends Controller
             // Tạo token mới với thời gian hết hạn tùy thuộc vào remember
             $tokenExpiration = $remember ? now()->addDays(30) : now()->addHour();
             $token = $user->createToken('auth_token', ['*'], $tokenExpiration)->plainTextToken;
+            Log::info('Login: Setting auth_token cookie', ['token' => substr($token, 0, 10) . '...']);
             return response()->json([
-                'token' => $token,
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                ],
-            ], 200);
+                ]
+            ])->cookie(
+                'auth_token',
+                $token,
+                $tokenExpiration->diffInMinutes(now()),
+                '/',
+                null,
+                false, // hiện local nên đặt false, secure: bật nếu dùng HTTPS
+                true, // httponly
+                false,
+                'Lax'
+            );
         } catch (\Exception $e) {
             Log::error('Login error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['message' => 'Đã có lỗi xảy ra. Vui lòng thử lại sau.'], 500);
