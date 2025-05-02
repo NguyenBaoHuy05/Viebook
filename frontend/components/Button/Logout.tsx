@@ -19,8 +19,8 @@ export default function Logout() {
       setUserId(null);
       setTimeout(() => {
         router.push("/login");
+        toast.success("Đăng xuất thành công!");
       }, 1500);
-      toast.success("Đăng xuất thành công!");
     } catch (error: any) {
       console.error("Logout error:", error.response?.data);
       toast.error(

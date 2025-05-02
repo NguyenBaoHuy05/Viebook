@@ -115,7 +115,7 @@ export default function Sidebar() {
         <div
           className="absolute left-1/2 -translate-x-1/2 -top-7 border-2 border-solid
                bg-white rounded-md py-2 px-3 shadow-md
-               hover:cursor-pointer hover:scale-105  hover:border-blue-300"
+                hover:scale-105  hover:border-blue-300"
         >
           Danh sách bạn bè
         </div>

@@ -15,7 +15,7 @@ export function Friend() {
         {Array.from({ length: 5 }).map((_, index) => (
           <CarouselItem
             key={index}
-            className="pl-1 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+            className=" sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
           >
             <div className="rounded-sm grid grid-rows-4 w-50 h-50 bg-gray-100 gap-2 p-1 border-2 border-gray-500">
               <div className="rounded-sm row-span-3 bg-[url(https://github.com/shadcn.png)] bg-cover bg-center"></div>
