@@ -13,6 +13,7 @@ export default function SignupPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
+    username: "",
     email: "",
     password: "",
     password_confirmation: "",
@@ -37,6 +38,7 @@ export default function SignupPage() {
         setErrors(error.response.data.errors);
         toast.error("Vui lòng kiểm tra lại thông tin!");
       } else {
+        console.log(error);
         toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau");
       }
     } finally {
@@ -89,6 +91,26 @@ export default function SignupPage() {
                 />
                 {errors.name && (
                   <p className="mt-1 text-sm text-red-600">{errors.name[0]}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  disabled={loading}
+                  className={`rounded-lg relative block w-full px-3 py-3 border ${
+                    errors.name ? "border-red-500" : "border-gray-300"
+                  } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                  placeholder="Username"
+                  value={formData.username}
+                  onChange={handleChange}
+                />
+                {errors.username && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.username[0]}
+                  </p>
                 )}
               </div>
               <div>

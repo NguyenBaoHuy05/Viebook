@@ -3,7 +3,7 @@ import Image from "next/image";
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import { FaCommentAlt } from "react-icons/fa";
 import { FaShare } from "react-icons/fa";
-import iPost from "@/app/interfaces/post";
+import iPost from "@/interface/post";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 function Post({ post }: { post: iPost }) {

@@ -13,6 +13,7 @@ return new class extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('username')->unique();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
@@ -21,9 +22,10 @@ return new class extends Migration {
             $table->text('bio')->nullable();
             $table->string('location')->nullable();
             $table->integer('count_follow')->default(0);
+            $table->integer('count_friend')->default(0);
 
-            $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('posts', function (Blueprint $table) {

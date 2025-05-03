@@ -28,6 +28,7 @@ class AuthController extends Controller
             $validated = $request->validated();
 
             $user = User::create([
+                'username' => $validated['username'],
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => bcrypt($validated['password']),

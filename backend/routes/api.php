@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -24,8 +25,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return response()->json([
         'user' => [
             'id' => $request->user()->id,
-            'name' => $request->user()->name,
-            'email' => $request->user()->email,
+            'username' => $request->user()->username,
         ]
     ]);
 });
@@ -35,11 +35,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/{conversationId}/messages', [MessageController::class, 'getMessages']);
     Route::delete('/messages/{id}/{check}', [MessageController::class, 'destroy']);
 });
-Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-    Route::post('users/{user}/follow', [FollowController::class, 'follow']);
-    Route::delete('users/{user}/follow', [FollowController::class, 'unfollow']);
-    Route::get('users/{user}/followers', [FollowController::class, 'followers']);
-    Route::post('notifications', [NotificationController::class, 'store']);
-    Route::get('notifications', [NotificationController::class, 'index']);
-    Route::put('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/account/{username}', [AccountController::class, 'show']);
+    Route::put('/account/{username}', [AccountController::class, 'update']);
 });
+// Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+
+//     Route::post('users/{user}/follow', [FollowController::class, 'follow']);
+//     Route::delete('users/{user}/follow', [FollowController::class, 'unfollow']);
+//     Route::get('users/{user}/followers', [FollowController::class, 'followers']);
+//     Route::post('notifications', [NotificationController::class, 'store']);
+//     Route::get('notifications', [NotificationController::class, 'index']);
+//     Route::put('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+// });

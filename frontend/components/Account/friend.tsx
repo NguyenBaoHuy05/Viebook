@@ -25,7 +25,7 @@ export function Friend() {
                   type="submit"
                   className="bg-black text-white px-3 py-1 rounded"
                 >
-                  Add
+                  Xem
                 </button>
               </div>
             </div>

@@ -24,11 +24,17 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'username' => [
+                'required',
+                'string',
+                'max:50',
+                'unique:users,username',
+                'regex:/^[a-zA-Z0-9_]+$/', // Cho phép chữ, số, dấu gạch dưới
+            ],
             'name' => [
                 'required',
                 'string',
                 'max:50',
-                'regex:/^[a-zA-Z\s]+$/', // Chỉ cho phép chữ cái và khoảng trắng
             ],
             'email' => [
                 'required',
@@ -48,9 +54,12 @@ class RegisterRequest extends FormRequest
     public function messages()
     {
         return [
+            'username.required' => 'Tên không được để trống.',
+            'username.max' => 'Tên không được dài quá 50 ký tự.',
+            'username.regex' => 'Tên chỉ được chứa chữ cái , số và dấu gạch dưới.',
+            'username.unique' => 'Username đã được sử dụng.',
             'name.required' => 'Tên không được để trống.',
             'name.max' => 'Tên không được dài quá 50 ký tự.',
-            'name.regex' => 'Tên chỉ được chứa chữ cái và khoảng trắng.',
             'email.required' => 'Email không được để trống.',
             'email.email' => 'Email không đúng định dạng.',
             'email.unique' => 'Email đã được sử dụng.',
