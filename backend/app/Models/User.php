@@ -8,15 +8,20 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\CustomResetPassword;
 use App\Notifications\CustomVerifyEmail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable, HasApiTokens;
+    use Notifiable, HasApiTokens, SoftDeletes;
 
     protected $fillable = [
+        'username',
         'name',
         'email',
         'password',
+        'profile_picture',
+        'bio',
+        'location',
     ];
 
     protected $hidden = [

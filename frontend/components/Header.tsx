@@ -9,6 +9,7 @@ import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
 import Link from "next/link";
+import { useUser } from "@/context/UserContext";
 import {
   Popover,
   PopoverContent,
@@ -36,6 +37,8 @@ import {
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSetting, setIsSetting] = useState(false);
+
+  const { username, setUsername } = useUser();
   return (
     <>
       <div className="relative">
@@ -111,7 +114,7 @@ function Header() {
                 className="cursor-pointer transition-transform hover:scale-130"
               />
             </Link>
-            <Link href="/account">
+            <Link href={`/account/${username}`}>
               <CgProfile
                 size={32}
                 className="cursor-pointer transition-transform hover:scale-130"

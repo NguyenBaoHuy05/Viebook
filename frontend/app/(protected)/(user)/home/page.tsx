@@ -3,8 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import Post from "@/components/Post";
 import Header from "@/components/Header";
 import CreateAPost from "@/components/CreateAPost";
-import { Loader2 } from "lucide-react";
-import iPost from "@/app/interfaces/post";
+import { useState, useEffect, useRef } from "react";
+import iPost from "@/interface/post";
 import axios from "@/lib/axiosConfig";
 import CommentSection from "@/components/CommentSection";
 

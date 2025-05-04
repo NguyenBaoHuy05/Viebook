@@ -28,6 +28,7 @@ class AuthController extends Controller
             $validated = $request->validated();
 
             $user = User::create([
+                'username' => $validated['username'],
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => bcrypt($validated['password']),
@@ -118,7 +119,7 @@ class AuthController extends Controller
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
-                    'email' => $user->email,
+                    'email' => $user->email,    
                 ]
             ])->cookie(
                 'auth_token',

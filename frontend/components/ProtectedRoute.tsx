@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { userId, setUserId } = useUser();
+  const { userId, setUserId, username, setUsername } = useUser();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -23,7 +23,10 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const fetchUser = async () => {
       try {
         const res = await axios.get("/api/user");
-        setUserId(res.data.id);
+        setUserId(res.data.user.id);
+        setUsername(res.data.user.username);
+        console.log("Kết quả context: ", res.data.user.id);
+        console.log("Kết quả context: ", res.data.user.username);
       } catch (error) {
         router.push("/login");
       } finally {

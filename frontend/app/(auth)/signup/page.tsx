@@ -6,11 +6,14 @@ import axios from "@/lib/axiosConfig";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import Ads from "@/components/Auth/Ads";
+import HeaderAuth from "@/components/Auth/HeaderAuth";
 
 export default function SignupPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
+    username: "",
     email: "",
     password: "",
     password_confirmation: "",
@@ -35,6 +38,7 @@ export default function SignupPage() {
         setErrors(error.response.data.errors);
         toast.error("Vui lòng kiểm tra lại thông tin!");
       } else {
+        console.log(error);
         toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau");
       }
     } finally {
@@ -60,29 +64,14 @@ export default function SignupPage() {
   return (
     <div className=" min-h-screen items-center flex justify-center bg-gray-100">
       <div className="flex justify-evenly items-center max-w-[1100px] w-full max-h-[650px] shadow-[0px_5px_10px_5px_rgba(173,197,202,0.7)] p-10  bg-gray-100 rounded-xl">
-        <div className="flex flex-col items-center justify-around max-w-md">
-          <img className="max-w-sm p-5" src="/landing.jpg" alt="" />
-          <h3 className="font-medium text-blue-600 hover:text-blue-500 text-center">
-            Vì một mạng xã hội Việt Nam an toàn , lành mạnh. Viebook sẽ là nơi
-            lan tỏa yêu thương đến với mọi người!
-          </h3>
-        </div>
+        <Ads />
         <div className=" max-w-md h-fit shadow-[0px_5px_20px_5px_rgba(0,123,255,0.2)] w-full space-y-8 p-8 bg-gray-100 rounded-xl">
-          <div className="text-center">
-            <FaFacebook size={50} className="mx-auto text-blue-600" />
-            <h2 className="mt-6 text-3xl font-bold text-gray-900">
-              Tạo tài khoản Viebook
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Đã có tài khoản?{" "}
-              <Link
-                href="/login"
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                Đăng nhập
-              </Link>
-            </p>
-          </div>
+          <HeaderAuth
+            head="Tạo tài khoản Viebook"
+            subHead1="Đã có tài khoản?"
+            subHead2="Đăng nhập"
+            link1="/login"
+          />
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md space-y-4">
@@ -102,6 +91,26 @@ export default function SignupPage() {
                 />
                 {errors.name && (
                   <p className="mt-1 text-sm text-red-600">{errors.name[0]}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  disabled={loading}
+                  className={`rounded-lg relative block w-full px-3 py-3 border ${
+                    errors.name ? "border-red-500" : "border-gray-300"
+                  } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                  placeholder="Username"
+                  value={formData.username}
+                  onChange={handleChange}
+                />
+                {errors.username && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.username[0]}
+                  </p>
                 )}
               </div>
               <div>

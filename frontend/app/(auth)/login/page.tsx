@@ -6,7 +6,8 @@ import axios from "@/lib/axiosConfig";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { useUser } from "@/context/UserContext";
+import Ads from "@/components/Auth/Ads";
+import HeaderAuth from "@/components/Auth/HeaderAuth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -83,29 +84,14 @@ export default function LoginPage() {
   return (
     <div className=" min-h-screen items-center flex justify-center bg-gray-100">
       <div className="flex justify-evenly items-center max-w-[1100px] w-full max-h-[650px] shadow-[0px_5px_10px_5px_rgba(173,197,202,0.7)] p-10  bg-gray-100 rounded-xl">
-        <div className="flex flex-col items-center justify-around max-w-md">
-          <img className="max-w-sm p-5" src="/landing.jpg" alt="" />
-          <h3 className="font-medium text-blue-600 hover:text-blue-500 text-center">
-            Vì một mạng xã hội Việt Nam an toàn , lành mạnh. Viebook sẽ là nơi
-            lan tỏa yêu thương đến với mọi người!
-          </h3>
-        </div>
+        <Ads />
         <div className="max-w-md shadow-[0_0_10px_10px_rgba(110,219,246,0.5)] w-full space-y-8 p-8 bg-gray-100 rounded-xl">
-          <div className="text-center">
-            <FaFacebook size={50} className="mx-auto text-blue-600" />
-            <h2 className="mt-6 text-3xl font-bold text-gray-900">
-              Đăng nhập vào Viebook
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Hoặc{" "}
-              <Link
-                href="/signup"
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                tạo tài khoản mới
-              </Link>
-            </p>
-          </div>
+          <HeaderAuth
+            head="Đăng nhập vào Viebook"
+            subHead1="Hoặc"
+            subHead2="tạo tài khoản mới"
+            link1="/signup"
+          />
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md space-y-4">

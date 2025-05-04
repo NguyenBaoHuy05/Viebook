@@ -4,31 +4,58 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Follow;
+use Illuminate\Support\Facades\Log;
 
 class FollowController extends Controller
 {
-    public function follow(Request $request, User $user){
-        if ($request->user()->id === $user->id){
-            return response()->json(['message' => 'Cannot follow yourself'], 400);
+    public function follow(Request $request)
+    {
+        $followerId = $request->user()->id;
+        $followedId = $request->input('followed_id');
+
+        if ($followerId == $followedId) {
+            return response()->json(['message' => 'Không thể tự follow chính mình'], 400);
+        }
+        Follow::firstOrCreate(['follower_id' => $followerId, 'followed_id' => $followedId]);
+
+        User::where('id', $followedId)->increment('count_follower');
+        User::where('id', $followerId)->increment('count_follow');
+
+        return response()->json(['message' => 'Follow thành công']);
+    }
+
+    public function unfollow(Request $request)
+    {
+        $followerId = $request->user()->id;
+        $followedId = $request->query('followed_id');
+
+        $follow = Follow::where('follower_id', $followerId)
+            ->where('followed_id', $followedId)
+            ->first();
+        Log::info("Giá trị follow: " . $follow);
+        if ($follow) {
+            $follow->delete();
+
+            User::where('id', $followedId)->decrement('count_follower');
+            User::where('id', $followerId)->decrement('count_follow');
+
+            return response()->json(['message' => 'Unfollowed']);
         }
 
-        $request->user()->following()->attach($user->id);
-
-        $user->increment('count_follow');
-
-        return response()->json(['message' => 'Followed']);
+        return response()->json(['message' => 'Ko có following'], 400);
     }
 
-    public function unfollow(Request $request, User $user){
-        $request->following()->detach($user->id);
 
-        $user->decrement('count_follow');
+    public function checkFollow(Request $request)
+    {
+        $followerId = $request->user()->id;
+        $followedId = $request->query('followed_id');
 
-        return response()->json(['message' => 'Unfollowed']);
-    }
+        $isFollowing = Follow::where('follower_id', $followerId)
+            ->where('followed_id', $followedId)
+            ->exists();
 
-    public function followers(User $user){
-        $followers = $user->followers()->get();
-        return response()->json($followers);
+        return response()->json(['is_following' => $isFollowing]);
     }
 }
