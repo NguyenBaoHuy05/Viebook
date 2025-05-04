@@ -7,4 +7,5 @@ export default interface iUser {
   location: string;
   count_follow: number;
   count_friend: number;
+  count_follower: number;
 }

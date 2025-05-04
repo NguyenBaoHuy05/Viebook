@@ -22,6 +22,7 @@ return new class extends Migration {
             $table->text('bio')->nullable();
             $table->string('location')->nullable();
             $table->integer('count_follow')->default(0);
+            $table->integer('count_follower')->default(0);
             $table->integer('count_friend')->default(0);
 
             $table->timestamps();
@@ -53,11 +54,11 @@ return new class extends Migration {
         Schema::create('follows', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('follower_id');
-            $table->unsignedBigInteger('followee_id');
+            $table->unsignedBigInteger('followed_id');
             $table->timestamps();
             $table->foreign('follower_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('followee_id')->references('id')->on('users')->onDelete('cascade');
-            $table->unique(['follower_id', 'followee_id']);
+            $table->foreign('followed_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unique(['follower_id', 'followed_id']);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

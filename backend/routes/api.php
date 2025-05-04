@@ -39,6 +39,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/account/{username}', [AccountController::class, 'show']);
     Route::put('/account/{username}', [AccountController::class, 'update']);
 });
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/follow', [FollowController::class, 'follow']);
+    Route::get('/follow', [FollowController::class, 'checkFollow']);
+    Route::delete('/follow', [FollowController::class, 'unfollow']);
+});
 // Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
 //     Route::post('users/{user}/follow', [FollowController::class, 'follow']);

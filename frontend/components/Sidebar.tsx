@@ -1,25 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { MdPhotoCamera } from "react-icons/md";
-import { CiViewList } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { Friend } from "@/components/Account/friend";
 import iUser from "@/interface/userType";
 import LoadingPage from "./Modal/LoadingPage";
 import axios from "@/lib/axiosConfig";
-import { IoMdClose } from "react-icons/io";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import ImageWithSkeleton from "./SideBar/image";
+import EditDialog from "./SideBar/EditDialog";
 interface SidebarProps {
   userInfo: iUser;
   id: string;
@@ -30,6 +19,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
   const [loading, setLoading] = useState(false);
   const isOwner = id == String(userInfo.id);
   const [change, setChange] = useState(false);
+  const [isFollow, setIsFollow] = useState(false);
 
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -43,7 +33,6 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
         setPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(file);
-      console.log("link: ", previewUrl);
     }
   };
 
@@ -100,29 +89,72 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
       setLoading(false);
       toast.success("Thay đổi dữ liệu thành công!");
     } catch (error) {
-      setLoading(true);
+      setLoading(false);
     }
   };
+  const handleFollow = async () => {
+    setIsFollow(true);
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/follow", {
+        followed_id: user.id,
+      });
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
+  };
+  const handleUnFollow = async () => {
+    setIsFollow(false);
+    try {
+      setLoading(true);
+      await axios.delete("/api/follow", {
+        params: { followed_id: user.id },
+      });
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    const checkFollow = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get("/api/follow", {
+          params: { followed_id: user.id },
+        });
+        setIsFollow(response.data.is_following);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false); // không nên set true ở đây
+        console.error("Failed to check follow status:", error);
+      }
+    };
+    if (!isOwner) checkFollow();
+  }, [isOwner, user.id]);
+
   useEffect(() => {
     if (change) {
       handleSubmit();
       setChange(false);
     }
   }, [change]);
+
   if (loading) return <LoadingPage isError={loading} />;
   return (
     <div className="mt-25 ">
       <div className="grid grid-cols-3 max-w-240 wrap mx-auto gap-2 h-50 mb-4">
-        <div
-          className={`m-auto relative col-span-1 p-4 grid grid-rows-6 rounded-full w-50 h-50  bg-cover bg-center `}
-          style={{
-            backgroundImage: `url(${
-              previewUrl ||
-              user.profile_picture ||
+        <div className={`m-auto relative col-span-1`}>
+          <ImageWithSkeleton
+            src={
+              previewUrl ??
+              user.profile_picture ??
               "https://github.com/shadcn.png"
-            })`,
-          }}
-        >
+            }
+            alt="demo"
+            className="w-50 h-50"
+          />
+
           {isOwner &&
             (!previewUrl ? (
               <label
@@ -158,11 +190,26 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
               <div className="text-2xl font-bold">
                 {user.name} <i>({user.username})</i>
               </div>{" "}
-              {user.count_follow} followers | {user.count_friend} friends
+              {user.count_follower} followers | {user.count_friend} friends |
+              Following: {user.count_follow}
             </div>
             {!isOwner && (
               <div className="flex gap-3 ml-auto ">
-                <Button className="hover:cursor-pointer">Follow</Button>
+                {isFollow ? (
+                  <Button
+                    className="hover:cursor-pointer bg-green-500 hover:bg-green-600"
+                    onClick={handleUnFollow}
+                  >
+                    Following
+                  </Button>
+                ) : (
+                  <Button
+                    className="hover:cursor-pointer"
+                    onClick={handleFollow}
+                  >
+                    Follow
+                  </Button>
+                )}
                 <Button className="hover:cursor-pointer">AddFriend</Button>
               </div>
             )}
@@ -180,91 +227,14 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
             </div>
           </div>
           {/* Edit Profile Dialog */}
-          {isOwner && (
-            <Dialog>
-              <DialogTrigger asChild onClick={(e) => setUserForm({ ...user })}>
-                <div
-                  className="absolute right-1/50 -top-4 border-2 border-dashed 
-                 bg-white rounded-full p-2 shadow-md
-                 hover:cursor-pointer hover:rotate-12 hover:border-solid hover:border-blue-300"
-                >
-                  <CiViewList size={20} />
-                </div>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Edit profile</DialogTitle>
-                  <DialogDescription>
-                    Make changes to your profile here. Click save when you're
-                    done.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                      Name
-                    </Label>
-                    <Input
-                      id="name"
-                      value={userForm.name ?? ""}
-                      className="col-span-3"
-                      onChange={(e) => {
-                        setUserForm({ ...userForm, name: e.target.value });
-                      }}
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="username" className="text-right">
-                      Username
-                    </Label>
-                    <Input
-                      id="username"
-                      value={userForm.username}
-                      className="col-span-3"
-                      readOnly
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="location" className="text-right">
-                      Location
-                    </Label>
-                    <Input
-                      id="location"
-                      value={userForm.location ?? ""}
-                      className="col-span-3"
-                      onChange={(e) => {
-                        setUserForm({ ...userForm, location: e.target.value });
-                      }}
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="bio" className="text-right">
-                      Bio
-                    </Label>
-                    <Input
-                      id="bio"
-                      value={userForm.bio ?? ""}
-                      className="col-span-3"
-                      onChange={(e) => {
-                        setUserForm({ ...userForm, bio: e.target.value });
-                      }}
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button
-                    type="submit"
-                    onClick={(e) => {
-                      setUser({ ...userForm });
-                      setChange(true);
-                    }}
-                  >
-                    Save changes
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          )}
+          <EditDialog
+            data={userForm}
+            onSave={(updatedData) => {
+              setUser(updatedData as iUser);
+              setChange(true);
+            }}
+            open={isOwner}
+          />
         </div>
       </div>
       {/* Bạn bè */}
