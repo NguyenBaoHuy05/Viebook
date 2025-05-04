@@ -32,20 +32,25 @@ class PostController extends Controller
     public function toggleReact(Post $post, Request $request)
     {
         $user = $request->user();
-        if(!$user) {
+        if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
+
         $react = PostReact::where('post_id', $post->id)->where('user_id', $user->id)->first();
-        if($react) {
+
+        if ($react) {
             $react->delete();
-        } 
-        else {
+            $post->decrement('react_count');
+        } else {    
             PostReact::create([
                 'post_id' => $post->id,
                 'user_id' => $user->id,
-                'react_type' => 'like'
+                'react_type' => 'like',
             ]);
+            $post->increment('react_count');
         }
-        return response()->json(['status' => 'liked']);
-    }
+
+        return response()->json(['status' => $react ? 'unliked' : 'liked']);
+    }   
+
 }

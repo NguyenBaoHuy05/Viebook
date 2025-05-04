@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { FaFacebook } from "react-icons/fa";
 import Link from "next/link";
 import axios from "@/lib/axiosConfig";
 import { useRouter } from "next/navigation";

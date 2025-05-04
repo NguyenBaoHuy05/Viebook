@@ -4,7 +4,6 @@ import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import { FaCommentAlt } from "react-icons/fa";
 import { FaShare } from "react-icons/fa";
 import iPost from "@/interface/post";
-import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axios from "@/lib/axiosConfig";
 import Image from "next/image";
@@ -46,8 +45,14 @@ function Post({
 
       <div className="mb-4">
         <p className="text-gray-800 text-lg mb-4">{post.title}</p>
-        <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden">
-          <Image src={post.content} alt="content" fill />
+        <div className="relative w-full rounded-lg overflow-hidden">
+          <Image
+            src={post.content}
+            alt="content"
+            width={600}
+            height={400}
+            objectFit="contain"
+          />
         </div>
       </div>
 

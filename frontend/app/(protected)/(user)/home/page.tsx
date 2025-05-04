@@ -1,5 +1,4 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
 import Post from "@/components/Post";
 import Header from "@/components/Header";
 import CreateAPost from "@/components/CreateAPost";
@@ -7,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import iPost from "@/interface/post";
 import axios from "@/lib/axiosConfig";
 import CommentSection from "@/components/CommentSection";
-
+import { Loader2 } from "lucide-react";
 function Page() {
   const [posts, setPosts] = useState<iPost[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
