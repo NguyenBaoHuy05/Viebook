@@ -8,6 +8,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostReactController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\FriendController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Auth\Events\Verified;
@@ -47,11 +48,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/follow', [FollowController::class, 'checkFollow']);
     Route::delete('/follow', [FollowController::class, 'unfollow']);
 });
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/friends', [FriendController::class, 'getStatusFriend']);
+    Route::post('/friends/add', [FriendController::class, 'addFriend']);
+    Route::delete('/friends/{friend_id}', [FriendController::class, 'deleteFriend']);
+});
 // Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
-//     Route::post('users/{user}/follow', [FollowController::class, 'follow']);
-//     Route::delete('users/{user}/follow', [FollowController::class, 'unfollow']);
-//     Route::get('users/{user}/followers', [FollowController::class, 'followers']);
 //     Route::post('notifications', [NotificationController::class, 'store']);
 //     Route::get('notifications', [NotificationController::class, 'index']);
 //     Route::put('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);

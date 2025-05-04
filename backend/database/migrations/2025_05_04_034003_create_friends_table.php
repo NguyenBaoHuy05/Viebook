@@ -11,18 +11,17 @@ class CreateFriendsTable extends Migration
         Schema::create('friends', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('requester_id');
-            $table->unsignedBigInteger('addressee_id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('friend_id');
 
             $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
 
             $table->timestamps();
 
-            $table->foreign('requester_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('addressee_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('friend_id')->references('id')->on('users')->onDelete('cascade');
 
-            // Đảm bảo không có bản ghi trùng ngược chiều
-            $table->unique(['requester_id', 'addressee_id']);
+            $table->unique(['user_id', 'friend_id']);
         });
     }
 

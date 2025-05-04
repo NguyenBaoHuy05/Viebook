@@ -9,6 +9,7 @@ import axios from "@/lib/axiosConfig";
 import { toast } from "sonner";
 import ImageWithSkeleton from "./SideBar/image";
 import EditDialog from "./SideBar/EditDialog";
+import AlertDialogDemo from "./Modal/AlertDialog";
 interface SidebarProps {
   userInfo: iUser;
   id: string;
@@ -20,6 +21,8 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
   const isOwner = id == String(userInfo.id);
   const [change, setChange] = useState(false);
   const [isFollow, setIsFollow] = useState(false);
+  const [isStatusFriend, setIsStatusFriend] = useState<number>(1);
+  const [btnAcceptFriend, setBtnAcceptFriend] = useState<React.ReactNode>();
 
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -76,9 +79,6 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    setUserForm(user);
-  }, [user]);
   const handleSubmit = async () => {
     try {
       const response = await axios.put(`/api/account/${userInfo.username}`, {
@@ -95,25 +95,51 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
   const handleFollow = async () => {
     setIsFollow(true);
     try {
-      setLoading(true);
       const response = await axios.post("/api/follow", {
         followed_id: user.id,
       });
-      setLoading(false);
+      console.log("Chạy");
     } catch (error) {
-      setLoading(false);
+      console.log("Lỗi: ", error);
     }
   };
   const handleUnFollow = async () => {
     setIsFollow(false);
     try {
-      setLoading(true);
       await axios.delete("/api/follow", {
         params: { followed_id: user.id },
       });
+      console.log("Chạy");
+    } catch (error) {
+      console.log("Lỗi: ", error);
+    }
+  };
+  const handleFriend = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/friends/add", {
+        friend_id: user.id,
+      });
+      if (response.data.message == 1) {
+        toast.success("Thêm bạn bè thành công. Đang chờ chấp nhận!");
+        setIsStatusFriend(response.data.message);
+      } else toast.error("Lỗi kết bạn");
       setLoading(false);
     } catch (error) {
       setLoading(false);
+      console.log("Lỗi", error);
+    }
+  };
+  const handleRemoveFriend = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.delete(`/api/friends/${user.id}`);
+      toast.success("Đã xóa bạn bè thành công!");
+      setIsStatusFriend(0);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log("Lỗi khi remove friend: ", error);
     }
   };
   useEffect(() => {
@@ -126,130 +152,206 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
         setIsFollow(response.data.is_following);
         setLoading(false);
       } catch (error) {
-        setLoading(false); // không nên set true ở đây
-        console.error("Failed to check follow status:", error);
+        setLoading(false);
+        console.error("Lỗi:", error);
       }
     };
-    if (!isOwner) checkFollow();
+    const checkFriend = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get("/api/friends", {
+          params: { friend_id: user.id },
+        });
+        setIsStatusFriend(response.data.status);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        console.error("Lỗi:", error);
+      }
+    };
+    if (!isOwner) {
+      checkFollow();
+      checkFriend();
+    }
   }, [isOwner, user.id]);
-
+  useEffect(() => {
+    setUserForm(user);
+  }, [user]);
   useEffect(() => {
     if (change) {
       handleSubmit();
       setChange(false);
     }
   }, [change]);
-
-  if (loading) return <LoadingPage isError={loading} />;
+  // useEffect(() => {
+  //   const;
+  // });
   return (
-    <div className="mt-25 ">
-      <div className="grid grid-cols-3 max-w-240 wrap mx-auto gap-2 h-50 mb-4">
-        <div className={`m-auto relative col-span-1`}>
-          <ImageWithSkeleton
-            src={
-              previewUrl ??
-              user.profile_picture ??
-              "https://github.com/shadcn.png"
-            }
-            alt="demo"
-            className="w-50 h-50"
-          />
+    <>
+      {loading && <LoadingPage isError={loading} />}
+      <div className="mt-25 relative">
+        {isOwner && (
+          <div className=" snap-y snap-mandatory absolute w-45 right-0 h-50 overflow-y-auto">
+            <Button className=" snap-center h-40 w-40 mb-1">
+              {" "}
+              A muốn kết bạn{" "}
+            </Button>
+            <Button className="snap-center h-40 w-40 mb-1">
+              {" "}
+              A muốn kết bạn{" "}
+            </Button>
+            <Button className="snap-center h-40 w-40 mb-1">
+              {" "}
+              A muốn kết bạn{" "}
+            </Button>
+            <Button className="snap-center h-40 w-40 mb-1">
+              {" "}
+              A muốn kết bạn{" "}
+            </Button>
+            <Button className="snap-center h-40 w-40 mb-1">
+              {" "}
+              A muốn kết bạn{" "}
+            </Button>
+            <Button className="snap-center h-40 w-40 mb-1">
+              {" "}
+              A muốn kết bạn{" "}
+            </Button>
+            <Button className="snap-center h-40 w-40 mb-1">
+              {" "}
+              A muốn kết bạn{" "}
+            </Button>
+          </div>
+        )}
+        <div className="grid grid-cols-3 max-w-240 wrap mx-auto gap-2 h-50 mb-4">
+          <div className={`m-auto relative col-span-1`}>
+            <ImageWithSkeleton
+              src={
+                previewUrl ??
+                user.profile_picture ??
+                "https://github.com/shadcn.png"
+              }
+              alt="demo"
+              className="w-50 h-50"
+            />
 
-          {isOwner &&
-            (!previewUrl ? (
-              <label
-                className="absolute right-0 top-5/6 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md"
-                htmlFor="file-upload"
-              >
-                <MdPhotoCamera size={20} />
-                <input
-                  id="file-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </label>
-            ) : (
-              <Button
-                className="absolute right-0 top-5/6 transform -translate-y-1/2  rounded-full p-2 shadow-md bg-green-500"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSubmitImage(
-                    e as unknown as React.FormEvent<HTMLFormElement>
-                  );
-                }}
-              >
-                Accept
-              </Button>
-            ))}
-        </div>
-        <div className="relative rounded col-span-2 p-4 grid grid-rows-2 gap-3 bg-white shadow-[0px_0px_8px_1px_gray] h-50">
-          <div className="row-span-1 flex">
-            <div className="justify-self-start">
-              <div className="text-2xl font-bold">
-                {user.name} <i>({user.username})</i>
-              </div>{" "}
-              {user.count_follower} followers | {user.count_friend} friends |
-              Following: {user.count_follow}
-            </div>
-            {!isOwner && (
-              <div className="flex gap-3 ml-auto ">
-                {isFollow ? (
-                  <Button
-                    className="hover:cursor-pointer bg-green-500 hover:bg-green-600"
-                    onClick={handleUnFollow}
-                  >
-                    Following
-                  </Button>
-                ) : (
-                  <Button
-                    className="hover:cursor-pointer"
-                    onClick={handleFollow}
-                  >
-                    Follow
-                  </Button>
-                )}
-                <Button className="hover:cursor-pointer">AddFriend</Button>
+            {isOwner &&
+              (!previewUrl ? (
+                <label
+                  className="absolute right-0 top-5/6 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md"
+                  htmlFor="file-upload"
+                >
+                  <MdPhotoCamera size={20} />
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+              ) : (
+                <Button
+                  className="absolute right-0 top-5/6 transform -translate-y-1/2  rounded-full p-2 shadow-md bg-green-500"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmitImage(
+                      e as unknown as React.FormEvent<HTMLFormElement>
+                    );
+                  }}
+                >
+                  Accept
+                </Button>
+              ))}
+          </div>
+          <div className="relative rounded col-span-2 p-4 grid grid-rows-3 gap-5 bg-white shadow-[0px_0px_8px_1px_gray] h-50 ">
+            <div className="row-span-1 flex">
+              <div className="justify-self-start">
+                <div className="text-2xl font-bold">
+                  {user.name} <i>({user.username})</i>
+                </div>{" "}
+                {user.count_follower} followers | {user.count_friend} friends |
+                Following: {user.count_follow}
               </div>
-            )}
-          </div>
-          <div className="grid grid-rows-3">
-            <div className="text-sm row-span-1 flex gap-2">
-              <div className="font-bold">Location:</div>
-              {user.location}
-              <i>{user.location ? " " : "Bạn chưa nhập thông tin"}</i>
+              {!isOwner && (
+                <div className="flex gap-3 ml-auto ">
+                  {isFollow ? (
+                    <Button
+                      className="hover:cursor-pointer bg-green-500 hover:bg-green-600"
+                      onClick={handleUnFollow}
+                    >
+                      Following
+                    </Button>
+                  ) : (
+                    <Button
+                      className="hover:cursor-pointer"
+                      onClick={handleFollow}
+                    >
+                      Follow
+                    </Button>
+                  )}
+                  {isStatusFriend == 1 ? (
+                    <Button className=" bg-blue-400 hover:bg-blue-400">
+                      PendingFriend
+                    </Button>
+                  ) : isStatusFriend == 2 ? (
+                    <AlertDialogDemo
+                      btn={
+                        <Button className="hover:cursor-pointer bg-red-400 hover:bg-red-500">
+                          RemoveFriend
+                        </Button>
+                      }
+                      title1="Xóa bạn bè"
+                      title2="Xóa bạn bè không thể hoàn lại thao tác. Bạn có chắc chắn muốn xóa không?"
+                      onSave={handleRemoveFriend}
+                    />
+                  ) : (
+                    <Button
+                      className="hover:cursor-pointer hover:bg-black-300"
+                      onClick={handleFriend}
+                    >
+                      AddFriend
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
-            <div className="text-sm row-span-1 flex  gap-2">
-              <div className="font-bold">Bio:</div>
-              {user.bio}
-              <i>{user.bio ? " " : "Bạn chưa nhập thông tin"}</i>
+            <div className="grid grid-rows-5 gap-6">
+              <div className="text-sm row-span-1 flex gap-2">
+                <div className="font-bold">Location:</div>
+                {user.location}
+                <i>{user.location ? " " : "Bạn chưa nhập thông tin"}</i>
+              </div>
+              <div className="text-sm row-span-4 flex gap-2">
+                <div className="font-bold">Bio:</div>
+                <span className="wrap-anywhere">{user.bio}</span>
+                <i>{user.bio ? " " : "Bạn chưa nhập thông tin"}</i>
+              </div>
             </div>
+            {/* Edit Profile Dialog */}
+            <EditDialog
+              data={userForm}
+              onSave={(updatedData) => {
+                setUser(updatedData as iUser);
+                setChange(true);
+              }}
+              open={isOwner}
+            />
           </div>
-          {/* Edit Profile Dialog */}
-          <EditDialog
-            data={userForm}
-            onSave={(updatedData) => {
-              setUser(updatedData as iUser);
-              setChange(true);
-            }}
-            open={isOwner}
-          />
         </div>
-      </div>
-      {/* Bạn bè */}
-      <div className="relative border-t-2 border-gray-700 pt-8 pb-5 max-w-240 mx-auto h-60 mt-20 mb-10 ">
-        <div
-          className="absolute left-1/2 -translate-x-1/2 -top-7 border-2 border-solid
+        {/* Bạn bè */}
+        <div className="relative border-t-2 border-gray-700 pt-8 pb-5 max-w-240 mx-auto h-60 mt-20 mb-10 ">
+          <div
+            className="absolute left-1/2 -translate-x-1/2 -top-7 border-2 border-solid
                bg-white rounded-md py-2 px-3 shadow-md
                 hover:scale-105  hover:border-blue-300"
-        >
-          Danh sách bạn bè
+          >
+            Danh sách bạn bè
+          </div>
+          <Friend />
         </div>
-        <Friend />
+        <div className="bg-gray-200 max-w-240 mx-auto h-50">Bài Post</div>
       </div>
-      <div className="bg-gray-200 max-w-240 mx-auto h-50">Bài Post</div>
-    </div>
+    </>
   );
 };
 
