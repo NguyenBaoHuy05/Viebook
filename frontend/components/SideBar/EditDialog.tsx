@@ -93,10 +93,13 @@ const EditDialog: React.FC<EditDialogProps> = ({ open, data, onSave }) => {
             <Label htmlFor="bio" className="text-right">
               Bio
             </Label>
-            <Input
+            <textarea
               id="bio"
               value={userForm.bio ?? ""}
               className="col-span-3"
+              maxLength={255}
+              rows={4}
+              cols={50}
               onChange={(e) => {
                 setUserForm({ ...userForm, bio: e.target.value });
               }}

@@ -12,7 +12,7 @@ export function Friend() {
   return (
     <Carousel className="w-full max-w-240">
       <CarouselContent className="mx-auto ">
-        {Array.from({ length: 5 }).map((_, index) => (
+        {Array.from({ length: 1 }).map((_, index) => (
           <CarouselItem
             key={index}
             className=" sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
