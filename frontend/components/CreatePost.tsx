@@ -138,7 +138,7 @@ function CreatePost({
 
           <button
             type="submit"
-            className="bg-blue-600 text-white w-full py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50"
+            className="bg-blue-600 text-white w-full py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
             disabled={uploading}
           >
             {uploading ? "Uploading..." : "Post"}

@@ -1,17 +1,20 @@
 "use client";
+import { useState, useEffect, useRef } from "react";
 import Post from "@/components/Post";
 import Header from "@/components/Header";
 import CreateAPost from "@/components/CreateAPost";
-import { useState, useEffect, useRef } from "react";
+import { Loader2 } from "lucide-react";
 import iPost from "@/app/interfaces/post";
 import axios from "@/lib/axiosConfig";
-import { Loader2 } from "lucide-react";
+import CommentSection from "@/components/CommentSection";
 
 function Page() {
   const [posts, setPosts] = useState<iPost[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const [comments, setComments] = useState<any[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -21,7 +24,6 @@ function Page() {
       setLoading(true);
       try {
         const res = await axios.get(`/api/posts?page=${currentPage}`);
-        console.log(res);
         const fetchedPosts: iPost[] = res.data.data.map((post: any) => ({
           id: post.id,
           name: post.user.name,
@@ -33,7 +35,6 @@ function Page() {
           shareCount: post.share_count,
           date: new Date(post.created_at).toLocaleDateString(),
         }));
-        console.log(fetchedPosts);
         setPosts((prevPosts) => {
           const newPosts = fetchedPosts.filter(
             (newPost) =>
@@ -54,6 +55,25 @@ function Page() {
 
     fetchPosts();
   }, [currentPage]);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      if (selectedPostId === null) return;
+
+      try {
+        const res = await axios.get(`/api/posts/${selectedPostId}/comments`);
+        if (res.data.comments && res.data.comments.length > 0) {
+          setComments(res.data.comments);
+        } else {
+          setComments([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch comments:", error);
+      }
+    };
+
+    fetchComments();
+  }, [selectedPostId]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -82,12 +102,16 @@ function Page() {
           <div className="col-span-1">a</div>
           <div
             ref={containerRef}
-            className="col-span-2 flex flex-col gap-8 overflow-y-auto scrollbar-hide"
+            className="col-span-2 flex flex-col gap-8 overflow-y-auto"
             style={{ maxHeight: "calc(100vh - 100px)" }}
           >
             <CreateAPost />
             {posts.map((post) => (
-              <Post key={post.id} post={post} />
+              <Post
+                key={post.id}
+                post={post}
+                onSelectPost={setSelectedPostId}
+              />
             ))}
             {loading && (
               <div className="flex items-center justify-center gap-2 p-4">
@@ -101,7 +125,25 @@ function Page() {
               </div>
             )}
           </div>
-          <div className="col-span-1">c</div>
+          <div className="col-span-1 h-full relative ">
+            {selectedPostId && (
+              <div>
+                <CommentSection comments={comments} />
+                <div className="absolute bottom-0 left-0 w-full bg-white px-4 py-3 border-t border-gray-200">
+                  <div className="flex items-center gap-2">
+                    <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition">
+                      Gửi
+                    </button>
+                    <input
+                      type="text"
+                      placeholder="Viết bình luận..."
+                      className="w-full px-4 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>

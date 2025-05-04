@@ -1,0 +1,21 @@
+import Comment from "./Comment";
+
+function CommentSection({ comments }: { comments: any[] }) {
+  return (
+    <div className="w-full">
+      {comments.length > 0 ? (
+        comments.map((comment, index) => (
+          <Comment key={index} comment={comment} />
+        ))
+      ) : (
+        <div className="flex justify-center items-center p-8">
+          <p className="text-gray-500 italic text-base">
+            Chưa có bình luận nào.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default CommentSection;
