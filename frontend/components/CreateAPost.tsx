@@ -5,7 +5,6 @@ import CreatePost from "./CreatePost";
 
 function CreateAPost() {
   const [load, setLoad] = useState(false);
-  console.log(load);
   const toggleLoad = () => {
     setLoad(!load);
   };

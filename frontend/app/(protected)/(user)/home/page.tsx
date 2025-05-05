@@ -7,6 +7,7 @@ import iPost from "@/interface/post";
 import axios from "@/lib/axiosConfig";
 import CommentSection from "@/components/CommentSection";
 import { Loader2 } from "lucide-react";
+import echo from "@/lib/echo";
 function Page() {
   const [posts, setPosts] = useState<iPost[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,7 +16,7 @@ function Page() {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [comments, setComments] = useState<any[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-
+  const [userComment, setUserComment] = useState<string>("");
   useEffect(() => {
     const fetchPosts = async () => {
       if (loading || !hasMore) return;
@@ -61,8 +62,9 @@ function Page() {
 
       try {
         const res = await axios.get(`/api/posts/${selectedPostId}/comments`);
-        if (res.data.comments && res.data.comments.length > 0) {
-          setComments(res.data.comments);
+        console.log(res);
+        if (res.data) {
+          setComments(res.data);
         } else {
           setComments([]);
         }
@@ -72,6 +74,13 @@ function Page() {
     };
 
     fetchComments();
+    const channel = echo.channel(`post.${selectedPostId}`);
+    channel.listen("CommentCreated", (event: any) => {
+      setComments((prevComments) => [event.comment, ...prevComments]);
+    });
+    return () => {
+      channel.stopListening("NewCommentAdded");
+    };
   }, [selectedPostId]);
 
   useEffect(() => {
@@ -92,6 +101,28 @@ function Page() {
     container.addEventListener("scroll", handleScroll);
     return () => container.removeEventListener("scroll", handleScroll);
   }, [hasMore, loading]);
+
+  const handleCommentClick = async () => {
+    if (userComment == "") return;
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `api/posts/${selectedPostId}/comment`,
+        {
+          post_id: selectedPostId,
+          parent_comment_id: null,
+          content: userComment,
+        },
+        { withCredentials: true }
+      );
+      console.log(res);
+    } catch (error) {
+      console.error("Failed to create comment", error);
+    } finally {
+      setLoading(false);
+      setUserComment("");
+    }
+  };
 
   return (
     <>
@@ -130,13 +161,24 @@ function Page() {
                 <CommentSection comments={comments} />
                 <div className="absolute bottom-0 left-0 w-full bg-white px-4 py-3 border-t border-gray-200">
                   <div className="flex items-center gap-2">
-                    <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition">
+                    <button
+                      className={`px-4 py-2 text-sm font-medium text-white rounded-full transition ${
+                        loading
+                          ? "bg-blue-400 cursor-not-allowed"
+                          : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                      }`}
+                      onClick={handleCommentClick}
+                      disabled={loading}
+                    >
                       Gửi
                     </button>
                     <input
                       type="text"
                       placeholder="Viết bình luận..."
                       className="w-full px-4 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      value={userComment}
+                      disabled={loading}
+                      onChange={(e) => setUserComment(e.target.value)}
                     />
                   </div>
                 </div>

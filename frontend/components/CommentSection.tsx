@@ -2,7 +2,7 @@ import Comment from "./Comment";
 
 function CommentSection({ comments }: { comments: any[] }) {
   return (
-    <div className="w-full">
+    <div className="w-full h-[75vh] overflow-y-auto">
       {comments.length > 0 ? (
         comments.map((comment, index) => (
           <Comment key={index} comment={comment} />
