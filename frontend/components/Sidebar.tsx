@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { MdPhotoCamera } from "react-icons/md";
 import { Button } from "@/components/ui/button";
-import { Friend } from "@/components/Account/friend";
+import Friend from "@/components/Account/friend";
 import iUser from "@/interface/userType";
 import LoadingPage from "./Modal/LoadingPage";
 import axios from "@/lib/axiosConfig";
@@ -190,39 +190,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
   return (
     <>
       {loading && <LoadingPage isError={loading} />}
-      <div className="mt-25 relative">
-        {isOwner && (
-          <div className=" snap-y snap-mandatory absolute w-45 right-0 h-50 overflow-y-auto scroll">
-            <Button className=" snap-center h-40 w-40 mt-2">
-              {" "}
-              A muốn kết bạn{" "}
-            </Button>
-            <Button className="snap-center h-40 w-40 mt-2">
-              {" "}
-              A muốn kết bạn{" "}
-            </Button>
-            <Button className="snap-center h-40 w-40 mt-2">
-              {" "}
-              A muốn kết bạn{" "}
-            </Button>
-            <Button className="snap-center h-40 w-40 mt-2">
-              {" "}
-              A muốn kết bạn{" "}
-            </Button>
-            <Button className="snap-center h-40 w-40 mt-2">
-              {" "}
-              A muốn kết bạn{" "}
-            </Button>
-            <Button className="snap-center h-40 w-40 mt-2">
-              {" "}
-              A muốn kết bạn{" "}
-            </Button>
-            <Button className="snap-center h-40 w-40 mt-2">
-              {" "}
-              A muốn kết bạn{" "}
-            </Button>
-          </div>
-        )}
+      <div className="mt-25">
         <div className="grid grid-cols-3 max-w-240 wrap mx-auto gap-2 h-50 mb-4">
           <div className={`m-auto relative col-span-1`}>
             <ImageWithSkeleton
@@ -232,7 +200,8 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
                 "https://github.com/shadcn.png"
               }
               alt="demo"
-              className="w-50 h-50"
+              className="w-50 h-50 "
+              imgClass="rounded-full"
             />
 
             {isOwner &&
@@ -340,17 +309,12 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
           </div>
         </div>
         {/* Bạn bè */}
-        <div className="relative border-t-2 border-gray-700 pt-8 pb-5 max-w-240 mx-auto h-60 mt-20 mb-10 ">
-          <div
-            className="absolute left-1/2 -translate-x-1/2 -top-7 border-2 border-solid
-               bg-white rounded-md py-2 px-3 shadow-md
-                hover:scale-105  hover:border-blue-300"
-          >
-            Danh sách bạn bè
+        <div className="relative max-w-240 mx-auto my-10 grid grid-cols-3 gap-3">
+          <div className="col-span-1 h-100">
+            <Friend open={isOwner} />
           </div>
-          <Friend />
+          <div className="col-span-2 bg-gray-200 h-200">Bài Post</div>
         </div>
-        <div className="bg-gray-200 max-w-240 mx-auto h-50">Bài Post</div>
       </div>
     </>
   );
