@@ -10,10 +10,12 @@ import { toast } from "sonner";
 import ImageWithSkeleton from "./SideBar/image";
 import EditDialog from "./SideBar/EditDialog";
 import AlertDialogDemo from "./Modal/AlertDialog";
+import iFriend from "@/interface/friendType";
 interface SidebarProps {
   userInfo: iUser;
   id: string;
 }
+
 const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
   const [user, setUser] = useState<iUser>(userInfo);
   const [userForm, setUserForm] = useState<iUser>(userInfo);
@@ -23,6 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
   const [isFollow, setIsFollow] = useState(false);
   const [isStatusFriend, setIsStatusFriend] = useState<number>(1);
   const [btnAcceptFriend, setBtnAcceptFriend] = useState<React.ReactNode>();
+  const [pendingFriend, setPendingFriend] = useState<iFriend[]>();
 
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -183,40 +186,38 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
       setChange(false);
     }
   }, [change]);
-  // useEffect(() => {
-  //   const;
-  // });
+  useEffect(() => {});
   return (
     <>
       {loading && <LoadingPage isError={loading} />}
       <div className="mt-25 relative">
         {isOwner && (
-          <div className=" snap-y snap-mandatory absolute w-45 right-0 h-50 overflow-y-auto">
-            <Button className=" snap-center h-40 w-40 mb-1">
+          <div className=" snap-y snap-mandatory absolute w-45 right-0 h-50 overflow-y-auto scroll">
+            <Button className=" snap-center h-40 w-40 mt-2">
               {" "}
               A muốn kết bạn{" "}
             </Button>
-            <Button className="snap-center h-40 w-40 mb-1">
+            <Button className="snap-center h-40 w-40 mt-2">
               {" "}
               A muốn kết bạn{" "}
             </Button>
-            <Button className="snap-center h-40 w-40 mb-1">
+            <Button className="snap-center h-40 w-40 mt-2">
               {" "}
               A muốn kết bạn{" "}
             </Button>
-            <Button className="snap-center h-40 w-40 mb-1">
+            <Button className="snap-center h-40 w-40 mt-2">
               {" "}
               A muốn kết bạn{" "}
             </Button>
-            <Button className="snap-center h-40 w-40 mb-1">
+            <Button className="snap-center h-40 w-40 mt-2">
               {" "}
               A muốn kết bạn{" "}
             </Button>
-            <Button className="snap-center h-40 w-40 mb-1">
+            <Button className="snap-center h-40 w-40 mt-2">
               {" "}
               A muốn kết bạn{" "}
             </Button>
-            <Button className="snap-center h-40 w-40 mb-1">
+            <Button className="snap-center h-40 w-40 mt-2">
               {" "}
               A muốn kết bạn{" "}
             </Button>

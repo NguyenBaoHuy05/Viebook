@@ -100,7 +100,7 @@ class FriendController extends Controller
 
         return response()->json(['message' => 'Đã xóa bạn bè']);
     }
-    public function getPendingFriend(Request $request)
+    public function getPendingFriendList(Request $request)
     {
         $userId = $request->user()->id;
 

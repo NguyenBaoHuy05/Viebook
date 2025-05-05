@@ -52,6 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/friends', [FriendController::class, 'getStatusFriend']);
     Route::post('/friends/add', [FriendController::class, 'addFriend']);
     Route::delete('/friends/{friend_id}', [FriendController::class, 'deleteFriend']);
+    Route::get('/friends/', [FriendController::class, 'getPendingFriendList']);
 });
 // Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
