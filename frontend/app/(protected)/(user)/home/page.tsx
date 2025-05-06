@@ -74,13 +74,6 @@ function Page() {
     };
 
     fetchComments();
-    const channel = echo.channel(`post.${selectedPostId}`);
-    channel.listen("CommentCreated", (event: any) => {
-      setComments((prevComments) => [event.comment, ...prevComments]);
-    });
-    return () => {
-      channel.stopListening("NewCommentAdded");
-    };
   }, [selectedPostId]);
 
   useEffect(() => {
@@ -104,6 +97,16 @@ function Page() {
 
   const handleCommentClick = async () => {
     if (userComment == "") return;
+    const res = await axios.get("api/user");
+    const newComment = {
+      content: userComment,
+      id: selectedPostId,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      user: {
+        username: res.data.user.username,
+      },
+    };
     setLoading(true);
     try {
       const res = await axios.post(
@@ -115,7 +118,8 @@ function Page() {
         },
         { withCredentials: true }
       );
-      console.log(res);
+      console.log(comments);
+      setComments((prevComments) => [newComment, ...prevComments]);
     } catch (error) {
       console.error("Failed to create comment", error);
     } finally {
@@ -123,10 +127,20 @@ function Page() {
       setUserComment("");
     }
   };
+  useEffect(() => {
+    if (!selectedPostId) return;
 
+    const channel = echo.channel(`post.${selectedPostId}`);
+    channel.listen("CommentCreated", (event: any) => {
+      setComments((prevComments) => [event.comment, ...prevComments]);
+    });
+
+    return () => {
+      channel.stopListening("CommentCreated");
+    };
+  }, [selectedPostId]);
   return (
     <>
-      <Header />
       <div className="mt-25">
         <div className="grid grid-cols-4">
           <div className="col-span-1">a</div>
