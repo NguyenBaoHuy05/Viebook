@@ -2,13 +2,19 @@ import React, { useState } from "react";
 import ImageWithSkeleton from "./image";
 import { Button } from "../ui/button";
 import { IoMdClose } from "react-icons/io";
+import iFriend from "@/interface/friendType";
 const AcceptFriends = ({
   isOpen,
   onSave,
+  onAccept,
+  data,
 }: {
   isOpen: boolean;
   onSave: () => void;
+  data: iFriend;
+  onAccept: (data: iFriend[]) => void;
 }) => {
+  const [isAgree, setIsAgree] = useState<boolean>(false);
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:text-black">
@@ -31,13 +37,28 @@ const AcceptFriends = ({
         <div className="col-span-2 grid grid-rows-2">
           <div className="flex flex-col gap-2">
             <span className="font-semibold">
-              Nguyễn Gia Huy đã gửi lời mời kết bạn cho bạn
+              {data.name} đã gửi lời mời kết bạn cho bạn
             </span>
-            <span className="italic">Ngày gửi: 22/02/2025</span>
+            <span className="italic">
+              Ngày gửi: {new Date(data.requested_at).toLocaleString()}
+            </span>
           </div>
           <div className="flex justify-evenly items-center">
-            <Button className="bg-red-500 hover:bg-red-600">Từ chối</Button>
-            <Button className="bg-green-500 hover:bg-green-600">
+            <Button
+              className="bg-red-500 hover:bg-red-600"
+              onClick={() => {
+                onSave();
+              }}
+            >
+              Từ chối
+            </Button>
+            <Button
+              className="bg-green-500 hover:bg-green-600"
+              onClick={() => {
+                onSave();
+                onAccept();
+              }}
+            >
               Chấp nhận
             </Button>
           </div>

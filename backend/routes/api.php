@@ -52,7 +52,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/friends', [FriendController::class, 'getStatusFriend']);
     Route::post('/friends/add', [FriendController::class, 'addFriend']);
     Route::delete('/friends/{friend_id}', [FriendController::class, 'deleteFriend']);
-    Route::get('/friends/', [FriendController::class, 'getPendingFriendList']);
+    Route::get('/friends/pendingList', [FriendController::class, 'getPendingFriendList']);
+    Route::put('/friends/acceptFriend', [FriendController::class, 'acceptFriend']);
+    Route::get('/friends/friendList', [FriendController::class, 'getFriendsList']);
 });
 // Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 

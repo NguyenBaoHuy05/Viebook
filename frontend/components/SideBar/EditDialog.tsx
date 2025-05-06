@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { CiViewList } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import iUser from "@/interface/userType";
+import { Textarea } from "../ui/textarea";
 
 interface EditDialogProps {
   open: boolean;
@@ -93,7 +94,7 @@ const EditDialog: React.FC<EditDialogProps> = ({ open, data, onSave }) => {
             <Label htmlFor="bio" className="text-right">
               Bio
             </Label>
-            <textarea
+            <Textarea
               id="bio"
               value={userForm.bio ?? ""}
               className="col-span-3"

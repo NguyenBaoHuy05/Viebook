@@ -91,12 +91,17 @@ class FriendController extends Controller
         })->orWhere(function ($q) use ($userId, $friendId) {
             $q->where('user_id', $friendId)->where('friend_id', $userId);
         })->first();
+        if ($friend->status === 'accepted') {
+            User::where('id', $userId)->decrement('count_friend');
+            User::where('id', $friendId)->decrement('count_friend');
+        }
 
         if (!$friend) {
             return response()->json(['message' => 'Không tìm thấy bạn bè'], 404);
         }
 
         $friend->delete();
+
 
         return response()->json(['message' => 'Đã xóa bạn bè']);
     }
@@ -111,7 +116,7 @@ class FriendController extends Controller
             ->map(function ($friend) {
                 return [
                     'id' => $friend->user_id,
-                    'username' => $friend->user->username,
+                    'name' => $friend->user->name,
                     'requested_at' => $friend->created_at,
                 ];
             });
@@ -120,10 +125,6 @@ class FriendController extends Controller
             'pending_friends' => $pendingFriends
         ]);
     }
-
-
-
-
     public function acceptFriend(Request $request)
     {
         $request->validate([
@@ -143,10 +144,15 @@ class FriendController extends Controller
         }
 
         $friendRequest->update(['status' => 'accepted']);
+        if ($friendRequest) {
+            User::where('id', $userId)->increment('count_friend');
+            User::where('id', $friendId)->increment('count_friend');
+        }
 
         return response()->json(['message' => 'Đã chấp nhận lời mời kết bạn']);
     }
-    public function getFriends(Request $request)
+
+    public function getFriendsList(Request $request)
     {
         $userId = $request->user()->id;
 
@@ -161,6 +167,7 @@ class FriendController extends Controller
                 $friendUser = $friend->user_id == $userId ? $friend->friend_id : $friend->user_id;
                 return [
                     'id' => $friendUser,
+                    'name' => $friend->user->name,
                     'since' => $friend->updated_at,
                 ];
             });

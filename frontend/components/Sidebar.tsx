@@ -22,10 +22,11 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
   const [loading, setLoading] = useState(false);
   const isOwner = id == String(userInfo.id);
   const [change, setChange] = useState(false);
-  const [isFollow, setIsFollow] = useState(false);
-  const [isStatusFriend, setIsStatusFriend] = useState<number>(1);
-  const [btnAcceptFriend, setBtnAcceptFriend] = useState<React.ReactNode>();
-  const [pendingFriend, setPendingFriend] = useState<iFriend[]>();
+  const [isFollow, setIsFollow] = useState(false); //Trạng thái nút accept ảnh
+  const [isStatusFriend, setIsStatusFriend] = useState<number>(1); //Trạng thái nút kết bạn
+  const [pendingFriend, setPendingFriend] = useState<iFriend[]>(); //Danh sách chờ kết bạn
+  const [friend, setFriend] = useState<iFriend[]>(); //Danh sách bạn bè
+  const [posAccept, setPosAccept] = useState<string>("");
 
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -106,6 +107,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
       console.log("Lỗi: ", error);
     }
   };
+
   const handleUnFollow = async () => {
     setIsFollow(false);
     try {
@@ -117,6 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
       console.log("Lỗi: ", error);
     }
   };
+
   const handleFriend = async () => {
     try {
       setLoading(true);
@@ -133,6 +136,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
       console.log("Lỗi", error);
     }
   };
+
   const handleRemoveFriend = async () => {
     try {
       setLoading(true);
@@ -145,6 +149,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
       console.log("Lỗi khi remove friend: ", error);
     }
   };
+
   useEffect(() => {
     const checkFollow = async () => {
       try {
@@ -172,10 +177,23 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
         console.error("Lỗi:", error);
       }
     };
+    const getPendingFriendList = async () => {
+      const response = await axios.get("/api/friends/pendingList");
+      console.log("Chạy", response.data.pending_friends);
+      setPendingFriend(response.data.pending_friends);
+    };
+    const getFriendList = async () => {
+      const response = await axios.get("/api/friends/friendList");
+      console.log("Chạy", response.data.friends);
+      setFriend(response.data.friends);
+    };
     if (!isOwner) {
       checkFollow();
       checkFriend();
+    } else {
+      getPendingFriendList();
     }
+    getFriendList();
   }, [isOwner, user.id]);
   useEffect(() => {
     setUserForm(user);
@@ -186,7 +204,20 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
       setChange(false);
     }
   }, [change]);
-  useEffect(() => {});
+  useEffect(() => {
+    const handlePosAccept = async () => {
+      const response = await axios.put("/api/friends/acceptFriend", {
+        friend_id: posAccept,
+      });
+      setPendingFriend(
+        pendingFriend?.filter((friend) => friend.id !== posAccept)
+      );
+      setPosAccept("");
+      toast.success("Chấp nhận bạn thành công");
+    };
+
+    if (posAccept) handlePosAccept();
+  }, [posAccept]);
   return (
     <>
       {loading && <LoadingPage isError={loading} />}
@@ -272,7 +303,9 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
                       }
                       title1="Xóa bạn bè"
                       title2="Xóa bạn bè không thể hoàn lại thao tác. Bạn có chắc chắn muốn xóa không?"
-                      onSave={handleRemoveFriend}
+                      onSave={() => {
+                        handleRemoveFriend;
+                      }}
                     />
                   ) : (
                     <Button
@@ -311,7 +344,12 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
         {/* Bạn bè */}
         <div className="relative max-w-240 mx-auto my-10 grid grid-cols-3 gap-3">
           <div className="col-span-1 h-100">
-            <Friend open={isOwner} />
+            <Friend
+              onSave={(id: string) => setPosAccept(id)}
+              data={pendingFriend} //Danh sách chờ kết bạn
+              dataFriend={friend}
+              open={isOwner}
+            />
           </div>
           <div className="col-span-2 bg-gray-200 h-200">Bài Post</div>
         </div>
