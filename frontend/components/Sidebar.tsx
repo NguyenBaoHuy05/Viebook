@@ -11,6 +11,8 @@ import ImageWithSkeleton from "./SideBar/image";
 import EditDialog from "./SideBar/EditDialog";
 import AlertDialogDemo from "./Modal/AlertDialog";
 import iFriend from "@/interface/friendType";
+import PostFeed from "./PostFeed";
+import CommentFeed from "./CommentFeed";
 interface SidebarProps {
   userInfo: iUser;
   id: string;
@@ -30,6 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
 
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -342,7 +345,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
           </div>
         </div>
         {/* Bạn bè */}
-        <div className="relative max-w-240 mx-auto my-10 grid grid-cols-3 gap-3">
+        <div className="relative mx-auto my-10 grid grid-cols-4 gap-3">
           <div className="col-span-1 h-100">
             <Friend
               onSave={(id: string) => setPosAccept(id)}
@@ -351,7 +354,10 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
               open={isOwner}
             />
           </div>
-          <div className="col-span-2 bg-gray-200 h-200">Bài Post</div>
+          <PostFeed onSelectPost={setSelectedPostId} userId={String(user.id)} />
+          <div className="h-full relative col-span-1">
+            {selectedPostId && <CommentFeed postId={selectedPostId} />}
+          </div>
         </div>
       </div>
     </>

@@ -37,7 +37,7 @@ const Friend: React.FC<FriendProps> = ({ open, onSave, data, dataFriend }) => {
           }}
         />
       )}
-      <div className="rounded-lg border-black border-2 flex flex-col p-2">
+      <div className="rounded-lg border-black border-2 flex flex-col p-2 ">
         {open && (
           <div className="flex flex-col mb-2">
             <b>Danh sách đang chờ kết bạn:</b>
