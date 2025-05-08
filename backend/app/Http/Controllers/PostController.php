@@ -52,5 +52,10 @@ class PostController extends Controller
 
         return response()->json(['status' => $react ? 'unliked' : 'liked']);
     }   
-
+    public function getReact(Post $post, Request $request)
+    {
+        $user = $request->user();
+        $react = PostReact::where('post_id', $post->id)->where('user_id', $user->id)->first();
+        return response()->json(['status' => $react ? 1 : 0]);
+    }
 }

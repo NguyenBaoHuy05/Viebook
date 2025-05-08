@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import { FaCommentAlt } from "react-icons/fa";
 import { FaShare } from "react-icons/fa";
@@ -17,16 +17,24 @@ function Post({
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.reactCount);
 
-  const handleLike = () => {
+  const handleLike = async () => {
     setIsLiked(!isLiked);
     setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
-    axios.post(`api/posts/${post.id}/react`);
+    const res = await axios.post(`api/posts/${post.id}/react`);
+    console.log(res);
   };
 
   const handleCommentClick = () => {
     onSelectPost(post.id);
   };
-
+  useEffect(() => {
+    const getReact = async () => {
+      const res = await axios.get(`api/posts/${post.id}/getReact`);
+      console.log(res);
+      setIsLiked(res.data.status);
+    };
+    getReact();
+  });
   return (
     <div className="bg-gray-50 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-200 p-4 mb-4">
       <div className="flex items-center gap-3 mb-4">
