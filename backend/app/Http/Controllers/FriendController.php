@@ -168,7 +168,7 @@ class FriendController extends Controller
                 return [
                     'id' => $friendUser,
                     'name' => $friend->user->name,
-                    'since' => $friend->updated_at,
+                    'requested_at' => $friend->updated_at,
                 ];
             });
 

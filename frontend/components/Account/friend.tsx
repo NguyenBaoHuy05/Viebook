@@ -3,6 +3,13 @@ import ImageWithSkeleton from "../SideBar/image";
 import { useState } from "react";
 import AcceptFriends from "../SideBar/AcceptFriend";
 import iFriend from "@/interface/friendType";
+import { Button } from "../ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface FriendProps {
   open: boolean;
@@ -71,18 +78,43 @@ const Friend: React.FC<FriendProps> = ({ open, onSave, data, dataFriend }) => {
             {dataFriend && dataFriend.length === 0 && "Trống"}
             {dataFriend &&
               dataFriend.map((p) => (
-                <div
-                  key={p.id}
-                  className="h-30 text-xs p-0.5 rounded-lg border-red-200 border-2 hover:cursor-pointer "
-                >
-                  <ImageWithSkeleton
-                    src={"https://github.com/shadcn.png"}
-                    alt="demo"
-                    className="w-25 h-20"
-                    imgClass="rounded-lg"
-                  />
-                  <div className="mt-1 ml-1 font-semibold">{p.name}</div>
-                </div>
+                <TooltipProvider key={p.id}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="h-30 text-xs p-0.5 rounded-lg border-green-200 border-2 hover:cursor-pointer ">
+                        <ImageWithSkeleton
+                          src={"https://github.com/shadcn.png"}
+                          alt="demo"
+                          className="w-25 h-20"
+                          imgClass="rounded-lg"
+                        />
+                        <div className="mt-1 ml-1 font-semibold">{p.name}</div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="grid gap-3 grid-cols-2">
+                        <div className="h-30 text-xs p-0.5 rounded-lg border-2 hover:cursor-pointer ">
+                          <ImageWithSkeleton
+                            src={"https://github.com/shadcn.png"}
+                            alt="demo"
+                            className="w-25 h-20"
+                            imgClass="rounded-lg"
+                          />
+                          <div className="mt-1 ml-1 font-semibold">
+                            {p.name}
+                          </div>
+                        </div>
+                        <div className="grid grid-rows-2 gap-3">
+                          <div className="flex justify-center items-center">
+                            Bạn bè lúc:{" "}
+                            {new Date(p.requested_at).toLocaleString()}
+                          </div>
+                          <Button>Trang cá nhân</Button>
+                        </div>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ))}
           </div>
         </div>

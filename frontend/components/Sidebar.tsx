@@ -11,6 +11,7 @@ import ImageWithSkeleton from "./SideBar/image";
 import EditDialog from "./SideBar/EditDialog";
 import AlertDialogDemo from "./Modal/AlertDialog";
 import iFriend from "@/interface/friendType";
+
 interface SidebarProps {
   userInfo: iUser;
   id: string;
