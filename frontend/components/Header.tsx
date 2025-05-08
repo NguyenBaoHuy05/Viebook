@@ -120,15 +120,15 @@ function Header() {
                 className="cursor-pointer transition-transform hover:scale-130"
               />
             </Link>
+          </div>
+
+          <div className="col-span-1 relative flex justify-end items-center gap-4">
             <Link href="/notifications">
               <IoMdNotifications
                 size={32}
                 className="cursor-pointer transition-transform hover:scale-130"
               />
             </Link>
-          </div>
-
-          <div className="col-span-1 relative flex justify-end items-center gap-4">
             <Popover>
               <PopoverTrigger asChild>
                 <FiSettings

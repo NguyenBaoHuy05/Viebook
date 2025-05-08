@@ -81,7 +81,7 @@ export default function PostFeed({ onSelectPost, userId }: Props) {
   return (
     <div
       ref={containerRef}
-      className="col-span-2 flex flex-col gap-8 overflow-y-auto"
+      className="col-span-2 flex flex-col gap-8 overflow-y-auto [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500"
       style={{ maxHeight: "calc(100vh - 100px)" }}
     >
       <CreateAPost />
