@@ -135,6 +135,7 @@ class FriendController extends Controller
                     'id' => $friend->user_id,
                     'name' => $friend->user->name,
                     'username' => $friend->user->username,
+                    'avatar' => $friend->user->profile_picture,
                     'requested_at' => $friend->created_at,
                 ];
             });
