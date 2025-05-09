@@ -8,13 +8,10 @@ function Page() {
 
   return (
     <div className="mt-25">
-      <div className="grid grid-cols-4">
+      <div className="grid grid-cols-4 ">
         <div className="col-span-1"></div>
-
-        <PostFeed onSelectPost={setSelectedPostId} />
-
-        <div className="col-span-1 h-full relative">
-          {selectedPostId && <CommentFeed postId={selectedPostId} />}
+        <div className="flex col-span-3">
+          <PostFeed onSelectPost={setSelectedPostId} />
         </div>
       </div>
     </div>
