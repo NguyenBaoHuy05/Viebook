@@ -11,7 +11,7 @@ function CreateAPost() {
   return (
     <div>
       <CreatePost load={load} toggleLoad={toggleLoad} />
-      <div className="bg-gray-50 p-4 shadow-sm rounded-xl">
+      <div className="bg-gray-50 p-4 shadow-sm rounded-xl border-1">
         <div className="flex items-center gap-3">
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" alt="avt" />

@@ -5,27 +5,30 @@ import Post from "@/components/Post";
 import CreateAPost from "@/components/CreateAPost";
 import { Loader2 } from "lucide-react";
 import axios from "@/lib/axiosConfig";
+import { useUser } from "@/context/UserContext";
 
 type Props = {
   onSelectPost: (postId: string) => void;
-  userId?: string;
+  userOwner?: string;
 };
 
-export default function PostFeed({ onSelectPost, userId }: Props) {
+export default function PostFeed({ onSelectPost, userOwner }: Props) {
   const [posts, setPosts] = useState<iPost[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { userId } = useUser();
 
   useEffect(() => {
     const fetchPosts = async () => {
       if (loading || !hasMore) return;
-      console.log(userId);
+      console.log(userOwner);
       setLoading(true);
       try {
         const query =
-          `/api/posts?page=${currentPage}` + (userId ? `&user=${userId}` : "");
+          `/api/posts?page=${currentPage}` +
+          (userOwner ? `&user=${userOwner}` : "");
         console.log(query);
         const res = await axios.get(query);
         const fetchedPosts: iPost[] = res.data.data.map((post: any) => ({
@@ -60,7 +63,7 @@ export default function PostFeed({ onSelectPost, userId }: Props) {
     };
 
     fetchPosts();
-  }, [currentPage, userId]);
+  }, [currentPage, userOwner]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -84,10 +87,10 @@ export default function PostFeed({ onSelectPost, userId }: Props) {
   return (
     <div
       ref={containerRef}
-      className="col-span-2 flex flex-col gap-8 overflow-y-auto [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500"
+      className="col-span-2 flex flex-col gap-8 bg-white "
       style={{ maxHeight: "calc(100vh - 100px)" }}
     >
-      <CreateAPost />
+      {userOwner == userId && <CreateAPost />}
       {posts.map((post) => (
         <Post key={post.id} post={post} onSelectPost={onSelectPost} />
       ))}

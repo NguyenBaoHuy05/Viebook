@@ -322,8 +322,11 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
                       }}
                     />
                   ) : isStatusFriend == 4 ? (
-                    <Button className="hover:cursor-pointer bg-yellow-400 hover:bg-yellow-500">
-                      AcceptFriend?
+                    <Button
+                      className="hover:cursor-pointer bg-yellow-400 hover:bg-yellow-500"
+                      onClick={() => setPosAccept(String(user.id))}
+                    >
+                      AcceptFriend
                     </Button>
                   ) : (
                     <Button
@@ -340,12 +343,12 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
               <div className="text-sm row-span-1 flex gap-2">
                 <div className="font-bold">Location:</div>
                 {user.location}
-                <i>{user.location ? " " : "Bạn chưa nhập thông tin"}</i>
+                <i>{user.location ? " " : "Chưa có thông tin"}</i>
               </div>
               <div className="text-sm row-span-4 flex gap-2">
                 <div className="font-bold">Bio:</div>
                 <span className="wrap-anywhere">{user.bio}</span>
-                <i>{user.bio ? " " : "Bạn chưa nhập thông tin"}</i>
+                <i>{user.bio ? " " : "Chưa có thông tin"}</i>
               </div>
             </div>
             {/* Edit Profile Dialog */}
@@ -361,7 +364,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
         </div>
         {/* Bạn bè */}
         <div className="max-w-240 relative mx-auto my-10 grid grid-cols-3 gap-3">
-          <div className="col-span-1 h-100 sticky top-72">
+          <div className="col-span-1 h-100 sticky top-10">
             <Friend
               onSave={(id: string) => setPosAccept(id)}
               data={pendingFriend} //Danh sách chờ kết bạn
@@ -369,11 +372,11 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
               open={isOwner}
             />
           </div>
-          <div className="max-w-240 col-span-2">
+          <div className="max-w-240 col-span-2 border-t-2 pt-2">
             {selectedPostId && <CommentFeed postId={selectedPostId} />}
             <PostFeed
               onSelectPost={setSelectedPostId}
-              userId={String(user.id)}
+              userOwner={String(user.id)}
             />
           </div>
         </div>

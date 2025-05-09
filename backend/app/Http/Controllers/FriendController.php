@@ -134,6 +134,7 @@ class FriendController extends Controller
                 return [
                     'id' => $friend->user_id,
                     'name' => $friend->user->name,
+                    'username' => $friend->user->username,
                     'requested_at' => $friend->created_at,
                 ];
             });

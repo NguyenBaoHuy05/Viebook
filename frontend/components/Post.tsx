@@ -7,6 +7,7 @@ import iPost from "@/interface/post";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axios from "@/lib/axiosConfig";
 import Image from "next/image";
+import ImageWithSkeleton from "./SideBar/image";
 function Post({
   post,
   onSelectPost,
@@ -36,7 +37,7 @@ function Post({
     getReact();
   });
   return (
-    <div className="bg-gray-50 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-200 p-4 mb-4">
+    <div className="bg-gray-50 rounded-xl transition-shadow duration-200 p-4 mb-4 shadow-[0px_0px_4px_1px_gray] hover:cursor-pointer">
       <div className="flex items-center gap-3 mb-4">
         <Avatar>
           <AvatarImage src={post.logo} alt="avt" />
@@ -49,51 +50,51 @@ function Post({
           </span>
           <span className="text-sm text-gray-500">{post.date}</span>
         </div>
+        <div className="flex ml-auto  rounded-lg">
+          <button
+            onClick={handleLike}
+            className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+          >
+            {isLiked ? (
+              <AiFillLike size={20} className="text-blue-500" />
+            ) : (
+              <AiOutlineLike size={20} className="text-gray-500" />
+            )}
+            <span className="text-gray-600 text-lg font-medium">
+              {likeCount}
+            </span>
+          </button>
+          <button
+            onClick={handleCommentClick}
+            className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+          >
+            <FaCommentAlt size={20} className="text-gray-500" />
+            <span className="text-gray-600 text-lg font-medium">
+              {post.commentCount}
+            </span>
+          </button>
+
+          <button className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
+            <FaShare size={20} className="text-gray-400" />
+            <span className="text-gray-600 text-lg font-medium">
+              {post.shareCount}
+            </span>
+          </button>
+        </div>
       </div>
 
       <div className="mb-4">
         <p className="text-gray-800 text-lg mb-4">{post.title}</p>
         <div className="relative w-full rounded-lg overflow-hidden">
           {post.content && (
-            <Image
+            <ImageWithSkeleton
               src={post.content}
               alt="content"
-              width={600}
-              height={400}
-              objectFit="contain"
+              className="h-1/2 "
+              imgClass="object-cover"
             />
           )}
         </div>
-      </div>
-
-      <div className="flex items-center justify-between border-t border-gray-100 pt-3">
-        <button
-          onClick={handleLike}
-          className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
-        >
-          {isLiked ? (
-            <AiFillLike size={28} className="text-blue-500" />
-          ) : (
-            <AiOutlineLike size={28} className="text-gray-500" />
-          )}
-          <span className="text-gray-600 text-lg font-medium">{likeCount}</span>
-        </button>
-        <button
-          onClick={handleCommentClick}
-          className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
-        >
-          <FaCommentAlt size={28} className="text-gray-500" />
-          <span className="text-gray-600 text-lg font-medium">
-            {post.commentCount}
-          </span>
-        </button>
-
-        <button className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
-          <FaShare size={28} className="text-gray-500" />
-          <span className="text-gray-600 text-lg font-medium">
-            {post.shareCount}
-          </span>
-        </button>
       </div>
     </div>
   );
