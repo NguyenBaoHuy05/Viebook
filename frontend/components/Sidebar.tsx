@@ -363,8 +363,8 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
           </div>
         </div>
         {/* Bạn bè */}
-        <div className="max-w-240 relative mx-auto my-10 grid grid-cols-3 gap-3">
-          <div className="col-span-1 h-100 sticky top-10">
+        <div className=" relative mx-auto my-10 grid grid-cols-3 gap-3">
+          <div className="col-span-1 h-100 sticky top-10 ml-52">
             <Friend
               onSave={(id: string) => setPosAccept(id)}
               data={pendingFriend} //Danh sách chờ kết bạn
@@ -372,8 +372,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
               open={isOwner}
             />
           </div>
-          <div className="max-w-240 col-span-2 border-t-2 pt-2">
-            {selectedPostId && <CommentFeed postId={selectedPostId} />}
+          <div className="col-span-2 border-t-2 pt-2">
             <PostFeed
               onSelectPost={setSelectedPostId}
               userOwner={String(user.id)}

@@ -87,7 +87,7 @@ export default function PostFeed({ onSelectPost, userOwner }: Props) {
   return (
     <div
       ref={containerRef}
-      className="col-span-2 flex flex-col gap-8 bg-white "
+      className="col-span-3 flex flex-col gap-8 bg-white "
       style={{ maxHeight: "calc(100vh - 100px)" }}
     >
       {userOwner == userId && <CreateAPost />}

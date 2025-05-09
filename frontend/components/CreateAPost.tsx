@@ -9,7 +9,7 @@ function CreateAPost() {
     setLoad(!load);
   };
   return (
-    <div>
+    <div className="w-180">
       <CreatePost load={load} toggleLoad={toggleLoad} />
       <div className="bg-gray-50 p-4 shadow-sm rounded-xl border-1">
         <div className="flex items-center gap-3">

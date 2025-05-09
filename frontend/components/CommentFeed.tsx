@@ -79,7 +79,7 @@ export default function CommentFeed({ postId }: Props) {
   return (
     <div className="relative border-2 border-b-0 ml-2 rounded-lg">
       <CommentSection comments={comments} />
-      <div className="w-full absolute bottom-3 px-3 py-3 rounded-lg bg-white border-2 border-gray-200">
+      <div className="w-full px-3 py-3 ">
         <div className="flex items-center gap-2">
           <button
             className={`px-4 py-2 text-sm font-medium text-white rounded-full transition ${
