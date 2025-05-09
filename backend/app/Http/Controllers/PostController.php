@@ -25,8 +25,14 @@ class PostController extends Controller
         ]);
         return response()->json(['post' => $post], 201);
     }
-    public function index() {
-        $posts = Post::with('user')->latest()->paginate(15);
+    public function index(Request $request) {
+        $query = Post::with('user')->latest();
+    
+        if ($request->has('user')) {
+            $query->where('user_id', $request->query('user'));
+        }
+    
+        $posts = $query->paginate(15);
         return response()->json($posts);
     }
     public function toggleReact(Post $post, Request $request)
