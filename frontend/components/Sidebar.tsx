@@ -185,18 +185,21 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
       console.log("Chạy", response.data.pending_friends);
       setPendingFriend(response.data.pending_friends);
     };
-    const getFriendList = async () => {
-      const response = await axios.get("/api/friends/friendList");
-      console.log("Chạy", response.data.friends);
+    const getFriendList = async (id: string) => {
+      const response = await axios.get("/api/friends/friendList", {
+        params: { friend_id: id },
+      });
+      console.log("Chạy friend", response.data.friends);
       setFriend(response.data.friends);
     };
     if (!isOwner) {
       checkFollow();
       checkFriend();
+      getFriendList(String(user.id));
     } else {
       getPendingFriendList();
+      getFriendList(id);
     }
-    getFriendList();
   }, [isOwner, user.id]);
   useEffect(() => {
     setUserForm(user);
@@ -222,9 +225,17 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
     if (posAccept) handlePosAccept();
   }, [posAccept]);
   return (
-    <>
+    <div className="relative">
       {loading && <LoadingPage isError={loading} />}
-      <div className="mt-25">
+      <ImageWithSkeleton
+        src={
+          previewUrl ?? user.profile_picture ?? "https://github.com/shadcn.png"
+        }
+        alt="demo"
+        className="mt-10 mx-auto absolute w-300 h-100 z-0"
+        imgClass="rounded-lg"
+      />
+      <div className="-mt-25 z-10">
         <div className="grid grid-cols-3 max-w-240 wrap mx-auto gap-2 h-50 mb-4">
           <div className={`m-auto relative col-span-1`}>
             <ImageWithSkeleton
@@ -345,8 +356,8 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
           </div>
         </div>
         {/* Bạn bè */}
-        <div className="relative mx-auto my-10 grid grid-cols-4 gap-3">
-          <div className="col-span-1 h-100">
+        <div className="max-w-240 relative mx-auto my-10 grid grid-cols-3 gap-3">
+          <div className="col-span-1 h-100 sticky top-72">
             <Friend
               onSave={(id: string) => setPosAccept(id)}
               data={pendingFriend} //Danh sách chờ kết bạn
@@ -354,13 +365,16 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
               open={isOwner}
             />
           </div>
-          <PostFeed onSelectPost={setSelectedPostId} userId={String(user.id)} />
-          <div className="h-full relative col-span-1">
+          <div className="max-w-240 col-span-2">
             {selectedPostId && <CommentFeed postId={selectedPostId} />}
+            <PostFeed
+              onSelectPost={setSelectedPostId}
+              userId={String(user.id)}
+            />
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

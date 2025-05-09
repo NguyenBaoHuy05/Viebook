@@ -155,20 +155,28 @@ class FriendController extends Controller
     public function getFriendsList(Request $request)
     {
         $userId = $request->user()->id;
+        $friendId = $request->query('friend_id');
 
-        $friends = Friend::where(function ($query) use ($userId) {
-            $query->where('user_id', $userId)
-                ->orWhere('friend_id', $userId);
+        $targetId = $userId == $friendId ? $userId : $friendId;
+
+        $friends = Friend::where(function ($query) use ($targetId) {
+            $query->where('user_id', $targetId)
+                ->orWhere('friend_id', $targetId);
         })
             ->where('status', 'accepted')
+            ->latest()
+            ->take(5)
+            ->with(['user', 'friend']) // eager load để tránh lỗi N+1
             ->get()
-            ->map(function ($friend) use ($userId) {
-                // Xác định ID bạn bè là ai trong quan hệ hai chiều
-                $friendUser = $friend->user_id == $userId ? $friend->friend_id : $friend->user_id;
+            ->map(function ($friend) use ($targetId) {
+                // Xác định bạn bè là người còn lại trong mối quan hệ
+                $friendUser = $friend->user_id == $targetId ? $friend->friend : $friend->user;
                 return [
-                    'id' => $friendUser,
-                    'name' => $friend->user->name,
-                    'since' => $friend->updated_at,
+                    'id' => $friendUser->id,
+                    'username' => $friendUser->username,
+                    'name' => $friendUser->name,
+                    'avatar' => $friendUser->profile_picture,
+                    'requested_at' => $friend->updated_at,
                 ];
             });
 
