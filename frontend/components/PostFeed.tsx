@@ -21,16 +21,19 @@ export default function PostFeed({ onSelectPost, userId }: Props) {
   useEffect(() => {
     const fetchPosts = async () => {
       if (loading || !hasMore) return;
-
+      console.log(userId);
       setLoading(true);
       try {
         const query =
           `/api/posts?page=${currentPage}` + (userId ? `&user=${userId}` : "");
+        console.log(query);
         const res = await axios.get(query);
         const fetchedPosts: iPost[] = res.data.data.map((post: any) => ({
           id: post.id,
           name: post.user.name,
-          logo: "/avt.jpg",
+          logo: post.user.profile_picture
+            ? post.user.profile_picture
+            : "https://github.com/shadcn.png",
           title: post.title,
           content: post.content,
           commentCount: post.comment_count,

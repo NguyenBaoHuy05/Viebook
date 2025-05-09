@@ -54,13 +54,15 @@ function Post({
       <div className="mb-4">
         <p className="text-gray-800 text-lg mb-4">{post.title}</p>
         <div className="relative w-full rounded-lg overflow-hidden">
-          <Image
-            src={post.content}
-            alt="content"
-            width={600}
-            height={400}
-            objectFit="contain"
-          />
+          {post.content && (
+            <Image
+              src={post.content}
+              alt="content"
+              width={600}
+              height={400}
+              objectFit="contain"
+            />
+          )}
         </div>
       </div>
 
