@@ -321,6 +321,10 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
                         handleRemoveFriend;
                       }}
                     />
+                  ) : isStatusFriend == 4 ? (
+                    <Button className="hover:cursor-pointer bg-yellow-400 hover:bg-yellow-500">
+                      AcceptFriend?
+                    </Button>
                   ) : (
                     <Button
                       className="hover:cursor-pointer hover:bg-black-300"

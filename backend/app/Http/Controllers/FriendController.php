@@ -22,9 +22,6 @@ class FriendController extends Controller
         $friend  = Friend::where(function ($q) use ($userId, $friendId) {
             $q->where('user_id', $userId)
                 ->where('friend_id', $friendId);
-        })->orWhere(function ($q) use ($userId, $friendId) {
-            $q->where('user_id', $friendId)
-                ->where('friend_id', $userId);
         })->first();
         if ($friend) {
             switch ($friend->status) {
@@ -43,7 +40,27 @@ class FriendController extends Controller
         } else {
             $status = 0;
         }
-
+        $friend_1  = Friend::where(function ($q) use ($userId, $friendId) {
+            $q->where('user_id', $friendId)
+                ->where('friend_id', $userId);
+        })->first();
+        if ($friend_1) {
+            switch ($friend_1->status) {
+                case 'pending':
+                    $status = 4;
+                    break;
+                case 'accepted':
+                    $status = 2;
+                    break;
+                case 'rejected':
+                    $status = 3;
+                    break;
+                default:
+                    $status = 0;
+            }
+        } else {
+            $status = 0;
+        }
         return response()->json(['status' => $status]);
     }
     public function addFriend(Request $request)
