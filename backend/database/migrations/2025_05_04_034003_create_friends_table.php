@@ -14,7 +14,7 @@ class CreateFriendsTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('friend_id');
 
-            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'accepted', 'blocked', 'deleted'])->default('pending');
 
             $table->timestamps();
 

@@ -7,7 +7,7 @@ import iFriend from "@/interface/friendType";
 import Link from "next/link";
 import AlertDialogDemo from "../Modal/AlertDialog";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "@/lib/axiosConfig";
 
 interface Props {
@@ -15,6 +15,7 @@ interface Props {
   pending: boolean;
   onSave: (id: string, check: boolean) => void;
 }
+
 const groupFriendsByFirstLetter = (friends: iFriend[]) => {
   return friends.reduce((acc, friend) => {
     const letter = friend.name[0].toUpperCase();
@@ -23,48 +24,43 @@ const groupFriendsByFirstLetter = (friends: iFriend[]) => {
     return acc;
   }, {} as Record<string, iFriend[]>);
 };
+
 const People = ({ friends, pending, onSave }: Props) => {
   const grouped = groupFriendsByFirstLetter(friends);
   const sortedLetters = Object.keys(grouped).sort();
   const [loading, setLoading] = useState(false);
-  const [deleteFriend, setDeleteFriend] = useState<string>("");
-  const [addFriend, setAddFriend] = useState<string>("");
-  const handleRemoveFriend = async () => {
+
+  const handleRemoveFriend = async (id: string) => {
     try {
       setLoading(true);
-      const response = await axios.delete(`/api/friends/${deleteFriend}`);
-      setDeleteFriend("");
+      console.log("Id:", id);
+      await axios.delete(`/api/friends/${id}`);
       toast.success("Đã xóa bạn bè thành công!");
-      onSave(deleteFriend, false);
-      setLoading(false);
+      onSave(id, false);
     } catch (error) {
+      toast.error("Lỗi khi xóa bạn.");
+      console.error("Remove friend error:", error);
+    } finally {
       setLoading(false);
-      console.log("Lỗi khi remove friend: ", error);
     }
   };
-  const handleAddFriend = async () => {
+
+  const handleAcceptFriend = async (id: string) => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/friends/add", {
-        friend_id: addFriend,
+      console.log("Id:", id);
+      const response = await axios.put("/api/friends/acceptFriend", {
+        friend_id: id,
       });
-      if (response.data.message == 1) {
-        setAddFriend("");
-        toast.success("Thêm bạn bè thành công.");
-        onSave(addFriend, true);
-      } else toast.error("Lỗi kết bạn");
-      setLoading(false);
+      toast.success("Thêm bạn bè thành công.");
+      onSave(id, true);
     } catch (error) {
+      toast.error("Lỗi khi thêm bạn.");
+      console.error("Add friend error:", error);
+    } finally {
       setLoading(false);
-      console.log("Lỗi", error);
     }
   };
-  useEffect(() => {
-    if (deleteFriend) handleRemoveFriend();
-  }, [deleteFriend]);
-  useEffect(() => {
-    if (addFriend) handleAddFriend();
-  }, [addFriend]);
 
   return (
     <div className="max-h-150 h-fit border-2 overflow-y-auto rounded-b-lg [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
@@ -108,41 +104,32 @@ const People = ({ friends, pending, onSave }: Props) => {
                         />
                       }
                       title1="Thêm bạn bè"
-                      title2={`Bạn có chắc chắn muốn kết bạn với ${friend.name} không`}
-                      onSave={() => {
-                        setAddFriend(friend.id);
-                      }}
+                      title2={`Bạn có chắc chắn muốn kết bạn với ${friend.name}?`}
+                      onSave={() => handleAcceptFriend(friend.id)}
                     />
                   )}
-                  {!pending ? (
-                    <AlertDialogDemo
-                      btn={
-                        <AiOutlineUserDelete
-                          size={25}
-                          className="mr-5 hover:scale-120 hover:cursor-pointer"
-                        />
-                      }
-                      title1="Xóa bạn bè"
-                      title2={`Bạn có chắc chắn muốn xóa bạn bè với ${friend.name} không`}
-                      onSave={() => {
-                        setDeleteFriend(friend.id);
-                      }}
-                    />
-                  ) : (
-                    <AlertDialogDemo
-                      btn={
+                  <AlertDialogDemo
+                    btn={
+                      pending ? (
                         <MdDelete
                           size={25}
                           className="mr-5 hover:scale-120 hover:cursor-pointer"
                         />
-                      }
-                      title1="Xóa bạn bè"
-                      title2={`Bạn có chắc chắn muốn xóa lời mời kết bạn của ${friend.name} không`}
-                      onSave={() => {
-                        setDeleteFriend(friend.id);
-                      }}
-                    />
-                  )}
+                      ) : (
+                        <AiOutlineUserDelete
+                          size={25}
+                          className="mr-5 hover:scale-120 hover:cursor-pointer"
+                        />
+                      )
+                    }
+                    title1="Xóa bạn bè"
+                    title2={
+                      pending
+                        ? `Bạn có chắc chắn muốn hủy lời mời kết bạn của ${friend.name}?`
+                        : `Bạn có chắc chắn muốn xóa bạn bè với ${friend.name}?`
+                    }
+                    onSave={() => handleRemoveFriend(friend.id)}
+                  />
                 </div>
               </div>
             ))}

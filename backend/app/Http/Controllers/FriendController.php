@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Conversation;
+use App\Models\ConversationUser;
 use Illuminate\Http\Request;
 use App\Models\Friend;
 use App\Models\User;
@@ -31,8 +33,11 @@ class FriendController extends Controller
                 case 'accepted':
                     $status = 2;
                     break;
-                case 'rejected':
+                case 'blocked':
                     $status = 3;
+                    break;
+                case 'deleted':
+                    $status = 4;
                     break;
                 default:
                     $status = 0;
@@ -40,6 +45,7 @@ class FriendController extends Controller
         } else {
             $status = 0;
         }
+        if ($friend) return response()->json(['status' => $status]);
         $friend_1  = Friend::where(function ($q) use ($userId, $friendId) {
             $q->where('user_id', $friendId)
                 ->where('friend_id', $userId);
@@ -47,13 +53,16 @@ class FriendController extends Controller
         if ($friend_1) {
             switch ($friend_1->status) {
                 case 'pending':
-                    $status = 4;
+                    $status = 5;
                     break;
                 case 'accepted':
-                    $status = 2;
+                    $status = 6;
                     break;
-                case 'rejected':
-                    $status = 3;
+                case 'blocked':
+                    $status = 7;
+                    break;
+                case 'deleted':
+                    $status = 8;
                     break;
                 default:
                     $status = 0;
@@ -79,12 +88,17 @@ class FriendController extends Controller
         })->orWhere(function ($q) use ($userId, $friendId) {
             $q->where('user_id', $friendId)
                 ->where('friend_id', $userId);
-        })->exists();
+        })->first();
 
         if ($exists) {
-            return response()->json(['message' => 0], 409);
+            if ($exists->status !== 'deleted') {
+                return response()->json(['message' => 0], 409);
+            }
+            if ($exists->status === 'deleted') {
+                $exists->update(['status' => 'pending']);
+                return response()->json(['message' => 1], 201);
+            }
         }
-
         Friend::create([
             'user_id' => $userId,
             'friend_id' => $friendId,
@@ -117,7 +131,7 @@ class FriendController extends Controller
             return response()->json(['message' => 'Không tìm thấy bạn bè'], 404);
         }
 
-        $friend->delete();
+        $friend->update(['status' => 'deleted']);
 
 
         return response()->json(['message' => 'Đã xóa bạn bè']);
@@ -163,9 +177,31 @@ class FriendController extends Controller
         }
 
         $friendRequest->update(['status' => 'accepted']);
-        if ($friendRequest) {
-            User::where('id', $userId)->increment('count_friend');
-            User::where('id', $friendId)->increment('count_friend');
+        User::where('id', $userId)->increment('count_friend');
+        User::where('id', $friendId)->increment('count_friend');
+        $existingConversation = Conversation::where('type', 'private')
+            ->whereHas('participants', function ($q) use ($userId, $friendId) {
+                $q->whereIn('user_id', [$userId, $friendId]);
+            })
+            ->withCount('participants') // Đếm số người tham gia
+            ->having('participants_count', '=', 2) // Đảm bảo có chính xác 2 người tham gia
+            ->first();
+
+        if (!$existingConversation) {
+            $conversation = Conversation::create([
+                'type' => 'private',
+                'creator_id' => $userId,
+            ]);
+
+            ConversationUser::create([
+                'conversation_id' => $conversation->id,
+                'user_id' => $userId,
+            ]);
+
+            ConversationUser::create([
+                'conversation_id' => $conversation->id,
+                'user_id' => $friendId,
+            ]);
         }
 
         return response()->json(['message' => 'Đã chấp nhận lời mời kết bạn']);

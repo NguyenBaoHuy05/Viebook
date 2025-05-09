@@ -125,7 +125,6 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
 
   const handleFriend = async () => {
     try {
-      setLoading(true);
       const response = await axios.post("/api/friends/add", {
         friend_id: user.id,
       });
@@ -133,9 +132,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
         toast.success("Thêm bạn bè thành công. Đang chờ chấp nhận!");
         setIsStatusFriend(response.data.message);
       } else toast.error("Lỗi kết bạn");
-      setLoading(false);
     } catch (error) {
-      setLoading(false);
       console.log("Lỗi", error);
     }
   };
@@ -308,7 +305,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
                     <Button className=" bg-blue-400 hover:bg-blue-400">
                       PendingFriend
                     </Button>
-                  ) : isStatusFriend == 2 ? (
+                  ) : isStatusFriend == 2 || isStatusFriend == 6 ? (
                     <AlertDialogDemo
                       btn={
                         <Button className="hover:cursor-pointer bg-red-400 hover:bg-red-500">
@@ -321,12 +318,20 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
                         handleRemoveFriend;
                       }}
                     />
-                  ) : isStatusFriend == 4 ? (
+                  ) : isStatusFriend == 5 ? (
                     <Button
                       className="hover:cursor-pointer bg-yellow-400 hover:bg-yellow-500"
                       onClick={() => setPosAccept(String(user.id))}
                     >
                       AcceptFriend
+                    </Button>
+                  ) : isStatusFriend == 7 ? (
+                    <Button className=" bg-violet-400 hover:bg-violet-500">
+                      BlockedFriend
+                    </Button>
+                  ) : isStatusFriend == 3 ? (
+                    <Button className=" bg-orange-400 hover:bg-orange-500">
+                      BlockingFriend
                     </Button>
                   ) : (
                     <Button
