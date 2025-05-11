@@ -6,19 +6,23 @@ import { FaShare } from "react-icons/fa";
 import iPost from "@/interface/post";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axios from "@/lib/axiosConfig";
-import Image from "next/image";
 import ImageWithSkeleton from "./SideBar/image";
 import CommentFeed from "./CommentFeed";
+
 function Post({
   post,
   onSelectPost,
+  setShowModal,
 }: {
   post: iPost;
   onSelectPost: (postId: string) => void;
+  setShowModal: (prop: boolean) => void;
 }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.reactCount);
   const [showComment, setShowComment] = useState(false);
+  const [sharedPost, setSharedPost] = useState<iPost | null>(null);
+
   const handleLike = async () => {
     setIsLiked(!isLiked);
     setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
@@ -30,6 +34,7 @@ function Post({
     onSelectPost(post.id);
     setShowComment(!showComment);
   };
+
   useEffect(() => {
     const getReact = async () => {
       const res = await axios.get(`api/posts/${post.id}/getReact`);
@@ -37,7 +42,42 @@ function Post({
       setIsLiked(res.data.status);
     };
     getReact();
-  });
+  }, [post.id]);
+
+  const handleShare = () => {
+    onSelectPost(post.id);
+    setShowModal((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (post.sharePostID) {
+      console.log(post.sharePostID);
+      const fetchSharedPost = async () => {
+        try {
+          const res = await axios.get(`/api/posts/${post.sharePostID}`);
+          const sharedPostData = res.data.data;
+          setSharedPost({
+            id: sharedPostData.id,
+            name: sharedPostData.user.username,
+            logo: sharedPostData.user.profile_picture
+              ? sharedPostData.user.profile_picture
+              : "https://github.com/shadcn.png",
+            title: sharedPostData.title,
+            content: sharedPostData.content,
+            commentCount: sharedPostData.comment_count,
+            reactCount: sharedPostData.react_count,
+            shareCount: sharedPostData.share_count,
+            date: new Date(sharedPostData.created_at).toLocaleDateString(),
+            sharePostID: sharedPostData.share_post_id ?? null,
+          });
+        } catch (err) {
+          console.error("Failed to fetch shared post:", err);
+        }
+      };
+      fetchSharedPost();
+    }
+  }, [post.sharePostID]);
+
   return (
     <div className="flex justify-between">
       <div className="bg-gray-50 rounded-xl transition-shadow duration-200 p-4 mb-4 shadow-[0px_0px_4px_1px_gray] hover:cursor-pointer w-180">
@@ -53,7 +93,7 @@ function Post({
             </span>
             <span className="text-sm text-gray-500">{post.date}</span>
           </div>
-          <div className="flex ml-auto  rounded-lg">
+          <div className="flex ml-auto rounded-lg">
             <button
               onClick={handleLike}
               className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
@@ -80,7 +120,10 @@ function Post({
               </span>
             </button>
 
-            <button className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
+            <button
+              className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+              onClick={handleShare}
+            >
               <FaShare size={20} className="text-gray-400" />
               <span className="text-gray-600 text-lg font-medium">
                 {post.shareCount}
@@ -90,7 +133,18 @@ function Post({
         </div>
 
         <div className="mb-4">
-          {post.content ? (
+          {sharedPost ? (
+            <div>
+              <span className="text-lg font-semibold">{post.title}</span>
+              <div className=" p-4 rounded-lg">
+                <Post
+                  post={sharedPost}
+                  onSelectPost={onSelectPost}
+                  setShowModal={setShowModal}
+                />
+              </div>
+            </div>
+          ) : post.content ? (
             <>
               <p className="text-gray-800 text-lg mb-4">{post.title}</p>
               <div className="relative w-full rounded-lg overflow-hidden">
@@ -111,6 +165,7 @@ function Post({
           )}
         </div>
       </div>
+
       {showComment && (
         <div className="">
           <CommentFeed postId={post.id} />

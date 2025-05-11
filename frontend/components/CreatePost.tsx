@@ -94,7 +94,7 @@ function CreatePost({
         <form onSubmit={handleSubmit} className="space-y-4">
           <textarea
             name="text"
-            placeholder="What's on your mind?"
+            placeholder="Hãy cho mọi người biết suy nghĩ của bạn"
             className="w-full border p-3 rounded-md resize-none min-h-[100px] border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onChange={(e) => setData(e.target.value)}
             value={data}

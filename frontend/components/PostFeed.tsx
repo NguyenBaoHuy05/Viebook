@@ -9,10 +9,15 @@ import { useUser } from "@/context/UserContext";
 
 type Props = {
   onSelectPost: (postId: string) => void;
+  setShowModal: (prop: boolean) => void;
   userOwner?: string;
 };
 
-export default function PostFeed({ onSelectPost, userOwner }: Props) {
+export default function PostFeed({
+  onSelectPost,
+  userOwner,
+  setShowModal,
+}: Props) {
   const [posts, setPosts] = useState<iPost[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -26,9 +31,7 @@ export default function PostFeed({ onSelectPost, userOwner }: Props) {
       console.log(userOwner);
       setLoading(true);
       try {
-        const query =
-          `/api/posts?page=${currentPage}` +
-          (userOwner ? `&user=${userOwner}` : "");
+        const query = `/api/posts?page=${currentPage}`;
         console.log(query);
         const res = await axios.get(query);
         const fetchedPosts: iPost[] = res.data.data.map((post: any) => ({
@@ -43,6 +46,7 @@ export default function PostFeed({ onSelectPost, userOwner }: Props) {
           reactCount: post.react_count,
           shareCount: post.share_count,
           date: new Date(post.created_at).toLocaleDateString(),
+          sharePostID: post.share_post_id,
         }));
 
         setPosts((prevPosts) => {
@@ -92,7 +96,12 @@ export default function PostFeed({ onSelectPost, userOwner }: Props) {
     >
       {userOwner == userId && <CreateAPost />}
       {posts.map((post) => (
-        <Post key={post.id} post={post} onSelectPost={onSelectPost} />
+        <Post
+          key={post.id}
+          post={post}
+          onSelectPost={onSelectPost}
+          setShowModal={setShowModal}
+        />
       ))}
       {loading && (
         <div className="flex items-center justify-center gap-2 p-4">

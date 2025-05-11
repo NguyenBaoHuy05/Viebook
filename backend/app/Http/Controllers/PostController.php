@@ -16,12 +16,16 @@ class PostController extends Controller
             'typeContent' => 'string|max:255',
             'title' => 'required|string|max:255',
             'content' => 'nullable|string', 
+            'share_post_id' => 'nullable|exists:posts,id',
+            'privacy' => 'nullable|string'
         ]); 
         $post = Post::create([
             'user_id' => $request->user()->id,
+            'share_post_id' => $data['share_post_id'] ?? null,
             'type_content' => $data['typeContent'],
             'title' => $data['title'],
             'content' => $data['content'] ?? '',
+            'privacy' => $data['privacy'] ?? ''
         ]);
         return response()->json(['post' => $post], 201);
     }
@@ -64,4 +68,13 @@ class PostController extends Controller
         $react = PostReact::where('post_id', $post->id)->where('user_id', $user->id)->first();
         return response()->json(['status' => $react ? 1 : 0]);
     }
+    public function getPostWithID(Post $post)
+    {
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+        $post->load('user'); 
+        return response()->json(['data' => $post]);
+    }
+
 }

@@ -33,7 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
-
+  const [showModal, setShowModal] = useState(false);
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -376,6 +376,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
             <PostFeed
               onSelectPost={setSelectedPostId}
               userOwner={String(user.id)}
+              setShowModal={setShowModal}
             />
           </div>
         </div>
