@@ -382,6 +382,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
               onSelectPost={setSelectedPostId}
               userOwner={String(user.id)}
               setShowModal={setShowModal}
+              isOnAccountPage={true}
             />
           </div>
         </div>

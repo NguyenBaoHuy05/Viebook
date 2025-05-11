@@ -11,12 +11,14 @@ type Props = {
   onSelectPost: (postId: string) => void;
   setShowModal: (prop: boolean) => void;
   userOwner?: string;
+  isOnAccountPage: boolean | false;
 };
 
 export default function PostFeed({
   onSelectPost,
   userOwner,
   setShowModal,
+  isOnAccountPage,
 }: Props) {
   const [posts, setPosts] = useState<iPost[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,7 +33,11 @@ export default function PostFeed({
       console.log(userOwner);
       setLoading(true);
       try {
-        const query = `/api/posts?page=${currentPage}`;
+        let query = `/api/posts?page=${currentPage}`;
+        if (isOnAccountPage) {
+          query += userOwner ? `&user=${userOwner}` : "";
+        }
+
         console.log(query);
         const res = await axios.get(query);
         const fetchedPosts: iPost[] = res.data.data.map((post: any) => ({
@@ -101,6 +107,7 @@ export default function PostFeed({
           post={post}
           onSelectPost={onSelectPost}
           setShowModal={setShowModal}
+          isShared={false}
         />
       ))}
       {loading && (

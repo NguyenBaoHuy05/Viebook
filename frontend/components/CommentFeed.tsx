@@ -15,11 +15,11 @@ export default function CommentFeed({ postId }: Props) {
   const [userComment, setUserComment] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Fetch comments
   useEffect(() => {
     const fetchComments = async () => {
       try {
         const res = await axios.get(`/api/posts/${postId}/comments`);
+        console.log("comment ", res);
         setComments(res.data || []);
       } catch (error) {
         console.error("Failed to fetch comments:", error);
@@ -29,7 +29,6 @@ export default function CommentFeed({ postId }: Props) {
     fetchComments();
   }, [postId]);
 
-  // Listen for new comments via Echo
   useEffect(() => {
     const channel = echo.channel(`post.${postId}`);
     channel.listen("CommentCreated", (event: any) => {

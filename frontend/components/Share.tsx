@@ -48,12 +48,6 @@ function Share({
     }
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
     <>
       {showModal && (
@@ -64,7 +58,7 @@ function Share({
           ></div>
           <div className="relative z-10 bg-white p-5 rounded-lg w-full max-w-md mx-auto shadow-xl">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Create Post</h2>
+              <h2 className="text-xl font-semibold">Chia sẻ</h2>
               <button onClick={() => setShowModal(false)}>
                 <IoMdClose className="h-6 w-6 text-gray-600 hover:text-black" />
               </button>
@@ -95,17 +89,6 @@ function Share({
                     {option.label}
                   </button>
                 ))}
-              </div>
-
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="flex items-center text-sm text-blue-600 hover:underline"
-                >
-                  <Copy className="w-4 h-4 mr-1" />
-                  {copied ? "Copied!" : "Copy link"}
-                </button>
               </div>
 
               <button

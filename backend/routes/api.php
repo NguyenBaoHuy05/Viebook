@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->post('/posts/{post}/comment', [CommentControl
 Route::middleware('auth:sanctum')->get('/posts/{post}/comments', [CommentController::class, 'index']);
 Route::get('/posts/{post}', [PostController::class, 'getPostWithID']);
 Route::get('/posts/{post}/getReact', [PostController::class, 'getReact']);
+Route::get('/comments/{id}', [CommentController::class, 'getCommentById']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return response()->json([
         'user' => [

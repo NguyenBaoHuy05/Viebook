@@ -13,10 +13,12 @@ function Post({
   post,
   onSelectPost,
   setShowModal,
+  isShared = false,
 }: {
   post: iPost;
   onSelectPost: (postId: string) => void;
   setShowModal: (prop: boolean) => void;
+  isShared: boolean;
 }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.reactCount);
@@ -51,7 +53,6 @@ function Post({
 
   useEffect(() => {
     if (post.sharePostID) {
-      console.log(post.sharePostID);
       const fetchSharedPost = async () => {
         try {
           const res = await axios.get(`/api/posts/${post.sharePostID}`);
@@ -79,11 +80,11 @@ function Post({
   }, [post.sharePostID]);
 
   return (
-    <div className="flex justify-between">
-      <div className="bg-gray-50 rounded-xl transition-shadow duration-200 p-4 mb-4 shadow-[0px_0px_4px_1px_gray] hover:cursor-pointer w-180">
-        <div className="flex items-center gap-3 mb-4">
+    <div className="flex justify-between mb-4">
+      <div className="bg-gray-50 rounded-xl p-4 shadow-[0px_0px_6px_2px_gray] hover:cursor-pointer w-full">
+        <div className="flex items-center gap-3">
           <Avatar>
-            <AvatarImage src={post.logo} alt="avt" />
+            <AvatarImage src={post.logo} alt="User Avatar" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
 
@@ -93,55 +94,66 @@ function Post({
             </span>
             <span className="text-sm text-gray-500">{post.date}</span>
           </div>
-          <div className="flex ml-auto rounded-lg">
-            <button
-              onClick={handleLike}
-              className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
-            >
-              {isLiked ? (
-                <AiFillLike size={20} className="text-blue-500" />
-              ) : (
-                <AiOutlineLike size={20} className="text-gray-500" />
-              )}
-              <span className="text-gray-600 text-lg font-medium">
-                {likeCount}
-              </span>
-            </button>
-            <button
-              onClick={handleCommentClick}
-              className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
-            >
-              <FaCommentAlt
-                size={20}
-                className={showComment ? `text-blue-500` : "text-gray-500"}
-              />
-              <span className="text-gray-600 text-lg font-medium">
-                {post.commentCount}
-              </span>
-            </button>
 
-            <button
-              className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
-              onClick={handleShare}
-            >
-              <FaShare size={20} className="text-gray-400" />
-              <span className="text-gray-600 text-lg font-medium">
-                {post.shareCount}
-              </span>
-            </button>
-          </div>
+          {!isShared && (
+            <div className="flex ml-auto rounded-lg">
+              <button
+                onClick={handleLike}
+                className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+              >
+                {isLiked ? (
+                  <AiFillLike size={20} className="text-blue-500" />
+                ) : (
+                  <AiOutlineLike size={20} className="text-gray-500" />
+                )}
+                <span className="text-gray-600 text-lg font-medium">
+                  {likeCount}
+                </span>
+              </button>
+
+              <button
+                onClick={handleCommentClick}
+                className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+              >
+                <FaCommentAlt
+                  size={20}
+                  className={showComment ? `text-blue-500` : "text-gray-500"}
+                />
+                <span className="text-gray-600 text-lg font-medium">
+                  {post.commentCount}
+                </span>
+              </button>
+
+              <button
+                className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+                onClick={handleShare}
+              >
+                <FaShare size={20} className="text-gray-400" />
+                <span className="text-gray-600 text-lg font-medium">
+                  {post.shareCount}
+                </span>
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="mb-4">
+        <div>
           {sharedPost ? (
             <div>
-              <span className="text-lg font-semibold">{post.title}</span>
-              <div className=" p-4 rounded-lg">
-                <Post
-                  post={sharedPost}
-                  onSelectPost={onSelectPost}
-                  setShowModal={setShowModal}
-                />
+              <p className="font-semibold text-gray-800 text-xl my-2">
+                {sharedPost.title}
+              </p>
+              <div className="bg-blue-50 p-4 border border-blue-200 rounded-xl mb-4">
+                <div className="mt-2">
+                  <div className=" p-4 rounded-lg mt-2">
+                    <Post
+                      post={sharedPost}
+                      onSelectPost={onSelectPost}
+                      setShowModal={setShowModal}
+                      isShared={true}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           ) : post.content ? (
@@ -167,7 +179,7 @@ function Post({
       </div>
 
       {showComment && (
-        <div className="">
+        <div>
           <CommentFeed postId={post.id} />
         </div>
       )}
