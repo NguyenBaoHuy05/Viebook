@@ -15,7 +15,7 @@ interface AlertDialogDemoProps {
   btn: React.ReactNode;
   title1: string | null;
   title2: string | null;
-  onSave?: () => void;
+  onSave: () => void;
 }
 
 const AlertDialogDemo: React.FC<AlertDialogDemoProps> = ({
@@ -37,9 +37,7 @@ const AlertDialogDemo: React.FC<AlertDialogDemoProps> = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Thoát</AlertDialogCancel>
-          <AlertDialogAction onClick={() => onSave && onSave()}>
-            Đồng ý
-          </AlertDialogAction>
+          <AlertDialogAction onClick={() => onSave()}>Đồng ý</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

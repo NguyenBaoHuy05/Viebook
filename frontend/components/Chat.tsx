@@ -5,17 +5,10 @@ import { SendHorizonal } from "lucide-react";
 import echo from "@/lib/echo";
 import axios from "@/lib/axiosConfig";
 import { useUser } from "@/context/UserContext";
-
-interface Message {
-  id: number;
-  user_id: string;
-  content: string;
-  is_read?: boolean;
-  is_deleted?: boolean;
-}
+import { iMessage } from "@/interface/messageType";
 
 export default function Chat() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<iMessage[]>([]);
   const [input, setInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);

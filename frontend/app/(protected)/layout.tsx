@@ -3,7 +3,7 @@ import "../globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Header from "@/components/Header";
-import Chat from "@/components/Chat";
+
 import { UserProvider } from "@/context/UserContext";
 export const metadata: Metadata = {
   title: "Viebook",
@@ -21,7 +21,6 @@ export default function ProtectedLayout({
         <ProtectedRoute>
           <Header />
           {children}
-          <Chat />
         </ProtectedRoute>
       </UserProvider>
 
