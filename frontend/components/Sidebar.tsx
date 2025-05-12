@@ -377,7 +377,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
               open={isOwner}
             />
           </div>
-          <div className="col-span-2 border-t-2 pt-2">
+          <div className="col-span-2 border-t-2 pt-2 w-180">
             <PostFeed
               onSelectPost={setSelectedPostId}
               userOwner={String(user.id)}
