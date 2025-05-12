@@ -59,7 +59,7 @@ function Post({
           const sharedPostData = res.data.data;
           setSharedPost({
             id: sharedPostData.id,
-            name: sharedPostData.user.username,
+            name: sharedPostData.user.name,
             logo: sharedPostData.user.profile_picture
               ? sharedPostData.user.profile_picture
               : "https://github.com/shadcn.png",
@@ -141,7 +141,7 @@ function Post({
           {sharedPost ? (
             <div>
               <p className="font-semibold text-gray-800 text-xl my-2">
-                {sharedPost.title}
+                {post.title}
               </p>
               <div className="bg-blue-50 p-4 border border-blue-200 rounded-xl mb-4">
                 <div className="mt-2">
