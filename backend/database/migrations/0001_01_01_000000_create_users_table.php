@@ -32,6 +32,8 @@ return new class extends Migration {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('share_post_id')->nullable()->constrained('posts')->onDelete('cascade');
+            $table->string('privacy')->nullable();
             $table->text('title');
             $table->text('content');
             $table->string('type_content')->nullable();
@@ -48,7 +50,9 @@ return new class extends Migration {
             $table->timestamps();
             $table->text('content');
             $table->unsignedBigInteger('parent_comment_id')->nullable();
+            $table->unsignedBigInteger('top_level_comment_id')->nullable();
             $table->foreign('parent_comment_id')->references('id')->on('comments')->onDelete('cascade');
+            $table->foreign('top_level_comment_id')->references('id')->on('comments')->onDelete('cascade'); 
         });
 
         Schema::create('follows', function (Blueprint $table) {

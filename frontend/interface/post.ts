@@ -8,4 +8,5 @@ export default interface iPost {
   reactCount: number;
   shareCount: number;
   date: string;
+  sharePostID?: string;
 }
