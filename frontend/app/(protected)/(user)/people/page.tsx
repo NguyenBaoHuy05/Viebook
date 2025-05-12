@@ -12,10 +12,13 @@ import iFriend from "@/interface/friendType";
 import LoadingPage from "@/components/Modal/LoadingPage";
 import People from "@/components/People/people";
 import Chat from "@/components/Chat";
+import PopoverChat from "@/components/PopoverChat";
 
 function Page() {
   const { userId } = useUser();
   const [loading, setLoading] = useState(false);
+  const [friendChat, setFriendChat] = useState<iFriend>();
+  const [conversationID, setConversation] = useState<string>("");
   const [friendList, setFriendList] = useState<iFriend[]>();
   const [pendingFriendList, setPendingFriendList] = useState<iFriend[]>();
 
@@ -76,6 +79,26 @@ function Page() {
                       setFriendList(friendList.filter((f) => f.id !== id));
                     }
                   }}
+                  onStartConversation={(id) => {
+                    const handleConversation = async () => {
+                      try {
+                        const res = await axios.post("/api/conversation", {
+                          friend_id: id,
+                        });
+                        console.log("ID", res.data.id);
+                        const result = res.data.id;
+                        setConversation(result);
+                        setFriendChat(friendList.find((f) => f.id == id));
+                      } catch (error) {
+                        console.log("Lỗi: ", error);
+                      }
+                    };
+                    if (id != conversationID && !conversationID)
+                      handleConversation();
+                    else {
+                      toast.warning("Vui lòng xóa hộp thoại");
+                    }
+                  }}
                 />
               )}
             </div>
@@ -105,6 +128,7 @@ function Page() {
                       );
                     }
                   }}
+                  onStartConversation={(id) => {}}
                 />
               )}
             </div>
@@ -112,7 +136,14 @@ function Page() {
           <div className="col-span-1"></div>
         </div>
       </div>
-      <Chat />
+      {conversationID && (
+        <Chat
+          IDconversation={conversationID}
+          IDfriend={friendChat}
+          isOpen={() => setConversation("")}
+        />
+      )}
+      <PopoverChat />
     </>
   );
 }

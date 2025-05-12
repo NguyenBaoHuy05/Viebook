@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Friend;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class FriendController extends Controller
 {
@@ -180,13 +182,17 @@ class FriendController extends Controller
         User::where('id', $userId)->increment('count_friend');
         User::where('id', $friendId)->increment('count_friend');
         $existingConversation = Conversation::where('type', 'private')
-            ->whereHas('participants', function ($q) use ($userId, $friendId) {
-                $q->whereIn('user_id', [$userId, $friendId]);
+            ->whereHas('participants', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
             })
-            ->withCount('participants') // Đếm số người tham gia
-            ->having('participants_count', '=', 2) // Đảm bảo có chính xác 2 người tham gia
+            ->whereHas('participants', function ($q) use ($friendId) {
+                $q->where('user_id', $friendId);
+            })
+            ->withCount('participants')
+            ->having('participants_count', '=', 2)
             ->first();
 
+        Log::info("Kết quả " . $existingConversation);
         if (!$existingConversation) {
             $conversation = Conversation::create([
                 'type' => 'private',
@@ -237,6 +243,35 @@ class FriendController extends Controller
 
         return response()->json([
             'friends' => $friends
+        ]);
+    }
+    public function getInfoFriend(Request $request)
+    {
+        $userId = $request->user()->id;
+        $friendId = $request->query('friend_id');
+
+        $friend = Friend::where(function ($q) use ($userId, $friendId) {
+            $q->where('user_id', $userId)->where('friend_id', $friendId);
+        })->orWhere(function ($q) use ($userId, $friendId) {
+            $q->where('user_id', $friendId)->where('friend_id', $userId);
+        })->first();
+
+        if (!$friend) {
+            return response()->json(['message' => 'Không tìm thấy bạn bè'], 404);
+        }
+
+        $otherUserId = $friend->user_id == $userId ? $friend->friend_id : $friend->user_id;
+
+        $otherUser = User::find($otherUserId);
+
+        return response()->json([
+            'friend' => [
+                'id' => $otherUser->id,
+                'username' => $otherUser->username,
+                'name' => $otherUser->name,
+                'avatar' => $otherUser->profile_picture,
+                'requested_at' => $friend->created_at,
+            ]
         ]);
     }
 }

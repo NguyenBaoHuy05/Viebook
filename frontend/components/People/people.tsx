@@ -14,6 +14,7 @@ interface Props {
   friends: iFriend[];
   pending: boolean;
   onSave: (id: string, check: boolean) => void;
+  onStartConversation: (id: string) => void;
 }
 
 const groupFriendsByFirstLetter = (friends: iFriend[]) => {
@@ -25,7 +26,7 @@ const groupFriendsByFirstLetter = (friends: iFriend[]) => {
   }, {} as Record<string, iFriend[]>);
 };
 
-const People = ({ friends, pending, onSave }: Props) => {
+const People = ({ friends, pending, onSave, onStartConversation }: Props) => {
   const grouped = groupFriendsByFirstLetter(friends);
   const sortedLetters = Object.keys(grouped).sort();
   const [loading, setLoading] = useState(false);
@@ -93,6 +94,7 @@ const People = ({ friends, pending, onSave }: Props) => {
                     <TiMessage
                       size={25}
                       className="mr-5 hover:scale-120 hover:cursor-pointer"
+                      onClick={() => onStartConversation(friend.id)}
                     />
                   )}
                   {pending && (

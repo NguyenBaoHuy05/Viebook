@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Events\MessageDeletedOrRestored;
+use App\Models\Conversation;
+use App\Models\ConversationUser;
 
 class MessageController extends Controller
 {
@@ -22,6 +24,8 @@ class MessageController extends Controller
             'conversation_id' => $request->conversation_id,
             'content' => $request->content,
         ]);
+        Conversation::where('id', $request->conversation_id)
+            ->update(['updated_at' => now()]);
         Log::info('Message: ' . $message);
         if (!$message) {
             Log::error('Failed to create message for user ID: ' . $user->id);
@@ -52,5 +56,88 @@ class MessageController extends Controller
         Log::info($message);
         broadcast(new MessageDeletedOrRestored($message))->toOthers();
         return response()->json(['success' => 'Message updated successfully.']);
+    }
+    public function getOrCreateConversation(Request $request)
+    {
+        $request->validate([
+            'friend_id' => 'required|exists:users,id',
+        ]);
+
+        $userId = $request->user()->id;
+        $friendId = $request->friend_id;
+
+        $conversation = Conversation::where('type', 'private')
+            ->whereHas('participants', function ($q) use ($userId, $friendId) {
+                $q->whereIn('user_id', [$userId, $friendId]);
+            }, '=', 2)
+            ->withCount('participants')
+            ->having('participants_count', '=', 2)
+            ->first();
+
+        if (!$conversation) {
+            $conversation = Conversation::create([
+                'type' => 'private',
+                'creator_id' => $userId,
+            ]);
+
+            ConversationUser::create([
+                'conversation_id' => $conversation->id,
+                'user_id' => $userId,
+            ]);
+            ConversationUser::create([
+                'conversation_id' => $conversation->id,
+                'user_id' => $friendId,
+            ]);
+        }
+
+        return response()->json([
+            'id' => $conversation->id,
+        ]);
+    }
+    public function getAllConversationsPrivate(Request $request)
+    {
+        $user = $request->user();
+
+        $conversations = Conversation::where('type', 'private')
+            ->whereHas('users', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->with([
+                'users',
+                'messages.user' => function ($q) {
+                    $q->latest()->limit(1);
+                }
+            ])
+            ->orderByDesc('updated_at')
+            ->get();
+
+        $result = $conversations->map(function ($conv) use ($user) {
+            $friend = $conv->users->firstWhere('id', '!=', $user->id);
+
+            $lastMessage = $conv->messages->first();
+
+            return [
+                'id' => $conv->id,
+                'type' => $conv->type,
+                'participant' => [
+                    'id' => $friend->id,
+                    'name' => $friend->name,
+                    'avatar' => $friend->profile_picture,
+                ],
+                'last_message' => $lastMessage ? [
+                    'id' => $lastMessage->id,
+                    'content' => $lastMessage->content,
+                    'created_at' => $lastMessage->created_at,
+                    'user' => $lastMessage->user ? [
+                        'id' => $lastMessage->user->id,
+                        'name' => $lastMessage->user->name,
+                        'avatar' => $lastMessage->user->profile_picture,
+                    ] : null,
+                ] : null,
+                'updated_at' => $conv->updated_at,
+            ];
+        });
+
+        return response()->json($result);
     }
 }

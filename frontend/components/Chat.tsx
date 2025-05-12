@@ -6,13 +6,19 @@ import echo from "@/lib/echo";
 import axios from "@/lib/axiosConfig";
 import { useUser } from "@/context/UserContext";
 import { iMessage } from "@/interface/messageType";
+import iFriend from "@/interface/friendType";
+import ImageWithSkeleton from "./SideBar/image";
 
-export default function Chat() {
+interface iChat {
+  IDconversation: string;
+  IDfriend?: iFriend;
+  isOpen: () => void;
+}
+const Chat = ({ IDconversation, IDfriend, isOpen }: iChat) => {
   const [messages, setMessages] = useState<iMessage[]>([]);
   const [input, setInput] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [conversationId, setConversationID] = useState<string>("1");
+  const [conversationId, setConversationID] = useState<string>(IDconversation);
   const [error, setError] = useState<string | null>(null);
 
   const { userId } = useUser();
@@ -24,15 +30,15 @@ export default function Chat() {
   useEffect(() => {
     const channel = echo.channel(`chat.${conversationId}`);
     channel.listen(".message.sent", (e: any) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: e.message.id,
-          user_id:
-            e.message.user_id == userId ? "Tôi" : `User ${e.message.user_id}`,
-          content: e.message.content,
-        },
-      ]);
+      if (IDfriend)
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: e.message.id,
+            user_id: e.message.user_id == userId ? "Tôi" : IDfriend.name,
+            content: e.message.content,
+          },
+        ]);
     });
     channel.listen(".message.DelOrStore", (e: any) => {
       console.log("Tin nhắn mới:", e.message);
@@ -54,14 +60,15 @@ export default function Chat() {
     axios
       .get(`/api/${conversationId}/messages`)
       .then((res) => {
-        setMessages(
-          res.data.map((msg: any) => ({
-            id: msg.id,
-            user_id: msg.user_id == userId ? "Tôi" : `User ${msg.user_id}`,
-            content: msg.content,
-            is_deleted: msg.is_deleted,
-          }))
-        );
+        if (IDfriend)
+          setMessages(
+            res.data.map((msg: any) => ({
+              id: msg.id,
+              user_id: msg.user_id == userId ? "Tôi" : IDfriend.name,
+              content: msg.content,
+              is_deleted: msg.is_deleted,
+            }))
+          );
       })
       .catch((err) => {
         console.error("Lỗi lấy tin nhắn:", err);
@@ -101,24 +108,23 @@ export default function Chat() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700"
-        >
-          💬 Chat
-        </button>
-      )}
-
-      {isOpen && (
+    <div className={`fixed right-4 z-50 flex bottom-12`}>
+      <div className="ml-auto">
         <div className="bg-white w-80 h-96 rounded-xl shadow-2xl flex flex-col">
-          <div className="bg-blue-600 text-white px-4 py-2 rounded-t-xl flex justify-between items-center">
-            <span>Chat</span>
-            <button onClick={() => setIsOpen(false)}>✕</button>
+          <div className="bg-black text-white px-4 py-2 rounded-t-xl flex justify-between items-center">
+            <div className="hover:cursor-pointer">
+              <ImageWithSkeleton
+                src={IDfriend?.avatar ?? "https://github.com/shadcn.png"}
+                alt="demo"
+                className="w-8 h-8 "
+                imgClass="rounded-full"
+              />
+            </div>
+            <span className="mr-auto ml-2">{IDfriend && IDfriend.name}</span>
+            <button onClick={isOpen}>✕</button>
           </div>
 
-          <div className="flex-1 flex flex-col overflow-y-auto px-4 py-2 space-y-2">
+          <div className="flex-1 flex flex-col overflow-y-auto px-4 py-2 space-y-2 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -134,18 +140,21 @@ export default function Chat() {
                     Tin nhắn đã xóa
                   </p>
                 ) : (
-                  <p className="text-sm mt-1">{msg.content}</p>
+                  <p className="text-sm mt-1 break-words text-justify">
+                    {msg.content}
+                  </p>
                 )}
 
                 {msg.user_id === "Tôi" && (
                   <div className="flex gap-2 text-xs mt-1 justify-end">
-                    <button
-                      className="text-red-600 hover:underline"
-                      onClick={() => handleDelete(msg.id, true)}
-                    >
-                      Xóa
-                    </button>
-                    {msg.is_deleted && (
+                    {!msg.is_deleted ? (
+                      <button
+                        className="text-red-600 hover:underline"
+                        onClick={() => handleDelete(msg.id, true)}
+                      >
+                        Xóa
+                      </button>
+                    ) : (
                       <button
                         className="text-blue-600 hover:underline"
                         onClick={() => handleDelete(msg.id, false)}
@@ -165,6 +174,7 @@ export default function Chat() {
               type="text"
               autoComplete="off"
               value={input}
+              maxLength={200}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               className="flex-1 px-3 py-1 border rounded-md focus:outline-none focus:ring"
@@ -180,7 +190,8 @@ export default function Chat() {
             )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
-}
+};
+export default Chat;

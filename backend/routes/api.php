@@ -41,6 +41,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/{userId}/send', [MessageController::class, 'sendMessage']);
     Route::get('/{conversationId}/messages', [MessageController::class, 'getMessages']);
     Route::delete('/messages/{id}/{check}', [MessageController::class, 'destroy']);
+    Route::post('/conversation', [MessageController::class, 'getOrCreateConversation']);
+    Route::get('/allConversationPrivate', [MessageController::class, 'getAllConversationsPrivate']);
 });
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/account/{username}', [AccountController::class, 'show']);
@@ -58,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/friends/pendingList', [FriendController::class, 'getPendingFriendList']);
     Route::put('/friends/acceptFriend', [FriendController::class, 'acceptFriend']);
     Route::get('/friends/friendList', [FriendController::class, 'getFriendsList']);
+    Route::get('/friends/friendInfo', [FriendController::class, 'getInfoFriend']);
 });
 // Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
