@@ -80,7 +80,7 @@ function Post({
   }, [post.sharePostID]);
 
   return (
-    <div className="flex justify-between mb-4">
+    <div className="flex justify-between mb-4 col-span-3 relative">
       <div className="bg-gray-50 rounded-xl p-4 shadow-[0px_0px_6px_2px_gray] hover:cursor-pointer w-full">
         <div className="flex items-center gap-3">
           <Avatar>
@@ -179,7 +179,7 @@ function Post({
       </div>
 
       {showComment && (
-        <div>
+        <div className="absolute right-[-290px]">
           <CommentFeed postId={post.id} />
         </div>
       )}

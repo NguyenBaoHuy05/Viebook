@@ -14,15 +14,14 @@ function Page() {
         setShowModal={setShowModal}
         postID={selectedPostId}
       />
-      <div className="grid grid-cols-4 ">
+      <div className="w-full grid grid-cols-4">
         <div className="col-span-1"></div>
-        <div className="flex col-span-3">
-          <PostFeed
-            onSelectPost={setSelectedPostId}
-            setShowModal={setShowModal}
-            userOwner={String(userId)}
-          />
-        </div>
+        <PostFeed
+          onSelectPost={setSelectedPostId}
+          setShowModal={setShowModal}
+          userOwner={String(userId)}
+          isOnAccountPage={false}
+        />
       </div>
     </div>
   );
