@@ -5,7 +5,7 @@ import { CgProfile } from "react-icons/cg";
 import { IoMdNotifications } from "react-icons/io";
 import { FaFacebook } from "react-icons/fa";
 import Logout from "./Button/Logout";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
 import Link from "next/link";
@@ -37,7 +37,6 @@ import {
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSetting, setIsSetting] = useState(false);
-
   const { username, setUsername } = useUser();
   return (
     <>

@@ -23,8 +23,6 @@ export default function ProtectedLayout({
           {children}
         </ProtectedRoute>
       </UserProvider>
-
-      <Toaster richColors position="bottom-right" />
     </div>
   );
 }

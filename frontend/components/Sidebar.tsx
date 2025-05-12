@@ -314,9 +314,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
                       }
                       title1="Xóa bạn bè"
                       title2="Xóa bạn bè không thể hoàn lại thao tác. Bạn có chắc chắn muốn xóa không?"
-                      onSave={() => {
-                        handleRemoveFriend;
-                      }}
+                      onSave={handleRemoveFriend}
                     />
                   ) : isStatusFriend == 5 ? (
                     <Button
@@ -347,7 +345,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
             <div className="grid grid-rows-5 gap-6">
               <div className="text-sm row-span-1 flex gap-2">
                 <div className="font-bold">Location:</div>
-                {user.location}
+                <span className="wrap-anywhere">{user.location}</span>
                 <i>{user.location ? " " : "Chưa có thông tin"}</i>
               </div>
               <div className="text-sm row-span-4 flex gap-2">
