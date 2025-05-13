@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         'user' => [
             'id' => $request->user()->id,
             'username' => $request->user()->username,
+            'avatar' => $request->user()->profile_picture,
         ]
     ]);
 });

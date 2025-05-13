@@ -3,6 +3,7 @@ import "../globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Header from "@/components/Header";
+import PopoverChat from "@/components/PopoverChat";
 
 import { UserProvider } from "@/context/UserContext";
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function ProtectedLayout({
         <ProtectedRoute>
           <Header />
           {children}
+          <PopoverChat />
         </ProtectedRoute>
       </UserProvider>
     </div>

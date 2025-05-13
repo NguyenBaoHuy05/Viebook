@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Notification extends Model
 {
     use HasFactory;
-    protected $fillable = ['actor_id', 'user_id', 'type', 'target_id', 'isRead'];
+    protected $fillable = ['actor_id', 'user_id', 'type', 'target_type', 'target_id', 'isRead'];
+
+    public function target()
+    {
+        return $this->morphTo();
+    }
 
     public function actor()
     {
@@ -17,6 +22,6 @@ class Notification extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

@@ -6,24 +6,53 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Follow;
 use Illuminate\Support\Facades\Log;
+use App\Models\Notification;
+use App\Events\NotificationCreated;
 
 class FollowController extends Controller
 {
     public function follow(Request $request)
     {
-        $followerId = $request->user()->id;
+        $user = $request->user();
         $followedId = $request->input('followed_id');
 
-        if ($followerId == $followedId) {
+        if ($user->id == $followedId) {
             return response()->json(['message' => 'Không thể tự follow chính mình'], 400);
         }
-        Follow::firstOrCreate(['follower_id' => $followerId, 'followed_id' => $followedId]);
 
+        // Kiểm tra follow đã tồn tại chưa
+        $follow = Follow::where('follower_id', $user->id)
+            ->where('followed_id', $followedId)
+            ->first();
+
+        if ($follow) {
+            return response()->json(['message' => 'Đã follow rồi'], 200);
+        }
+
+        // Tạo follow
+        $newFollow = Follow::create([
+            'follower_id' => $user->id,
+            'followed_id' => $followedId,
+        ]);
+
+        // Tăng số người follow
         User::where('id', $followedId)->increment('count_follower');
-        User::where('id', $followerId)->increment('count_follow');
+        User::where('id', $user->id)->increment('count_follow');
+
+        // Tạo notification
+        $notification = Notification::create([
+            'user_id' => $followedId,            // người nhận
+            'actor_id' => $user->id,             // người thực hiện hành động
+            'type' => 'follow',
+            'target_type' => User::class,
+            'target_id' => $user->id,            // target là người follow
+        ]);
+
+        broadcast(new NotificationCreated($notification, $followedId));
 
         return response()->json(['message' => 'Follow thành công']);
     }
+
 
     public function unfollow(Request $request)
     {

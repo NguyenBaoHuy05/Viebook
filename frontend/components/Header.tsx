@@ -15,6 +15,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import PopoverNotifycation from "./PopoverNotifycation";
+import ImageWithSkeleton from "./SideBar/image";
 import {
   Calculator,
   Calendar,
@@ -37,7 +39,7 @@ import {
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSetting, setIsSetting] = useState(false);
-  const { username, setUsername } = useUser();
+  const { username, setUsername, avatar } = useUser();
   return (
     <>
       <div className="relative">
@@ -122,24 +124,20 @@ function Header() {
           </div>
 
           <div className="col-span-1 relative flex justify-end items-center gap-4">
-            <Link href="/notifications">
-              <IoMdNotifications
-                size={32}
-                className="cursor-pointer transition-transform hover:scale-130"
-              />
-            </Link>
+            <PopoverNotifycation />
             <Popover>
               <PopoverTrigger asChild>
-                <FiSettings
-                  onClick={() => setIsSetting(!isSetting)}
-                  size={25}
-                  className={`${
-                    isSetting ? "rotate-90" : ""
-                  } cursor-pointer transition-transform hover:scale-130`}
-                />
+                <div onClick={() => setIsSetting(!isSetting)}>
+                  <ImageWithSkeleton
+                    src={avatar ?? "https://github.com/shadcn.png"}
+                    alt="demo"
+                    className="w-8 h-8 hover:scale-130 transition-transform hover:cursor-pointer"
+                    imgClass="rounded-full"
+                  />
+                </div>
               </PopoverTrigger>
               <PopoverContent className="w-40 mr-10">
-                <div className="grid gap-4">
+                <div>
                   <Logout />
                 </div>
               </PopoverContent>
@@ -148,7 +146,7 @@ function Header() {
         </div>
       </div>
       {isOpen && (
-        <Command className="focus z-4 absolute h-fit top-4.5 ml-5 w-1/6 rounded-lg border shadow-md">
+        <Command className="focus z-50 absolute h-fit top-4.5 ml-5 w-1/6 rounded-lg border shadow-md">
           <CommandInput placeholder="Search..." />
           <CommandList></CommandList>
         </Command>

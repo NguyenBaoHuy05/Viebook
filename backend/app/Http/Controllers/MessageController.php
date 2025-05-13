@@ -104,7 +104,7 @@ class MessageController extends Controller
             })
             ->with([
                 'users',
-                'messages.user' => function ($q) {
+                'messages' => function ($q) {
                     $q->latest()->limit(1);
                 }
             ])

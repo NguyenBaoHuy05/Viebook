@@ -143,7 +143,6 @@ function Page() {
           isOpen={() => setConversation("")}
         />
       )}
-      <PopoverChat />
     </>
   );
 }
