@@ -59,7 +59,7 @@ function Post({
           const sharedPostData = res.data.data;
           setSharedPost({
             id: sharedPostData.id,
-            name: sharedPostData.user.username,
+            name: sharedPostData.user.name,
             logo: sharedPostData.user.profile_picture
               ? sharedPostData.user.profile_picture
               : "https://github.com/shadcn.png",
@@ -80,7 +80,7 @@ function Post({
   }, [post.sharePostID]);
 
   return (
-    <div className="flex justify-between mb-4">
+    <div className="flex justify-between mb-4 col-span-3 relative">
       <div className="bg-gray-50 rounded-xl p-4 shadow-[0px_0px_6px_2px_gray] hover:cursor-pointer w-full">
         <div className="flex items-center gap-3">
           <Avatar>
@@ -141,7 +141,7 @@ function Post({
           {sharedPost ? (
             <div>
               <p className="font-semibold text-gray-800 text-xl my-2">
-                {sharedPost.title}
+                {post.title}
               </p>
               <div className="bg-blue-50 p-4 border border-blue-200 rounded-xl mb-4">
                 <div className="mt-2">
@@ -179,7 +179,7 @@ function Post({
       </div>
 
       {showComment && (
-        <div>
+        <div className="absolute right-[-290px]">
           <CommentFeed postId={post.id} />
         </div>
       )}
