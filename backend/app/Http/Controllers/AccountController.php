@@ -38,4 +38,14 @@ class AccountController extends Controller
 
         return response()->json(['message' => "Cập nhật thành công"]);
     }
+    public function searchUsers(Request $request)
+    {
+        $query = $request->query('q'); // từ khóa tìm kiếm
+
+        $users = User::Where('username', 'like', '%' . $query . '%')
+            ->limit(5)
+            ->get(['id', 'name', 'username', 'profile_picture']);
+
+        return response()->json(['users' => $users]);
+    }
 }

@@ -48,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/account/{username}', [AccountController::class, 'show']);
     Route::put('/account/{username}', [AccountController::class, 'update']);
+    Route::get('/searchUsers', [AccountController::class, 'searchUsers']);
 });
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/follow', [FollowController::class, 'follow']);

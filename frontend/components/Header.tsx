@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/popover";
 import PopoverNotifycation from "./PopoverNotifycation";
 import ImageWithSkeleton from "./SideBar/image";
+import axios from "@/lib/axiosConfig";
 import {
   Calculator,
   Calendar,
@@ -36,10 +37,33 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
+import iUser from "@/interface/userType";
+import { Span } from "next/dist/trace";
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSetting, setIsSetting] = useState(false);
   const { username, setUsername, avatar } = useUser();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState<iUser[]>([]);
+
+  useEffect(() => {
+    // if (searchTerm === "") {
+    //   setResults([]);
+    //   return;
+    // }
+
+    const fetch = async () => {
+      const res = await axios.get("/api/searchUsers", {
+        params: { q: searchTerm },
+      });
+      setResults(res.data.users);
+    };
+
+    fetch();
+  }, [searchTerm]);
+  useEffect(() => {
+    console.log("Kết quả:", results);
+  }, [results]);
   return (
     <>
       <div className="relative">
@@ -147,8 +171,31 @@ function Header() {
       </div>
       {isOpen && (
         <Command className="focus z-50 absolute h-fit top-4.5 ml-5 w-1/6 rounded-lg border shadow-md">
-          <CommandInput placeholder="Search..." />
-          <CommandList></CommandList>
+          <CommandInput
+            placeholder="Search..."
+            onValueChange={(value) => setSearchTerm(value)}
+          />
+          <CommandList>
+            <CommandGroup>
+              {results.length !== 0 ? (
+                results.map((res) => (
+                  <CommandItem key={res.id} value={res.username}>
+                    <ImageWithSkeleton
+                      src={
+                        res.profile_picture ?? "https://github.com/shadcn.png"
+                      }
+                      alt="demo"
+                      className="w-8 h-8"
+                      imgClass="rounded-full"
+                    />
+                    <span>{res.username}</span>
+                  </CommandItem>
+                ))
+              ) : (
+                <CommandItem>Không tìm thấy thông tin</CommandItem>
+              )}
+            </CommandGroup>
+          </CommandList>
         </Command>
       )}
     </>
