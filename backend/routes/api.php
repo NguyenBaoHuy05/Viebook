@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         'user' => [
             'id' => $request->user()->id,
             'username' => $request->user()->username,
+            'name' => $request->user()->name,
             'avatar' => $request->user()->profile_picture,
         ]
     ]);
@@ -63,6 +64,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/friends/acceptFriend', [FriendController::class, 'acceptFriend']);
     Route::get('/friends/friendList', [FriendController::class, 'getFriendsList']);
     Route::get('/friends/friendInfo', [FriendController::class, 'getInfoFriend']);
+});
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/getAllNotification', [NotificationController::class, 'getAllNotification']);
 });
 // Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 

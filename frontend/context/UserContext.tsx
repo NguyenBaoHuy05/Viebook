@@ -4,9 +4,11 @@ import { createContext, ReactNode, useState, useContext, useMemo } from "react";
 interface UserContextType {
   userId: string | null;
   username: string | null;
+  name: string | null;
   avatar: string | null;
   setUserId: (id: string | null) => void;
   setUsername: (user: string | null) => void;
+  setName: (user: string | null) => void;
   setAvatar: (avatar: string | null) => void;
 }
 
@@ -23,9 +25,19 @@ export const useUser = () => {
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [name, setName] = useState<string | null>(null);
   const [avatar, setAvatar] = useState<string | null>(null);
   const value = useMemo(
-    () => ({ userId, setUserId, username, setUsername, avatar, setAvatar }),
+    () => ({
+      userId,
+      setUserId,
+      username,
+      setUsername,
+      name,
+      setName,
+      avatar,
+      setAvatar,
+    }),
     [userId, username]
   );
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

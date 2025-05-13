@@ -20,7 +20,7 @@ class FollowController extends Controller
             return response()->json(['message' => 'Không thể tự follow chính mình'], 400);
         }
 
-        // Kiểm tra follow đã tồn tại chưa
+
         $follow = Follow::where('follower_id', $user->id)
             ->where('followed_id', $followedId)
             ->first();
@@ -29,23 +29,20 @@ class FollowController extends Controller
             return response()->json(['message' => 'Đã follow rồi'], 200);
         }
 
-        // Tạo follow
         $newFollow = Follow::create([
             'follower_id' => $user->id,
             'followed_id' => $followedId,
         ]);
 
-        // Tăng số người follow
         User::where('id', $followedId)->increment('count_follower');
         User::where('id', $user->id)->increment('count_follow');
 
-        // Tạo notification
         $notification = Notification::create([
             'user_id' => $followedId,            // người nhận
             'actor_id' => $user->id,             // người thực hiện hành động
             'type' => 'follow',
             'target_type' => User::class,
-            'target_id' => $user->id,            // target là người follow
+            'target_id' => $followedId,
         ]);
 
         broadcast(new NotificationCreated($notification, $followedId));
