@@ -9,6 +9,8 @@ use App\Models\Friend;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Models\Notification;
+use  App\Events\NotificationCreated;
 
 
 class FriendController extends Controller
@@ -98,6 +100,14 @@ class FriendController extends Controller
             }
             if ($exists->status === 'deleted') {
                 $exists->update(['status' => 'pending']);
+                $notification = Notification::create([
+                    'user_id' => $friendId,            // người nhận
+                    'actor_id' => $userId,             // người thực hiện hành động
+                    'type' => 'addFriend',
+                    'target_type' => User::class,
+                    'target_id' => $friendId,
+                ]);
+                broadcast(new NotificationCreated($notification, $friendId));
                 return response()->json(['message' => 1], 201);
             }
         }
@@ -107,6 +117,14 @@ class FriendController extends Controller
             'status' => 'pending',
         ]);
 
+        $notification = Notification::create([
+            'user_id' => $friendId,            // người nhận
+            'actor_id' => $userId,             // người thực hiện hành động
+            'type' => 'addFriend',
+            'target_type' => User::class,
+            'target_id' => $friendId,
+        ]);
+        broadcast(new NotificationCreated($notification, $friendId));
         return response()->json(['message' => 1], 201);
     }
 
@@ -134,6 +152,14 @@ class FriendController extends Controller
         }
 
         $friend->update(['status' => 'deleted']);
+        $notification = Notification::create([
+            'user_id' => $friendId,            // người nhận
+            'actor_id' => $userId,             // người thực hiện hành động
+            'type' => 'deleteFriend',
+            'target_type' => User::class,
+            'target_id' => $friendId,
+        ]);
+        broadcast(new NotificationCreated($notification, $friendId));
 
 
         return response()->json(['message' => 'Đã xóa bạn bè']);
@@ -179,6 +205,14 @@ class FriendController extends Controller
         }
 
         $friendRequest->update(['status' => 'accepted']);
+        $notification = Notification::create([
+            'user_id' => $friendId,            // người nhận
+            'actor_id' => $userId,             // người thực hiện hành động
+            'type' => 'acceptFriend',
+            'target_type' => User::class,
+            'target_id' => $friendId,
+        ]);
+        broadcast(new NotificationCreated($notification, $friendId));
         User::where('id', $userId)->increment('count_friend');
         User::where('id', $friendId)->increment('count_friend');
         $existingConversation = Conversation::where('type', 'private')
@@ -192,7 +226,6 @@ class FriendController extends Controller
             ->having('participants_count', '=', 2)
             ->first();
 
-        Log::info("Kết quả " . $existingConversation);
         if (!$existingConversation) {
             $conversation = Conversation::create([
                 'type' => 'private',
@@ -273,5 +306,19 @@ class FriendController extends Controller
                 'requested_at' => $friend->created_at,
             ]
         ]);
+    }
+    public function blockFriend(Request $request)
+    {
+        $userId = $request->user()->id;
+        $friendId = $request->friend_id;
+
+        $friend = Friend::where(function ($q) use ($userId, $friendId) {
+            $q->where('user_id', $userId)->where('friend_id', $friendId);
+        })->orWhere(function ($q) use ($userId, $friendId) {
+            $q->where('user_id', $friendId)->where('friend_id', $userId);
+        })->first();
+
+        $friend->update(['status' => 'blocked']);
+        return response()->json(["message" => "Block thành công"]);
     }
 }

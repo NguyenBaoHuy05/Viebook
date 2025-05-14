@@ -6,7 +6,6 @@ import CreateAPost from "@/components/CreateAPost";
 import { Loader2 } from "lucide-react";
 import axios from "@/lib/axiosConfig";
 import { useUser } from "@/context/UserContext";
-
 type Props = {
   onSelectPost: (postId: string) => void;
   setShowModal: (prop: boolean) => void;
@@ -97,7 +96,7 @@ export default function PostFeed({
   return (
     <div
       ref={containerRef}
-      className="col-span-3 flex flex-col gap-8 bg-white "
+      className="flex flex-col gap-8 bg-white col-span-3 w-180"
       style={{ maxHeight: "calc(100vh - 100px)" }}
     >
       {userOwner == userId && <CreateAPost />}

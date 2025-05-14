@@ -66,7 +66,7 @@ function Page() {
             <div>
               <strong>Danh sách bạn bè</strong>
               {friendList && friendList.length == 0 && (
-                <div className="z-20 sticky top-0 h-10 bg-blue-200 px-2 flex items-center font-bold">
+                <div className="sticky top-0 h-10 bg-blue-200 px-2 flex items-center font-bold">
                   Không có bạn bè
                 </div>
               )}
@@ -105,7 +105,7 @@ function Page() {
             <div>
               <strong>Danh sách chờ kết bạn</strong>
               {pendingFriendList && pendingFriendList.length == 0 && (
-                <div className="z-20 sticky top-0 h-10 bg-blue-200 px-2 flex items-center font-bold">
+                <div className="sticky top-0 h-10 bg-blue-200 px-2 flex items-center font-bold">
                   Không có ai chờ kết bạn
                 </div>
               )}
@@ -143,7 +143,6 @@ function Page() {
           isOpen={() => setConversation("")}
         />
       )}
-      <PopoverChat />
     </>
   );
 }

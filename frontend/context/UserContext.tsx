@@ -4,10 +4,14 @@ import { createContext, ReactNode, useState, useContext, useMemo } from "react";
 interface UserContextType {
   userId: string | null;
   username: string | null;
+  name: string | null;
+  avatar: string | null;
   setUserId: (id: string | null) => void;
   setUsername: (user: string | null) => void;
   role: string | null;
   setRole: (role: string | null) => void;
+  setName: (user: string | null) => void;
+  setAvatar: (avatar: string | null) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -27,6 +31,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const value = useMemo(
     () => ({ userId, setUserId, username, setUsername, role, setRole }),
     [userId, username, role]
+  const [name, setName] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const value = useMemo(
+    () => ({
+      userId,
+      setUserId,
+      username,
+      setUsername,
+      name,
+      setName,
+      avatar,
+      setAvatar,
+    }),
+    [userId, username]
   );
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

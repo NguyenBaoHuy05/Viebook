@@ -27,6 +27,10 @@ class PostController extends Controller
             'content' => $data['content'] ?? '',
             'privacy' => $data['privacy'] ?? ''
         ]);
+        if (isset($data['share_post_id'])) {
+            Post::where('id', $data['share_post_id'])->increment('share_count');
+        }
+
         return response()->json(['post' => $post], 201);
     }
     public function index(Request $request) {

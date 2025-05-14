@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { IConversation } from "@/interface/conversationType";
@@ -23,7 +24,6 @@ function PopoverChat() {
       try {
         const res = await axios.get("/api/allConversationPrivate");
         setConversations(res.data);
-        toast.success("Data loaded successfully");
       } catch (error) {
         console.log("Lỗi", error);
       }

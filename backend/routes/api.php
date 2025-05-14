@@ -35,6 +35,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
             'id' => $request->user()->id,
             'username' => $request->user()->username,
             'role' => $request->user()->role,
+            'name' => $request->user()->name,
+            'avatar' => $request->user()->profile_picture,
         ]
     ]);
 });
@@ -49,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/account/{username}', [AccountController::class, 'show']);
     Route::put('/account/{username}', [AccountController::class, 'update']);
+    Route::get('/searchUsers', [AccountController::class, 'searchUsers']);
 });
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/follow', [FollowController::class, 'follow']);
@@ -63,14 +66,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/friends/acceptFriend', [FriendController::class, 'acceptFriend']);
     Route::get('/friends/friendList', [FriendController::class, 'getFriendsList']);
     Route::get('/friends/friendInfo', [FriendController::class, 'getInfoFriend']);
+    Route::post('/friends/blockFriend', [FriendController::class, 'blockFriend']);
 });
-// Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-
-//     Route::post('notifications', [NotificationController::class, 'store']);
-//     Route::get('notifications', [NotificationController::class, 'index']);
-//     Route::put('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
-// });
-
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/notification/getAllNotification', [NotificationController::class, 'getAllNotification']);
+    Route::post('/notification/changeRedDot', [NotificationController::class, 'changeIsRead']);
+});
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/users', [AdminController::class, 'getAllUsers']);
     Route::get('/admin/posts', [AdminController::class, 'getAllPosts']);

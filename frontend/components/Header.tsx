@@ -5,7 +5,7 @@ import { CgProfile } from "react-icons/cg";
 import { IoMdNotifications } from "react-icons/io";
 import { FaFacebook } from "react-icons/fa";
 import Logout from "./Button/Logout";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
 import Link from "next/link";
@@ -15,6 +15,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import PopoverNotifycation from "./PopoverNotifycation";
+import ImageWithSkeleton from "./SideBar/image";
+import axios from "@/lib/axiosConfig";
 import {
   Calculator,
   Calendar,
@@ -34,10 +37,39 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
+import { RiAccountCircleLine } from "react-icons/ri";
+import iUser from "@/interface/userType";
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSetting, setIsSetting] = useState(false);
-  const { username, setUsername } = useUser();
+  const { username, setUsername, avatar } = useUser();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState<iUser[]>([]);
+  const commandInputRef = useRef<HTMLInputElement>(null);
+  const commandRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (searchTerm === "") {
+      setResults([]);
+      return;
+    }
+
+    const fetch = async () => {
+      const res = await axios.get("/api/searchUsers", {
+        params: { q: searchTerm },
+      });
+      setResults(res.data.users);
+    };
+
+    fetch();
+  }, [searchTerm]);
+  const handleFocus = () => {
+    setTimeout(() => {
+      if (!commandRef.current?.contains(document.activeElement)) {
+        setIsOpen(false);
+      }
+    }, 100);
+  };
   return (
     <>
       <div className="relative">
@@ -89,16 +121,6 @@ function Header() {
                 strokeLinecap="round"
               />
             </svg>
-
-            {!isOpen && (
-              <div className="rounded-full bg-gray-200 p-2 flex items-center gap-2">
-                <FaSearch
-                  size={20}
-                  onClick={() => setIsOpen(!isOpen)}
-                  className="cursor-pointer transition-transform hover:scale-100"
-                />
-              </div>
-            )}
           </div>
           <div className="col-span-5 flex justify-center items-center gap-12">
             <Link href="/home">
@@ -121,25 +143,21 @@ function Header() {
             </Link>
           </div>
 
-          <div className="col-span-1 relative flex justify-end items-center gap-4">
-            <Link href="/notifications">
-              <IoMdNotifications
-                size={32}
-                className="cursor-pointer transition-transform hover:scale-130"
-              />
-            </Link>
+          <div className="z-50 col-span-1 relative flex justify-end items-center gap-4">
+            <PopoverNotifycation />
             <Popover>
               <PopoverTrigger asChild>
-                <FiSettings
-                  onClick={() => setIsSetting(!isSetting)}
-                  size={25}
-                  className={`${
-                    isSetting ? "rotate-90" : ""
-                  } cursor-pointer transition-transform hover:scale-130`}
-                />
+                <div onClick={() => setIsSetting(!isSetting)}>
+                  <ImageWithSkeleton
+                    src={avatar ?? "https://github.com/shadcn.png"}
+                    alt="demo"
+                    className="w-8 h-8 hover:scale-130 transition-transform hover:cursor-pointer"
+                    imgClass="rounded-full"
+                  />
+                </div>
               </PopoverTrigger>
               <PopoverContent className="w-40 mr-10">
-                <div className="grid gap-4">
+                <div>
                   <Logout />
                 </div>
               </PopoverContent>
@@ -147,12 +165,46 @@ function Header() {
           </div>
         </div>
       </div>
-      {isOpen && (
-        <Command className="focus z-4 absolute h-fit top-4.5 ml-5 w-1/6 rounded-lg border shadow-md">
-          <CommandInput placeholder="Search..." />
-          <CommandList></CommandList>
-        </Command>
-      )}
+      <Command
+        ref={commandRef}
+        className="z-50 absolute h-fit top-4.5 ml-5 w-1/6 rounded-lg border shadow-md"
+      >
+        <CommandInput
+          ref={commandInputRef}
+          placeholder="Search..."
+          onFocus={() => setIsOpen(true)}
+          onBlur={handleFocus}
+          onValueChange={(value) => setSearchTerm(value)}
+        />
+        {isOpen && (
+          <CommandList>
+            <CommandGroup heading="Users">
+              {results.length !== 0 ? (
+                results.map((res) => (
+                  <CommandItem key={res.id} value={res.username}>
+                    <ImageWithSkeleton
+                      src={
+                        res.profile_picture ?? "https://github.com/shadcn.png"
+                      }
+                      alt="demo"
+                      className="w-8 h-8"
+                      imgClass="rounded-full"
+                    />
+                    <span>{res.username}</span>
+                    <CommandShortcut onClick={() => setIsOpen(false)}>
+                      <Link href={`/account/${res.username}`}>
+                        <RiAccountCircleLine />
+                      </Link>
+                    </CommandShortcut>
+                  </CommandItem>
+                ))
+              ) : (
+                <CommandItem>Không tìm thấy thông tin</CommandItem>
+              )}
+            </CommandGroup>
+          </CommandList>
+        )}
+      </Command>
     </>
   );
 }
