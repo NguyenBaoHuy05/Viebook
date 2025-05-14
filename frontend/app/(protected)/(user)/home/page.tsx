@@ -3,6 +3,7 @@ import PostFeed from "@/components/PostFeed";
 import Share from "@/components/Share";
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
+import PopoverChat from "@/components/PopoverChat";
 function Page() {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);

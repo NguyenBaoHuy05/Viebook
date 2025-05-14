@@ -180,7 +180,10 @@ const Chat = ({ IDconversation, IDfriend, isOpen }: iChat) => {
               className="flex-1 px-3 py-1 border rounded-md focus:outline-none focus:ring"
               placeholder="Nhập tin nhắn..."
             />
-            <button onClick={handleSend} className="text-blue-600">
+            <button
+              onClick={handleSend}
+              className="text-blue-600 hover:cursor-pointer hover:text-blue-900"
+            >
               <SendHorizonal />
             </button>
             {error && (

@@ -121,7 +121,7 @@ const Friend: React.FC<FriendProps> = ({ open, onSave, data, dataFriend }) => {
             {!dataFriend && (
               <div className="h-30 text-xs p-0.5 rounded-lg">
                 <ImageWithSkeleton
-                  src={""}
+                  src={"khongco.jpg"}
                   alt="demo"
                   className="w-25 h-20"
                   imgClass="rounded-lg"

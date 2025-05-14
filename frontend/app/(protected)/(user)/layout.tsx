@@ -1,15 +1,8 @@
 import type { Metadata } from "next";
-import "../globals.css";
+import "../../globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Header from "@/components/Header";
-import PopoverChat from "@/components/PopoverChat";
-
-import { UserProvider } from "@/context/UserContext";
-export const metadata: Metadata = {
-  title: "Viebook",
-  description: "Mạng xã hội cho người Việt",
-};
 
 export default function ProtectedLayout({
   children,
@@ -18,12 +11,8 @@ export default function ProtectedLayout({
 }>) {
   return (
     <div className="antialiased px-15">
-      <UserProvider>
-        <ProtectedRoute>
+          <Header />
           {children}
-          <PopoverChat />
-        </ProtectedRoute>
-      </UserProvider>
     </div>
   );
 }

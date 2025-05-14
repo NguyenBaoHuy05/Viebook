@@ -11,20 +11,39 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { userId, setUserId, username, setUsername } = useUser();
+  const {
+    userId,
+    setUserId,
+    username,
+    setUsername,
+    name,
+    setName,
+    avatar,
+    setAvatar,
+    role,
+    setRole,
+  } = useUser();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     if (userId) {
       setLoading(false);
+      if (role == "admin") {
+        router.push("/admin"); // Chuyển hướng nếu không phải admin
+      }
       return;
     }
+
     const fetchUser = async () => {
       try {
         const res = await axios.get("/api/user");
         setUserId(res.data.user.id);
         setUsername(res.data.user.username);
+        setRole(res.data.user.role); // Lấy role từ API
+        setAvatar(res.data.user.avatar);
+        setName(res.data.user.name);
+        console.log(res);
         console.log("Kết quả context: ", res.data.user.id);
         console.log("Kết quả context: ", res.data.user.username);
       } catch (error) {
@@ -35,7 +54,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     };
 
     fetchUser();
-  }, [router, setUserId]);
+  }, [role, router, setRole, setUserId, setUsername, userId]);
 
   if (loading) {
     return (

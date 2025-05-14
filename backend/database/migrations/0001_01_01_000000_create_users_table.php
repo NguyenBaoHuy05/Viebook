@@ -52,7 +52,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('parent_comment_id')->nullable();
             $table->unsignedBigInteger('top_level_comment_id')->nullable();
             $table->foreign('parent_comment_id')->references('id')->on('comments')->onDelete('cascade');
-            $table->foreign('top_level_comment_id')->references('id')->on('comments')->onDelete('cascade'); 
+            $table->foreign('top_level_comment_id')->references('id')->on('comments')->onDelete('cascade');
         });
 
         Schema::create('follows', function (Blueprint $table) {
@@ -81,13 +81,21 @@ return new class extends Migration {
 
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
+
+            // Người nhận thông báo
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+
+            // Người thực hiện hành động (follow, comment, like, ...)
             $table->foreignId('actor_id')->constrained('users')->onDelete('cascade');
+
+            // Kiểu hành động: follow, comment, like, etc.
             $table->string('type');
-            $table->unsignedBigInteger('target_id')->nullable();
-            $table->boolean('isRead')->default(false);
+            $table->morphs('target'); // tạo target_id và target_type
+
+            $table->boolean('is_read')->default(false);
             $table->timestamps();
         });
+
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();

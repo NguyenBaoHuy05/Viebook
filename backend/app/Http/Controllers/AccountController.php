@@ -22,6 +22,7 @@ class AccountController extends Controller
                 'count_follow' => $user->count_follow,
                 'count_friend' => $user->count_friend,
                 'count_follower' => $user->count_follower,
+                'role' => $user->role,
             ]
         ]);
     }
@@ -37,5 +38,16 @@ class AccountController extends Controller
         $user->update($request->only(['name', 'bio', 'location', 'profile_picture']));
 
         return response()->json(['message' => "Cập nhật thành công"]);
+    }
+    public function searchUsers(Request $request)
+    {
+        $user = $request->user();
+        $query = $request->query('q'); // từ khóa tìm kiếm
+
+        $users = User::Where('username', 'like', '%' . $query . '%')->where('username', '!=', $user->username)
+            ->limit(5)
+            ->get(['id', 'name', 'username', 'profile_picture']);
+
+        return response()->json(['users' => $users]);
     }
 }

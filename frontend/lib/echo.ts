@@ -16,7 +16,6 @@ const getCookie = (name: string): string | null => {
   if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
   return null;
 };
-
 const echo = new Echo({
   broadcaster: "reverb",
   key: process.env.NEXT_PUBLIC_REVERB_APP_KEY || "pbjtbqkgods0xbxtp81y",
@@ -25,7 +24,7 @@ const echo = new Echo({
   wssPort: parseInt(process.env.NEXT_PUBLIC_REVERB_PORT || "8080"),
   forceTLS: (process.env.NEXT_PUBLIC_REVERB_SCHEME || "http") === "https",
   enabledTransports: ["ws"],
-  authEndpoint: "/broadcasting/auth",
+  authEndpoint: "http://localhost:8000/broadcasting/auth",
   auth: {
     headers: {
       Accept: "application/json",
