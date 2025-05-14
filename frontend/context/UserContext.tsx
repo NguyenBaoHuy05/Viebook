@@ -28,9 +28,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
-  const value = useMemo(
-    () => ({ userId, setUserId, username, setUsername, role, setRole }),
-    [userId, username, role]
   const [name, setName] = useState<string | null>(null);
   const [avatar, setAvatar] = useState<string | null>(null);
   const value = useMemo(
@@ -43,6 +40,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setName,
       avatar,
       setAvatar,
+      role,
+      setRole,
     }),
     [userId, username]
   );

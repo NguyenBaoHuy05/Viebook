@@ -368,7 +368,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
         </div>
         {/* Bạn bè */}
         <div className="relative my-10 flex gap-3">
-          <div className="h-100 sticky top-10 ml-40">
+          <div className="h-100 ml-40">
             <Friend
               onSave={(id: string) => setPosAccept(id)}
               data={pendingFriend} //Danh sách chờ kết bạn
@@ -385,12 +385,6 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
             />
           </div>
         </div>
-        {/* admin */}
-      <Link href="/(protected)/(admin)">
-        <button className="bg-blue-500 text-white px-4 py-2 rounded">
-          Trang Admin
-        </button>
-      </Link>
       </div>
     </div>
   );

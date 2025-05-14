@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { CiViewList } from "react-icons/ci";
 import { FaUsers } from "react-icons/fa";
 import { LuActivity } from "react-icons/lu";
@@ -15,14 +15,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { User2, ChevronUp } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import React, { useState } from "react";
@@ -30,16 +30,16 @@ import { useRouter } from "next/navigation";
 // Menu items.
 const listItems = [
   {
-    title: "User",
+    title: "ManageUser",
     url: "/admin/list/users",
     icon: PiUserList,
   },
   {
-    title: "Post",
+    title: "ManagePost",
     url: "/admin/list/posts",
     icon: BsPostcard,
   },
-]
+];
 
 const applicationItems = [
   {
@@ -52,27 +52,38 @@ const applicationItems = [
     url: "/admin/statictis/posts",
     icon: TbReportAnalytics,
   },
-]
+];
 
 export function AppSidebar() {
   const { username } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-
-  const handleNavigation = (url:string) => {
+  const [open, setOpen] = useState<string>("");
+  const handleNavigation = (url: string) => {
     router.push(url);
-  }
+  };
   return (
     <>
       <Sidebar>
-        <SidebarContent>
+        <SidebarContent className="bg-gray-300">
           <SidebarGroup>
-            <SidebarGroupLabel className="text-base font-bold mt-5"><CiViewList className="mr-2"/>List</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-base font-bold mt-5">
+              <CiViewList className="mr-2" />
+              List
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {listItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton
+                      onClick={() => setOpen(item.title)}
+                      asChild
+                      className={`${
+                        open == item.title
+                          ? "bg-gray-700 text-white hover:bg-gray-600 hover:text-white"
+                          : "hover:bg-gray-200"
+                      }`}
+                    >
                       <button onClick={() => handleNavigation(item.url)}>
                         <item.icon />
                         <span>{item.title}</span>
@@ -84,12 +95,22 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
           <SidebarGroup>
-            <SidebarGroupLabel className="text-base font-bold"><LuActivity className="mr-2"/>Statistics</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-base font-bold">
+              <LuActivity className="mr-2" />
+              Statistics
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {applicationItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton
+                      asChild
+                      className={`${
+                        open == item.title
+                          ? "bg-gray-700 text-white hover:bg-gray-600 hover:text-white"
+                          : "hover:bg-gray-200"
+                      }`}
+                    >
                       <button onClick={() => handleNavigation(item.url)}>
                         <item.icon />
                         <span>{item.title}</span>
@@ -102,28 +123,28 @@ export function AppSidebar() {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton>
-                      <User2 /> {username}
-                      <ChevronUp className="ml-auto" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    side="top"
-                    className="w-[--radix-popper-anchor-width]"
-                  >
-                    <DropdownMenuItem>
-                      <span className="w-55">Log out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton>
+                    <User2 /> {username}
+                    <ChevronUp className="ml-auto" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="top"
+                  className="w-[--radix-popper-anchor-width]"
+                >
+                  <DropdownMenuItem>
+                    <span className="w-55">Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
       </Sidebar>
     </>
-  )
+  );
 }

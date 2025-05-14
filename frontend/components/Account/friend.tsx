@@ -53,10 +53,13 @@ const Friend: React.FC<FriendProps> = ({ open, onSave, data, dataFriend }) => {
             <div className="flex gap-3 overflow-x-auto mt-1 mb-1 p-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
               {!data && (
                 <div className="h-30 text-xs p-0.5 rounded-lg">
-                  <div className="w-25 h-20 rounded-lg" />
-                  <div className="mt-1 w-25 h-5 rounded-lg  bg-gray-300 animate-pulse font-semibold">
-                    {" "}
-                  </div>
+                  <ImageWithSkeleton
+                    src={"khongco.jpg"}
+                    alt="demo"
+                    className="w-25 h-20"
+                    imgClass="rounded-lg"
+                  />
+                  <div className="mt-1 w-25 h-5 rounded-lg  bg-gray-300 animate-pulse font-semibold"></div>
                 </div>
               )}
               {data && data.length === 0 && "Trống"}
@@ -76,8 +79,8 @@ const Friend: React.FC<FriendProps> = ({ open, onSave, data, dataFriend }) => {
                           <ImageWithSkeleton
                             src={p.avatar ?? "https://github.com/shadcn.png"}
                             alt="demo"
-                            className="w-25 h-20"
-                            imgClass="rounded-lg"
+                            className="w-20 h-20"
+                            imgClass="rounded-full"
                           />
                           <div className="mt-1 ml-1 font-semibold">
                             {p.name}
@@ -126,9 +129,7 @@ const Friend: React.FC<FriendProps> = ({ open, onSave, data, dataFriend }) => {
                   className="w-25 h-20"
                   imgClass="rounded-lg"
                 />
-                <div className="mt-1 w-25 h-5 rounded-lg  bg-gray-300 animate-pulse font-semibold">
-                  {" "}
-                </div>
+                <div className="mt-1 w-25 h-5 rounded-lg  bg-gray-300 animate-pulse font-semibold"></div>
               </div>
             )}
             {dataFriend && dataFriend.length === 0 && "Trống"}

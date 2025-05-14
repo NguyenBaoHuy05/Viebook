@@ -17,7 +17,7 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="antialiased px-15">
+    <div className="antialiased">
       <UserProvider>
         <ProtectedRoute>
           {children}
