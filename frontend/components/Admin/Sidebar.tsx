@@ -27,6 +27,7 @@ import { User2, ChevronUp } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Logo from "@/logo/logo";
 // Menu items.
 const listItems = [
   {
@@ -42,6 +43,11 @@ const listItems = [
 ];
 
 const applicationItems = [
+  {
+    title: "Overview",
+    url: "/admin/statictis/overview",
+    icon: FaUsers,
+  },
   {
     title: "User",
     url: "/admin/statictis/users",
@@ -64,10 +70,10 @@ export function AppSidebar() {
   };
   return (
     <>
-      <Sidebar>
-        <SidebarContent className="bg-gray-300">
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-base font-bold mt-5">
+      <Sidebar className="text-white">
+        <SidebarContent className="bg-gray-800">
+          <SidebarGroup className="">
+            <SidebarGroupLabel className="text-white text-2xl font-bold mt-5">
               <CiViewList className="mr-2" />
               List
             </SidebarGroupLabel>
@@ -79,7 +85,7 @@ export function AppSidebar() {
                       onClick={() => setOpen(item.title)}
                       asChild
                       className={`${
-                        open == item.title
+                        open === item.title
                           ? "bg-gray-700 text-white hover:bg-gray-600 hover:text-white"
                           : "hover:bg-gray-200"
                       }`}
@@ -95,7 +101,7 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
           <SidebarGroup>
-            <SidebarGroupLabel className="text-base font-bold">
+            <SidebarGroupLabel className="text-white text-xl font-bold mt-5">
               <LuActivity className="mr-2" />
               Statistics
             </SidebarGroupLabel>
@@ -104,9 +110,10 @@ export function AppSidebar() {
                 {applicationItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
+                      onClick={() => setOpen(item.title)}
                       asChild
                       className={`${
-                        open == item.title
+                        open === item.title
                           ? "bg-gray-700 text-white hover:bg-gray-600 hover:text-white"
                           : "hover:bg-gray-200"
                       }`}
@@ -122,7 +129,7 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter>
+        <SidebarFooter className="bg-gray-900">
           <SidebarMenu>
             <SidebarMenuItem>
               <DropdownMenu>
@@ -134,7 +141,7 @@ export function AppSidebar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   side="top"
-                  className="w-[--radix-popper-anchor-width]"
+                  className="w-[--radix-popper-anchor-width] hover:cursor-pointer hover:bg-gray-200"
                 >
                   <DropdownMenuItem>
                     <span className="w-55">Log out</span>

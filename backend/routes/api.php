@@ -77,4 +77,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/posts', [AdminController::class, 'getAllPosts']);
     // Route::put('/admin/users/role', [AdminController::class, 'updateUserRole']);
     Route::put('/admin/users/{id}/block', [AdminController::class, 'blockUser']);
+    Route::get('/admin/statisticsOverview', [AdminController::class, 'statisticsOverview']);
+    Route::get('/admin/stats/users-daily', [AdminController::class, 'getCountUserDay']);
 });

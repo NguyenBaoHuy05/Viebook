@@ -15,9 +15,9 @@ interface Post {
   share_count: number | string;
   created_at: string;
   user: {
-    id: number,
-    name: string
-  }
+    id: number;
+    name: string;
+  };
 }
 
 export default function AdminPage() {
@@ -51,10 +51,9 @@ export default function AdminPage() {
     }
   };
 
-
   return (
     <>
-      {loading && <LoadingPage isError={loading}/>}
+      {loading && <LoadingPage isError={loading} />}
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">Quản lý bài Post</h1>
         <table className="table-auto w-full border-collapse border border-gray-300">
@@ -65,23 +64,35 @@ export default function AdminPage() {
               <th className="border border-gray-300 px-4 py-2">Title</th>
               <th className="border border-gray-300 px-4 py-2">Type</th>
               <th className="border border-gray-300 px-4 py-2">React_Count</th>
-              <th className="border border-gray-300 px-4 py-2">Comment_Count</th>
+              <th className="border border-gray-300 px-4 py-2">
+                Comment_Count
+              </th>
               <th className="border border-gray-300 px-4 py-2">Share_Count</th>
               <th className="border border-gray-300 px-4 py-2">Action</th>
-
-
             </tr>
           </thead>
           <tbody>
             {posts.map((post) => (
               <tr key={post.id}>
                 <td className="border border-gray-300 px-4 py-2">{post.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{post.user?.name || "N/A"}</td>
-                <td className="border border-gray-300 px-4 py-2">{String(post.title)}</td>
-                <td className="border border-gray-300 px-4 py-2">{String(post.type_content)}</td>
-                <td className="border border-gray-300 px-4 py-2">{String(post.react_count)}</td>
-                <td className="border border-gray-300 px-4 py-2">{String(post.comment_count)}</td>
-                <td className="border border-gray-300 px-4 py-2">{String(post.share_count)}</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {post.user?.name || "N/A"}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {String(post.title)}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {String(post.type_content)}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {String(post.react_count)}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {String(post.comment_count)}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {String(post.share_count)}
+                </td>
                 {/* <td className="border border-gray-300 px-4 py-2">
                   <select
                     value={user.role}
@@ -106,7 +117,6 @@ export default function AdminPage() {
         </table>
       </div>
     </>
-    
   );
 }
 

@@ -366,7 +366,6 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
             />
           </div>
         </div>
-        {/* Bạn bè */}
         <div className="relative my-10 flex gap-3">
           <div className="h-100 ml-40">
             <Friend
