@@ -20,6 +20,8 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     setName,
     avatar,
     setAvatar,
+    role,
+    setRole,
   } = useUser();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -27,13 +29,18 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     if (userId) {
       setLoading(false);
+      if (role == "admin") {
+        router.push("/admin"); // Chuyển hướng nếu không phải admin
+      }
       return;
     }
+
     const fetchUser = async () => {
       try {
         const res = await axios.get("/api/user");
         setUserId(res.data.user.id);
         setUsername(res.data.user.username);
+        setRole(res.data.user.role); // Lấy role từ API
         setAvatar(res.data.user.avatar);
         setName(res.data.user.name);
         console.log(res);
@@ -47,7 +54,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     };
 
     fetchUser();
-  }, [router, setUserId]);
+  }, [role, router, setRole, setUserId, setUsername, userId]);
 
   if (loading) {
     return (

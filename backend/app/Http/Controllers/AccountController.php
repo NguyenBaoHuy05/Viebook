@@ -22,6 +22,7 @@ class AccountController extends Controller
                 'count_follow' => $user->count_follow,
                 'count_friend' => $user->count_friend,
                 'count_follower' => $user->count_follower,
+                'role' => $user->role,
             ]
         ]);
     }

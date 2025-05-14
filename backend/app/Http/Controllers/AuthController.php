@@ -32,6 +32,7 @@ class AuthController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => bcrypt($validated['password']),
+                // 'role' => 'user',
             ]);
 
             event(new Registered($user));
