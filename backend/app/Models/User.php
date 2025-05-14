@@ -9,7 +9,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\CustomResetPassword;
 use App\Notifications\CustomVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\Models\Friend;
 class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable, HasApiTokens, SoftDeletes;
@@ -71,5 +71,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function receivedFriendRequests()
     {
         return $this->hasMany(Friend::class, 'addressee_id');
+    }
+
+    public function allFriendIds()
+    {
+        $friends1 = Friend::where('user_id', $this->id)
+            ->where('status', 'accepted')
+            ->pluck('friend_id');
+        $friends2 = Friend::where('friend_id', $this->id)
+            ->where('status', 'accepted')
+            ->pluck('user_id');
+        
+        return $friends1->merge($friends2)->unique()->values();
     }
 }

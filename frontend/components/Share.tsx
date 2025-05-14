@@ -7,9 +7,21 @@ import { Globe2, Users, Lock, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const privacyOptions = [
-  { label: "Công khai", icon: <Globe2 className="h-4 w-4 mr-1" /> },
-  { label: "Bạn bè", icon: <Users className="h-4 w-4 mr-1" /> },
-  { label: "Riêng tư", icon: <Lock className="h-4 w-4 mr-1" /> },
+  {
+    label: "Công khai",
+    value: "public",
+    icon: <Globe2 className="h-4 w-4 mr-1" />,
+  },
+  {
+    label: "Bạn bè",
+    value: "friends",
+    icon: <Users className="h-4 w-4 mr-1" />,
+  },
+  {
+    label: "Riêng tư",
+    value: "private",
+    icon: <Lock className="h-4 w-4 mr-1" />,
+  },
 ];
 
 function Share({
@@ -22,7 +34,7 @@ function Share({
   postID: string | null;
 }) {
   const [data, setData] = useState("");
-  const [privacy, setPrivacy] = useState("Public");
+  const [privacy, setPrivacy] = useState("public");
   const [copied, setCopied] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -75,12 +87,12 @@ function Share({
               <div className="flex gap-2 items-center text-sm">
                 {privacyOptions.map((option) => (
                   <button
-                    key={option.label}
+                    key={option.value}
                     type="button"
-                    onClick={() => setPrivacy(option.label)}
+                    onClick={() => setPrivacy(option.value)}
                     className={cn(
                       "flex items-center px-3 py-1 rounded-full border transition",
-                      privacy === option.label
+                      privacy === option.value
                         ? "bg-blue-600 text-white"
                         : "bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
                     )}

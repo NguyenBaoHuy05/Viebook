@@ -2,6 +2,25 @@ import axios from "@/lib/axiosConfig";
 import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { MdPhotoLibrary } from "react-icons/md";
+import { Globe2, Users, Lock } from "lucide-react";
+
+const privacyOptions = [
+  {
+    label: "Công khai",
+    value: "public",
+    icon: <Globe2 className="h-4 w-4 mr-1" />,
+  },
+  {
+    label: "Bạn bè",
+    value: "friends",
+    icon: <Users className="h-4 w-4 mr-1" />,
+  },
+  {
+    label: "Riêng tư",
+    value: "private",
+    icon: <Lock className="h-4 w-4 mr-1" />,
+  },
+];
 
 function CreatePost({
   load,
@@ -14,6 +33,7 @@ function CreatePost({
   const [image, setImage] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [privacy, setPrivacy] = useState("public");
 
   if (!load) return null;
 
@@ -63,6 +83,7 @@ function CreatePost({
           typeContent: "image_post",
           title: data,
           content: imageUrl,
+          privacy,
         },
         { withCredentials: true }
       );
@@ -70,7 +91,9 @@ function CreatePost({
       setData("");
       setImage(null);
       setPreviewUrl(null);
+      setPrivacy("public");
       toggleLoad();
+      window.location.reload();
     } catch (error) {
       console.error("Failed to create post:", error);
     } finally {
@@ -99,6 +122,24 @@ function CreatePost({
             onChange={(e) => setData(e.target.value)}
             value={data}
           />
+
+          <div className="flex gap-2 mb-2">
+            {privacyOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setPrivacy(option.value)}
+                className={`flex items-center px-3 py-1 rounded-full border transition ${
+                  privacy === option.value
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
+                }`}
+              >
+                {option.icon}
+                {option.label}
+              </button>
+            ))}
+          </div>
           <div>
             {previewUrl ? (
               <div className="relative">
