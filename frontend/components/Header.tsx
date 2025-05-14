@@ -143,7 +143,7 @@ function Header() {
             </Link>
           </div>
 
-          <div className="col-span-1 relative flex justify-end items-center gap-4">
+          <div className="z-50 col-span-1 relative flex justify-end items-center gap-4">
             <PopoverNotifycation />
             <Popover>
               <PopoverTrigger asChild>

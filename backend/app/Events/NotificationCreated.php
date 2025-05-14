@@ -11,6 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class NotificationCreated implements ShouldBroadcast
 {
@@ -23,11 +24,12 @@ class NotificationCreated implements ShouldBroadcast
     {
         $this->notification = $notification;
         $this->userId = $userId;
+        Log::info("Có chạy");
     }
 
     public function broadcastOn()
     {
-        return new PrivateChannel('notifications.' . $this->userId);
+        return new Channel('notifications.' . $this->userId);
     }
 
     public function broadcastAs()
@@ -39,7 +41,7 @@ class NotificationCreated implements ShouldBroadcast
         return [
             'id' => $this->notification->id,
             'type' => $this->notification->type,
-            'message' => "Bạn có thông báo mới",
+            'message' => "Bạn vừa có thông báo mới",
             'actor' => [
                 'id' => $this->notification->actor->id,
                 'name' => $this->notification->actor->name

@@ -64,13 +64,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/friends/acceptFriend', [FriendController::class, 'acceptFriend']);
     Route::get('/friends/friendList', [FriendController::class, 'getFriendsList']);
     Route::get('/friends/friendInfo', [FriendController::class, 'getInfoFriend']);
+    Route::post('/friends/blockFriend', [FriendController::class, 'blockFriend']);
 });
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/getAllNotification', [NotificationController::class, 'getAllNotification']);
+    Route::get('/notification/getAllNotification', [NotificationController::class, 'getAllNotification']);
+    Route::post('/notification/changeRedDot', [NotificationController::class, 'changeIsRead']);
 });
-// Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-
-//     Route::post('notifications', [NotificationController::class, 'store']);
-//     Route::get('notifications', [NotificationController::class, 'index']);
-//     Route::put('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
-// });

@@ -10,5 +10,6 @@ export interface iFollowNoti {
     id: number | string;
     name: string;
   };
+  is_read: boolean;
   created_at: string;
 }

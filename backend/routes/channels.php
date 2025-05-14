@@ -8,5 +8,5 @@ Broadcast::channel('chat.{conversationId}', function ($user, $conversationId) {
     return $user->conversation()->where('id', $conversationId)->exists();
 });
 Broadcast::channel('notifications.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
+    return $user && (int) $user->id === (int) $userId;
 });
