@@ -13,6 +13,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Auth\Events\Verified;
 use App\Models\User;
+use App\Http\Controllers\AdminController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -33,6 +34,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         'user' => [
             'id' => $request->user()->id,
             'username' => $request->user()->username,
+            'role' => $request->user()->role,
         ]
     ]);
 });
@@ -68,3 +70,10 @@ Route::middleware('auth:sanctum')->group(function () {
 //     Route::get('notifications', [NotificationController::class, 'index']);
 //     Route::put('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
 // });
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/admin/users', [AdminController::class, 'getAllUsers']);
+    Route::get('/admin/posts', [AdminController::class, 'getAllPosts']);
+    // Route::put('/admin/users/role', [AdminController::class, 'updateUserRole']);
+    Route::put('/admin/users/{id}/block', [AdminController::class, 'blockUser']);
+});

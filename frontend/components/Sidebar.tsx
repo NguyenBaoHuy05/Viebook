@@ -13,6 +13,7 @@ import AlertDialogDemo from "./Modal/AlertDialog";
 import iFriend from "@/interface/friendType";
 import PostFeed from "./PostFeed";
 import CommentFeed from "./CommentFeed";
+import Link from "next/link";
 interface SidebarProps {
   userInfo: iUser;
   id: string;
@@ -384,6 +385,12 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
             />
           </div>
         </div>
+        {/* admin */}
+      <Link href="/(protected)/(admin)">
+        <button className="bg-blue-500 text-white px-4 py-2 rounded">
+          Trang Admin
+        </button>
+      </Link>
       </div>
     </div>
   );

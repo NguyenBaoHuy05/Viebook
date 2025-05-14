@@ -6,6 +6,8 @@ interface UserContextType {
   username: string | null;
   setUserId: (id: string | null) => void;
   setUsername: (user: string | null) => void;
+  role: string | null;
+  setRole: (role: string | null) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -21,9 +23,10 @@ export const useUser = () => {
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const value = useMemo(
-    () => ({ userId, setUserId, username, setUsername }),
-    [userId, username]
+    () => ({ userId, setUserId, username, setUsername, role, setRole }),
+    [userId, username, role]
   );
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
