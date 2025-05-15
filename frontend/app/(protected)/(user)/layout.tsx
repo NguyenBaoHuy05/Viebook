@@ -11,8 +11,8 @@ export default function ProtectedLayout({
 }>) {
   return (
     <div className="antialiased px-15">
-          <Header />
-          {children}
+      <Header />
+      {children}
     </div>
   );
 }

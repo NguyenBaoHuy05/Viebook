@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axios from "@/lib/axiosConfig";
 import ImageWithSkeleton from "./SideBar/image";
 import CommentFeed from "./CommentFeed";
+import { useUser } from "@/context/UserContext";
 
 function Post({
   post,
@@ -20,6 +21,7 @@ function Post({
   setShowModal: (prop: boolean) => void;
   isShared: boolean;
 }) {
+  const { username } = useUser();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.reactCount);
   const [showComment, setShowComment] = useState(false);
@@ -49,6 +51,17 @@ function Post({
   const handleShare = () => {
     onSelectPost(post.id);
     setShowModal((prev) => !prev);
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này không?")) {
+      try {
+        await axios.delete(`/api/posts/${post.id}`);
+        window.location.reload();
+      } catch (err) {
+        alert("Failed to delete post.");
+      }
+    }
   };
 
   useEffect(() => {
@@ -94,6 +107,15 @@ function Post({
             </span>
             <span className="text-sm text-gray-500">{post.date}</span>
           </div>
+
+          {username && username === post.name && !isShared && (
+            <button
+              onClick={handleDelete}
+              className="ml-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Delete
+            </button>
+          )}
 
           {!isShared && (
             <div className="flex ml-auto rounded-lg">

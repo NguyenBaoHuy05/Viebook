@@ -119,5 +119,13 @@ class PostController extends Controller
         $post->load('user'); 
         return response()->json(['data' => $post]);
     }
-
+    public function destroy(Post $post, Request $request)
+    {
+        $user = $request->user();
+        if (!$user || $user->id !== $post->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+        $post->delete();
+        return response()->json(['message' => 'Post deleted successfully']);
+    }
 }
