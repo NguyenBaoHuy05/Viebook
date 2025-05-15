@@ -367,7 +367,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
           </div>
         </div>
         <div className="relative my-10 flex gap-3">
-          <div className="h-100 ml-40">
+          <div className="h-100 ml-40 overflow-auto max-w-80">
             <Friend
               onSave={(id: string) => setPosAccept(id)}
               data={pendingFriend} //Danh sách chờ kết bạn

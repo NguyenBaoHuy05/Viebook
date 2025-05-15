@@ -167,7 +167,7 @@ function Header() {
       </div>
       <Command
         ref={commandRef}
-        className="z-50 absolute h-fit top-4.5 ml-5 w-1/6 rounded-lg border shadow-md"
+        className="z-50 fixed h-fit top-4.5 ml-5 w-1/6 rounded-lg border shadow-md"
       >
         <CommandInput
           ref={commandInputRef}
