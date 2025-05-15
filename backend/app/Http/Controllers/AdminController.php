@@ -44,9 +44,7 @@ class AdminController extends Controller
             return response()->json(['error' => 'Không thể block admin'], 403);
         }
         Log::info("block:" . $request->is_blocked);
-        $user->block = $request->is_blocked === 1 ?? 0; // Directly assign the value
-        $user->save();
-
+        $user->update(['block' => $request->is_blocked]);
         return response()->json(['message' => 'Cập nhật trạng thái thành công']);
     }
 

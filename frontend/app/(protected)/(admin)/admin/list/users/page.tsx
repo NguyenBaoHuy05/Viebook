@@ -18,12 +18,15 @@ interface User {
 
 export default function AdminPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [usersRaw, setUsersRaw] = useState<User[]>([]);
+  const [select, setSelect] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get("/api/admin/users");
+        setUsersRaw(response.data);
         setUsers(response.data);
       } catch (error) {
         toast.error("Không thể tải danh sách người dùng!");
@@ -47,7 +50,7 @@ export default function AdminPage() {
           f.id === userId ? { ...f, block: value === "true" } : f
         )
       );
-      toast.success("Block người dùng thành công!");
+      toast.success("Thay đổi chế độ người dùng thành công!");
     } catch (error) {
       toast.error("Không thể block người dùng!");
       console.error(error);
@@ -58,7 +61,27 @@ export default function AdminPage() {
     <>
       {loading && <LoadingPage isError={loading} />}
       <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Quản lý người dùng</h1>
+        <div className="flex mb-2">
+          <h1 className="text-2xl font-bold mb-4">Quản lý người dùng</h1>
+          <select
+            onChange={(e) => {
+              const value = e.target.value;
+              console.log(value);
+              if (value === "block") {
+                setUsers(usersRaw.filter((u) => u.block == true));
+              } else if (value === "unblock") {
+                setUsers(usersRaw.filter((u) => u.block == false));
+              } else {
+                setUsers(usersRaw);
+              }
+            }}
+            className={`border rounded px-2 py-1 ml-auto`}
+          >
+            <option value="all">All</option>
+            <option value="block">Block</option>
+            <option value="unblock">Unblock</option>
+          </select>
+        </div>
         <table className="table-auto w-full border-collapse border border-gray-300">
           <thead>
             <tr>
