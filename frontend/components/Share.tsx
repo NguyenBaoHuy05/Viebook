@@ -65,14 +65,14 @@ function Share({
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center ">
           <div
-            className="absolute inset-0 bg-black bg-opacity-50"
+            className="absolute inset-0 bg-black opacity-50"
             onClick={() => setShowModal(false)}
           ></div>
           <div className="relative z-10 bg-white p-5 rounded-lg w-full max-w-md mx-auto shadow-xl">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Chia sẻ</h2>
               <button onClick={() => setShowModal(false)}>
-                <IoMdClose className="h-6 w-6 text-gray-600 hover:text-black" />
+                <IoMdClose className="h-6 w-6 text-gray-600 hover:text-black hover:scale-125 cursor-pointer" />
               </button>
             </div>
 

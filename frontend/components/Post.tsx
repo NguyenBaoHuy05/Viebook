@@ -82,7 +82,14 @@ function Post({
             commentCount: sharedPostData.comment_count,
             reactCount: sharedPostData.react_count,
             shareCount: sharedPostData.share_count,
-            date: new Date(sharedPostData.created_at).toLocaleDateString(),
+            date: new Date(sharedPostData.created_at).toLocaleDateString(
+              "en-GB",
+              {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              }
+            ),
             sharePostID: sharedPostData.share_post_id ?? null,
           });
         } catch (err) {
@@ -220,9 +227,7 @@ function Post({
       </div>
 
       {showComment && (
-        <div className="absolute right-[-290px]">
-          <CommentFeed postId={post.id} />
-        </div>
+        <CommentFeed postId={post.id} setShowComment={setShowComment} />
       )}
     </div>
   );

@@ -51,7 +51,11 @@ export default function PostFeed({
           commentCount: post.comment_count,
           reactCount: post.react_count,
           shareCount: post.share_count,
-          date: new Date(post.created_at).toLocaleDateString(),
+          date: new Date(post.created_at).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }),
           sharePostID: post.share_post_id,
         }));
 
