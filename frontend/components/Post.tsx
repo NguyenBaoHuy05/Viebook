@@ -21,7 +21,7 @@ function Post({
   setShowModal: (prop: boolean) => void;
   isShared: boolean;
 }) {
-  const { username } = useUser();
+  const { userId } = useUser();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.reactCount);
   const [showComment, setShowComment] = useState(false);
@@ -72,6 +72,7 @@ function Post({
           const sharedPostData = res.data.data;
           setSharedPost({
             id: sharedPostData.id,
+            userId: sharedPostData.user.id,
             name: sharedPostData.user.name,
             logo: sharedPostData.user.profile_picture
               ? sharedPostData.user.profile_picture
@@ -108,17 +109,8 @@ function Post({
             <span className="text-sm text-gray-500">{post.date}</span>
           </div>
 
-          {username && username === post.name && !isShared && (
-            <button
-              onClick={handleDelete}
-              className="ml-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              Delete
-            </button>
-          )}
-
           {!isShared && (
-            <div className="flex ml-auto rounded-lg">
+            <div className="flex ml-auto rounded-lg items-center">
               <button
                 onClick={handleLike}
                 className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
@@ -155,6 +147,33 @@ function Post({
                   {post.shareCount}
                 </span>
               </button>
+
+              {userId && userId === post.userId && !isShared && (
+                <div>
+                  <button
+                    onClick={handleDelete}
+                    className="ml-auto px-3 py-2 bg-transparent border border-red-400 text-red-500 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors duration-200 shadow-sm flex items-center gap-1 cursor-pointer"
+                    style={{ marginLeft: "auto", alignSelf: "flex-start" }}
+                    title="Xóa bài viết"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    <span className="font-medium text-sm">Xóa</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

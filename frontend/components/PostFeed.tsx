@@ -42,6 +42,7 @@ export default function PostFeed({
         const fetchedPosts: iPost[] = res.data.data.map((post: any) => ({
           id: post.id,
           name: post.user.name,
+          userId: post.user.id,
           logo: post.user.profile_picture
             ? post.user.profile_picture
             : "https://github.com/shadcn.png",
