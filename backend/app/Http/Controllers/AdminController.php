@@ -122,12 +122,10 @@ class AdminController extends Controller
         // Sử dụng CarbonPeriod để tạo ra một dãy các đối tượng ngày từ startDate đến endDate
         $period = CarbonPeriod::create($startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
 
-        // Tạo một mảng kết hợp (associative array) hoặc map để lưu số lượng bài viết theo ngày
-        // Khởi tạo số lượng bài viết cho mỗi ngày trong khoảng là 0
         $dataByDate = [];
         foreach ($period as $date) {
             $dataByDate[$date->format('Y-m-d')] = [
-                'date' => $date->format('Y-m-d'), // Định dạng lại ngày tháng cho phù hợp frontend? Hoặc giữ Y-m-d và format ở frontend
+                'date' => $date->format('Y-m-d'),
                 'users' => 0,
             ];
         }
@@ -135,17 +133,84 @@ class AdminController extends Controller
         // Điền số lượng bài viết thực tế từ kết quả truy vấn vào map đã tạo
         // $dailyCounts chứa các object có 'date' (chuỗi Y-m-d) và 'users' (số đếm)
         foreach ($dailyCounts as $count) {
-            // Dùng count->date làm key để truy cập đúng ngày trong map
-            if (isset($dataByDate[$count->date])) { // Đảm bảo ngày tồn tại trong map (phòng trường hợp lệch múi giờ nhỏ)
+            if (isset($dataByDate[$count->date])) {
                 $dataByDate[$count->date]['users'] = $count->users;
             }
         }
 
         // Chuyển map thành một mảng tuần tự các object để trả về cho frontend
-        // Frontend mong đợi mảng dạng [{ date: '...', users: ... }, ...]
         $formattedData = array_values($dataByDate);
 
-        // 6. Trả về dữ liệu đã định dạng dưới dạng JSON response
+        return response()->json($formattedData);
+    }
+    public function getCountPostDay(Request $request)
+    {
+        $user = $request->user();
+        if (!$user || $user->role != 'admin') {
+            return response()->json(['message' => 'Bạn không phải admin'], 403);
+        }
+
+        $lastDays = (int) $request->query('last_days', 90);
+        if ($lastDays <= 0) $lastday = 90;
+        if ($lastDays > 365) $lastday = 365;
+        $endDate = Carbon::now()->endOfDay();
+        $startDate = Carbon::now()->subDays($lastDays - 1)->startOfDay();
+        $dailyCountsPost = User::select(
+            // Sử dụng DB::raw để chọn chỉ phần ngày của cột created_at, đặt tên là 'date'
+            DB::raw('DATE(created_at) as date'),
+            // Sử dụng DB::raw để đếm số bản ghi trong mỗi nhóm, đặt tên là 'users'
+            DB::raw('count(*) as posts')
+        )
+            // Lọc các bài viết có thời gian tạo nằm trong khoảng từ $startDate đến $endDate
+            ->whereBetween('created_at', [$startDate, $endDate])
+            // Nhóm các kết quả theo ngày 
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date', 'ASC')
+            ->get();
+        $dailyCountsComment = Comment::select(
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('count(*) as comments')
+        )
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date', 'ASC')
+            ->get();
+        $dailyCountsLike = PostReact::select(
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('count(*) as likes')
+        )
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date', 'ASC')
+            ->get();
+        $period = CarbonPeriod::create($startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
+
+        $dataByDate = [];
+        foreach ($period as $date) {
+            $dataByDate[$date->format('Y-m-d')] = [
+                'date' => $date->format('Y-m-d'),
+                'posts' => 0,
+                'comments' => 0,
+                'likes' => 0,
+            ];
+        }
+        foreach ($dailyCountsPost as $count) {
+            if (isset($dataByDate[$count->date])) {
+                $dataByDate[$count->date]['posts'] = $count->posts;
+            }
+        }
+        foreach ($dailyCountsComment as $count) {
+            if (isset($dataByDate[$count->date])) {
+                $dataByDate[$count->date]['comments'] = $count->comments;
+            }
+        }
+        foreach ($dailyCountsLike as $count) {
+            if (isset($dataByDate[$count->date])) {
+                $dataByDate[$count->date]['likes'] = $count->likes;
+            }
+        }
+        $formattedData = array_values($dataByDate);
+
         return response()->json($formattedData);
     }
 }

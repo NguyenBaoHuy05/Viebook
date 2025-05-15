@@ -2,13 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Follow;
-use App\Models\Post;
-use App\Models\Comment;
-use App\Models\Notification;
-use App\Models\PostReact;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -18,12 +11,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(50)->create();
-
-        Follow::factory(10)->existing()->create();
-        Post::factory(10)->existing()->create();
-        Comment::factory(10)->existing()->create();
-        PostReact::factory(10)->existing()->create();
-        Notification::factory(10)->existing()->create();
+        // Order matters for foreign key constraints
+        $this->call([
+            UserSeeder::class,
+            FollowSeeder::class, // Depends on Users
+            FriendSeeder::class, // Depends on Users
+            PostSeeder::class,   // Depends on Users
+            CommentSeeder::class, // Depends on Users, Posts, Comments (for parent)
+            PostReactSeeder::class, // Depends on Users, Posts
+            ConversationSeeder::class, // Depends on Users
+            MessageSeeder::class, // Depends on Users, Conversations
+            NotificationSeeder::class, // Depends on Users, Follows, Comments, PostReacts, Posts
+            // PasswordResetTokens, Cache, Sessions, PersonalAccessTokens, Jobs are typically not seeded like this
+        ]);
     }
 }
