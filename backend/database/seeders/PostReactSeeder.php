@@ -24,27 +24,26 @@ class PostReactSeeder extends Seeder
             return;
         }
 
-        $reactTypes = ['like', 'love', 'haha', 'wow', 'sad', 'angry']; // Define available react types
+        $reactTypes = ['like', 'love', 'haha', 'wow', 'sad', 'angry'];
 
-        // Create reactions for a random subset of user-post combinations
-        $numberOfReactions = $faker->numberBetween(500, 2000); // Create between 500 and 2000 reactions
+        $numberOfReactions = $faker->numberBetween(500, 2000);
 
         for ($i = 0; $i < $numberOfReactions; $i++) {
             $user = $users->random();
             $post = $posts->random();
             $reactType = $faker->randomElement($reactTypes);
 
-            // Check if this user has already reacted to this post with this type (or any type if you want unique reactions per post per user)
-            // The schema doesn't have a unique constraint on (user_id, post_id, react_type), only (user_id, post_id) if added later.
-            // For basic seeding, let's allow multiple reaction types from the same user on the same post for simplicity, but ensure the pair (user, post, type) is unique in this seed run.
+            // Check if this user has already reacted to this post with this type
             if (!PostReact::where('user_id', $user->id)->where('post_id', $post->id)->where('react_type', $reactType)->exists()) {
-                PostReact::create([
+
+                // --- SỬ DỤNG FACTORY ĐỂ TẠO POST REACT ---
+                PostReact::factory()->create([
                     'user_id' => $user->id,
                     'post_id' => $post->id,
                     'react_type' => $reactType,
                 ]);
+                // --- KẾT THÚC SỬ DỤNG FACTORY ---
 
-                // Update post react count (optional, can use observer)
                 $post->increment('react_count');
             }
         }

@@ -99,8 +99,8 @@ class AdminController extends Controller
         if (!$user || $user->role != 'admin') {
             return response()->json(['message' => 'Bạn không phải admin'], 403);
         }
-        $lastDays = (int) $request->query('last_days', 30);
-        if ($lastDays <= 0) $lastday = 30;
+        $lastDays = (int) $request->query('last_days', 90);
+        if ($lastDays <= 0) $lastday = 90;
         if ($lastDays > 365) $lastday = 365;
         $endDate = Carbon::now()->endOfDay();
         $startDate = Carbon::now()->subDays($lastDays - 1)->startOfDay();
