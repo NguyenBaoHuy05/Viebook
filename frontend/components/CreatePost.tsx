@@ -109,7 +109,7 @@ function CreatePost({
           <div>Create a Post</div>
           <button
             onClick={toggleLoad}
-            className="text-gray-600 hover:text-black hover:scale-125"
+            className="text-gray-600 hover:text-black hover:scale-125 cursor-pointer"
           >
             <IoMdClose className="h-6 w-6" />
           </button>

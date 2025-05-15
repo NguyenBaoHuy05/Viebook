@@ -60,14 +60,16 @@ function Comment({ comment: commentData }: { comment: any }) {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
 
-        <div className="flex flex-col gap-2 flex-1">
+        <div className="flex flex-col gap-2 flex-1 w-full max-w-full">
           {currentComment.parent && currentComment.parent.user && (
             <span className="text-blue-600 font-medium text-sm">
               @{currentComment.parent.user.username}
             </span>
           )}
 
-          <p className="text-sm text-gray-800">{currentComment.content}</p>
+          <p className="text-sm text-gray-800 break-all w-full max-w-full">
+            {currentComment.content}
+          </p>
 
           <div className="flex gap-4 mt-1">
             <button className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer">
