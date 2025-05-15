@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axios from "@/lib/axiosConfig";
 import ImageWithSkeleton from "./SideBar/image";
 import CommentFeed from "./CommentFeed";
+import { useUser } from "@/context/UserContext";
 
 function Post({
   post,
@@ -20,6 +21,7 @@ function Post({
   setShowModal: (prop: boolean) => void;
   isShared: boolean;
 }) {
+  const { userId } = useUser();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.reactCount);
   const [showComment, setShowComment] = useState(false);
@@ -51,6 +53,17 @@ function Post({
     setShowModal((prev) => !prev);
   };
 
+  const handleDelete = async () => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này không?")) {
+      try {
+        await axios.delete(`/api/posts/${post.id}`);
+        window.location.reload();
+      } catch (err) {
+        alert("Failed to delete post.");
+      }
+    }
+  };
+
   useEffect(() => {
     if (post.sharePostID) {
       const fetchSharedPost = async () => {
@@ -59,6 +72,7 @@ function Post({
           const sharedPostData = res.data.data;
           setSharedPost({
             id: sharedPostData.id,
+            userId: sharedPostData.user.id,
             name: sharedPostData.user.name,
             logo: sharedPostData.user.profile_picture
               ? sharedPostData.user.profile_picture
@@ -96,7 +110,7 @@ function Post({
           </div>
 
           {!isShared && (
-            <div className="flex ml-auto rounded-lg">
+            <div className="flex ml-auto rounded-lg items-center">
               <button
                 onClick={handleLike}
                 className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
@@ -133,6 +147,33 @@ function Post({
                   {post.shareCount}
                 </span>
               </button>
+
+              {userId && userId === post.userId && !isShared && (
+                <div>
+                  <button
+                    onClick={handleDelete}
+                    className="ml-auto px-3 py-2 bg-transparent border border-red-400 text-red-500 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors duration-200 shadow-sm flex items-center gap-1 cursor-pointer"
+                    style={{ marginLeft: "auto", alignSelf: "flex-start" }}
+                    title="Xóa bài viết"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    <span className="font-medium text-sm">Xóa</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

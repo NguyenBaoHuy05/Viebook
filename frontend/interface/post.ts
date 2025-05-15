@@ -1,5 +1,6 @@
 export default interface iPost {
   id: string;
+  userId: string;
   name: string;
   logo: string;
   title: string;
