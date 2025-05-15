@@ -3,7 +3,6 @@ import "../globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Header from "@/components/Header";
-import PopoverChat from "@/components/PopoverChat";
 
 import { UserProvider } from "@/context/UserContext";
 export const metadata: Metadata = {
@@ -19,10 +18,7 @@ export default function ProtectedLayout({
   return (
     <div className="antialiased">
       <UserProvider>
-        <ProtectedRoute>
-          {children}
-          <PopoverChat />
-        </ProtectedRoute>
+        <ProtectedRoute>{children}</ProtectedRoute>
       </UserProvider>
     </div>
   );

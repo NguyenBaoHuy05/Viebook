@@ -80,4 +80,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/admin/users/{id}/block', [AdminController::class, 'blockUser']);
     Route::get('/admin/statisticsOverview', [AdminController::class, 'statisticsOverview']);
     Route::get('/admin/stats/users-daily', [AdminController::class, 'getCountUserDay']);
+    Route::get('/admin/stats/daily-counts', [AdminController::class, 'getCountPostDay']);
 });

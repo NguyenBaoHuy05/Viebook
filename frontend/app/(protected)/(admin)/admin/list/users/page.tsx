@@ -13,7 +13,7 @@ interface User {
   block: boolean;
   count_follower: number | string;
   count_friend: number | string;
-  created_at: string; 
+  created_at: string;
 }
 
 export default function AdminPage() {
@@ -48,10 +48,9 @@ export default function AdminPage() {
     }
   };
 
-
   return (
     <>
-      {loading && <LoadingPage isError={loading}/>}
+      {loading && <LoadingPage isError={loading} />}
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">Quản lý người dùng</h1>
         <table className="table-auto w-full border-collapse border border-gray-300">
@@ -71,16 +70,26 @@ export default function AdminPage() {
             {users.map((user) => (
               <tr key={user.id}>
                 <td className="border border-gray-300 px-4 py-2">{user.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{user.name}</td>
-                <td className="border border-gray-300 px-4 py-2">{user.email}</td>
-                <td className="border border-gray-300 px-4 py-2">{user.role}</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {user.name}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {user.email}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {user.role}
+                </td>
                 <td className="border border-gray-300 px-4 py-2">
                   {user.role === "admin" ? (
-                    <span className="text-gray-500 italic">Không thể block</span>
+                    <span className="text-gray-500 italic">
+                      Không thể block
+                    </span>
                   ) : (
                     <select
                       value={String(user.block)}
-                      onChange={(e) => handleUpdateBlock(user.id, e.target.value)}
+                      onChange={(e) =>
+                        handleUpdateBlock(user.id, e.target.value)
+                      }
                       className="border rounded px-2 py-1"
                     >
                       <option value="true">Yes</option>
@@ -88,18 +97,20 @@ export default function AdminPage() {
                     </select>
                   )}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">{String(user.count_follower)}</td>
-                <td className="border border-gray-300 px-4 py-2">{String(user.count_friend)}</td>
-                <td>{new Date(user.created_at).toLocaleString("vi-VN", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                  hour12: false,
-                })}</td>
-                
+                <td className="border border-gray-300 px-4 py-2">
+                  {String(user.count_follower)}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {String(user.count_friend)}
+                </td>
+                <td className="text-center">
+                  {new Date(user.created_at).toLocaleString("vi-VN", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })}
+                </td>
+
                 {/* <td className="border border-gray-300 px-4 py-2">
                   <button
                     className="bg-red-500 text-white px-2 py-1 rounded"
@@ -114,7 +125,6 @@ export default function AdminPage() {
         </table>
       </div>
     </>
-    
   );
 }
 

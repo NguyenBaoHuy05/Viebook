@@ -7,11 +7,15 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
 class UserFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = User::class;
+
     /**
      * Define the model's default state.
      *
@@ -19,36 +23,40 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $faker = $this->faker;
+
+        $email = $faker->unique()->safeEmail();
+        while (str_ends_with($email, '@example.com')) {
+            $email = $faker->unique()->safeEmail();
+        }
+
+        $username = $faker->unique()->userName();
+
+        // --- Thêm timestamps ngẫu nhiên ---
+        $createdAt = $faker->dateTimeBetween('-5 years', '-1 year'); // User được tạo trong 2-5 năm trước
+        $updatedAt = $faker->dateTimeBetween($createdAt, 'now'); // updated_at sau created_at
+
         return [
-            'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'email_verified_at' => $this->faker->optional()->dateTime(),
-            'password' => bcrypt('password123'),
-            'profile_picture' => $this->faker->optional()->imageUrl(200, 200, 'people'),
-            'bio' => $this->faker->optional(0.7)->paragraph(),
-            'location' => $this->faker->optional(0.7)->city(),
-            'count_follow' => $this->faker->numberBetween(0, 100),
+            'username' => $username,
+            'name' => $faker->name(),
+            'email' => $email,
+            'email_verified_at' => $faker->boolean(80) ? $faker->dateTimeBetween($createdAt, $updatedAt) : null, // verified_at giữa created và updated
+            'password' => Hash::make('A123123@'),
             'remember_token' => Str::random(10),
-            'created_at' => now(),
+            'profile_picture' => null,
+            'bio' => $faker->sentence(),
+            'location' => $faker->city(),
+            'count_follow' => 0,
+            'count_follower' => 0,
+            'count_friend' => 0,
+            'role' => 'user', // Mặc định là user, sẽ bị ghi đè trong Seeder cho admin
+            'block' => false, // Mặc định là false, sẽ bị ghi đè trong Seeder
+            'created_at' => $createdAt,
+            'updated_at' => $updatedAt,
         ];
     }
-    // Trạng thái tùy chỉnh: User đã xác minh email
-    public function verified(): static
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'email_verified_at' => now(),
-            ];
-        });
-    }
 
-    // Trạng thái tùy chỉnh: User chưa xác minh email
-    public function unverified(): static
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'email_verified_at' => null,
-            ];
-        });
-    }
+    // ... các phương thức unverified(), admin(), blocked() giữ nguyên hoặc xóa nếu không dùng ...
+    // Vì role và block được set trong seeder, các state này ít có ý nghĩa trong UserFactory lúc này.
+    // Bạn có thể xóa chúng để code gọn hơn nếu chỉ set role/block trong seeder.
 }

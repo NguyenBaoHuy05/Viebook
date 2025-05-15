@@ -4,73 +4,40 @@ namespace Database\Factories;
 
 use App\Models\Notification;
 use App\Models\User;
-use App\Models\Post;
-use App\Models\Comment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class NotificationFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
     protected $model = Notification::class;
 
-    public function definition()
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
     {
+        $userId = User::inRandomOrder()->first()?->id ?? User::factory();
+        $actorId = User::inRandomOrder()->where('id', '!=', $userId)->first()?->id ?? User::factory();
+        $createdAt = $this->faker->dateTimeBetween('-1 year', 'now'); // Post được tạo trong 1 năm trở lại đây
+        $updatedAt = $this->faker->dateTimeBetween($createdAt, 'now'); // updated_at sau created_at
+        // Defining target_type and target_id in a factory is tricky because they can be polymorphic.
+        // It's often better to set these specifically in the Seeder based on the actual created models (like Follow, Comment, PostReact).
+        // This factory provides basic notification data without a meaningful target relationship.
         return [
-            'user_id' => User::factory(),
-            'actor_id' => User::factory(),
-            'type' => $this->faker->randomElement(['like', 'comment', 'follow', 'mention']),
-            'target_id' => $this->faker->optional(0.8)->randomNumber(),
-            'isRead' => $this->faker->boolean(20),
-            'created_at' => now(),
+            'user_id' => $userId,
+            'actor_id' => $actorId,
+            'type' => $this->faker->randomElement(['follow', 'comment', 'react', 'share', 'friend_request']), // Example types
+            'target_type' => null, // Should be set specifically in seeder
+            'target_id' => null, // Should be set specifically in seeder
+            'is_read' => $this->faker->boolean(50), // 50% chance of being read
+            'created_at' => $createdAt, // Thêm created_at
+            'updated_at' => $updatedAt, // Thêm updated_at
         ];
-    }
-
-    // Trạng thái: Dùng user hiện có
-    public function existing(): static
-    {
-        return $this->state(function (array $attributes) {
-            $user = User::inRandomOrder()->first() ?? User::factory()->create();
-            $actor = User::inRandomOrder()->where('id', '!=', $user->id)->first() ?? User::factory()->create();
-
-            return [
-                'user_id' => $user->id,
-                'actor_id' => $actor->id,
-            ];
-        });
-    }
-
-    // Trạng thái: Thông báo đã đọc
-    public function read(): static
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'isRead' => true,
-            ];
-        });
-    }
-
-    // Trạng thái: Thông báo liên quan đến post
-    public function postRelated(): static
-    {
-        return $this->state(function (array $attributes) {
-            $post = Post::inRandomOrder()->first() ?? Post::factory()->create();
-
-            return [
-                'type' => $this->faker->randomElement(['like', 'comment']),
-                'target_id' => $post->id,
-            ];
-        });
-    }
-
-    // Trạng thái: Thông báo liên quan đến comment
-    public function commentRelated(): static
-    {
-        return $this->state(function (array $attributes) {
-            $comment = Comment::inRandomOrder()->first() ?? Comment::factory()->create();
-
-            return [
-                'type' => 'comment',
-                'target_id' => $comment->id,
-            ];
-        });
     }
 }

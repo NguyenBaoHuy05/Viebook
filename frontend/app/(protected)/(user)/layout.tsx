@@ -3,6 +3,7 @@ import "../../globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Header from "@/components/Header";
+import PopoverChat from "@/components/PopoverChat";
 
 export default function ProtectedLayout({
   children,
@@ -13,6 +14,7 @@ export default function ProtectedLayout({
     <div className="antialiased px-15">
       <Header />
       {children}
+      <PopoverChat />
     </div>
   );
 }

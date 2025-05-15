@@ -27,7 +27,7 @@ interface DailyUserData {
 // Cấu hình này định nghĩa các data key và label cho biểu đồ và tooltip
 const chartConfig = {
   users: {
-    label: "Số lượng bài viết",
+    label: "Số lượng thành viên: ",
     color: "hsl(var(--chart-1))",
   },
   count: {
@@ -75,7 +75,7 @@ export default function UserStatisticsChart() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Thống kê bài viết</CardTitle>
+          <CardTitle>Thống kê user</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-[250px]">
           <p className="text-muted-foreground">Đang tải dữ liệu thống kê...</p>
@@ -88,7 +88,7 @@ export default function UserStatisticsChart() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Thống kê bài viết</CardTitle>
+          <CardTitle>Thống kê user</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-[250px]">
           <p className="text-destructive">{error}</p>{" "}
@@ -101,11 +101,11 @@ export default function UserStatisticsChart() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Thống kê bài viết</CardTitle>
+          <CardTitle>Thống kê user</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-[250px]">
           <p className="text-muted-foreground">
-            Không có dữ liệu thống kê bài viết.
+            Không có dữ liệu thống kê user.
           </p>
         </CardContent>
       </Card>
@@ -116,9 +116,9 @@ export default function UserStatisticsChart() {
       {/* 👇 Cập nhật Card Header 👇 */}
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle>Thống kê bài viết theo ngày</CardTitle>
+          <CardTitle>Thống kê user theo ngày</CardTitle>
           <CardDescription>
-            Hiển thị số lượng bài viết được tạo 7 ngày gần nhất
+            Hiển thị số lượng user được tạo 7 ngày gần nhất
           </CardDescription>
         </div>
       </CardHeader>
@@ -140,65 +140,57 @@ export default function UserStatisticsChart() {
               bottom: 0, // Giảm margin dưới nếu cần
             }}
           >
-            <CartesianGrid vertical={false} /> {/* Lưới ngang */}
-            {/* 👇 Thêm trục Y (Optional nhưng nên có) 👇 */}
+            <CartesianGrid vertical={false} />
             <YAxis
-              tickLine={false} // Ẩn gạch chân tick
-              axisLine={true} // Ẩn đường trục
-              tickMargin={8} // Khoảng cách tick với trục
-              tickFormatter={(value) => value.toLocaleString()} // Format số lớn (ví dụ: 1000 -> 1,000)
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => value.toLocaleString()}
             />
             {/* Trục X (ngày tháng) */}
             <XAxis
-              dataKey="date" // 👇 Sử dụng data key 'date' từ dữ liệu mới 👇
+              dataKey="date"
               tickLine={false}
-              axisLine={true}
+              axisLine={false}
               tickMargin={8}
-              minTickGap={32} // Khoảng cách tối thiểu giữa các tick
+              minTickGap={32}
               tickFormatter={(value: string) => {
                 const date = new Date(value);
                 return date.toLocaleDateString("vi-VN", {
-                  month: "short", // Tên tháng ngắn
-                  day: "numeric", // Số ngày
+                  month: "short",
+                  day: "numeric",
                 });
               }}
             />
-            {/* 👇 Cập nhật Tooltip 👇 */}
+
             <ChartTooltip
               content={
                 <ChartTooltipContent
                   className="w-[150px]"
                   nameKey="users"
-                  // Optional: Định dạng hiển thị giá trị trong tooltip
                   formatter={(value, name) => {
-                    const numericValue = value as number; // Explicitly cast value to number
-                    const stringName = name as string; // Explicitly cast name to string
-                    // Lấy label từ chartConfig để hiển thị "Số lượng bài viết: [value]"
+                    const numericValue = value as number;
+                    const stringName = name as string;
                     return [
-                      `${numericValue.toLocaleString()} post. `,
                       chartConfig[stringName as keyof typeof chartConfig]
                         ?.label,
+                      ` ${numericValue.toLocaleString()} user. `,
                     ];
                   }}
                   // Định dạng hiển thị ngày trong header của tooltip
                   labelFormatter={(value: string) => {
                     const date = new Date(value);
-                    // Format đầy đủ ngày tháng năm cho tooltip
+
                     return date.toLocaleDateString("vi-VN", {
                       year: "numeric",
-                      month: "long",
+                      month: "numeric",
                       day: "numeric",
                     });
                   }}
                 />
               }
             />
-            {/* 👇 Cập nhật Bar hiển thị dữ liệu bài viết 👇 */}
-            <Bar
-              dataKey="users" // 👇 Sử dụng data key users từ dữ liệu mới 👇
-              fill={chartConfig.users.color} // 👇 Sử dụng màu từ chartConfig 👇
-              radius={4} // Bo góc cho cột bar (tùy chọn)
-            />
+            <Bar dataKey="users" fill={chartConfig.users.color} radius={4} />
           </BarChart>
         </ChartContainer>
       </CardContent>

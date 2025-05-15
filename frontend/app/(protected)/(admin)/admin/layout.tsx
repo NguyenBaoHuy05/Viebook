@@ -11,7 +11,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <main>
         <SidebarTrigger />
         {children}
-        <div className="absolute right-5 top-5">{Logo(50, 50)}</div>
+        {/* <div className="absolute right-5 top-5">{Logo(50, 50)}</div> */}
       </main>
     </SidebarProvider>
   );

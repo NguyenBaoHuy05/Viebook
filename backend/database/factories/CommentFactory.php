@@ -2,49 +2,42 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\User;
-use  App\Models\Post;
 use App\Models\Comment;
+use App\Models\User;
+use App\Models\Post;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Comment>
- */
 class CommentFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
     protected $model = Comment::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
+        $userId = User::inRandomOrder()->first()?->id ?? User::factory();
+        $postId = Post::inRandomOrder()->first()?->id ?? Post::factory();
+        $createdAt = $this->faker->dateTimeBetween('-1 year', 'now'); // Post được tạo trong 1 năm trở lại đây
+        $updatedAt = $this->faker->dateTimeBetween($createdAt, 'now'); // updated_at sau created_at
+        // Factory alone can't easily create nested comments correctly.
+        // This factory creates basic comments. Seeder handles parent/top_level logic.
         return [
-            'user_id' => User::factory(), // Tạo một user ngẫu nhiên cho mỗi bình luận
-            'post_id' => Post::factory(), // Tạo một post ngẫu nhiên cho mỗi bình luận
-            'content' => $this->faker->sentence(),
-            'created_at' => now(),
-            'parent_comment_id' => null,
+            'user_id' => $userId,
+            'post_id' => $postId,
+            'content' => $this->faker->paragraph(rand(1, 3)),
+            'parent_comment_id' => null, // Handled in seeder
+            'top_level_comment_id' => null, // Handled in seeder
+            'created_at' => $createdAt, // Thêm created_at
+            'updated_at' => $updatedAt, // Thêm updated_at
+            // timestamps are handled automatically by model
         ];
-    }
-    // Trạng thái: Dùng user và post hiện có
-    public function existing(): static
-    {
-        return $this->state(function (array $attributes) {
-            $user = User::inRandomOrder()->first() ?? User::factory()->create();
-            $post = Post::inRandomOrder()->first() ?? Post::factory()->create();
-
-            return [
-                'user_id' => $user->id,
-                'post_id' => $post->id,
-            ];
-        });
-    }
-    // Trạng thái: Comment là reply (có parent_comment_id)
-    public function reply(): static
-    {
-        return $this->state(function (array $attributes) {
-            $parentComment = Comment::inRandomOrder()->first() ?? Comment::factory()->create();
-
-            return [
-                'parent_comment_id' => $parentComment->id,
-            ];
-        });
     }
 }

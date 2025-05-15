@@ -10,9 +10,11 @@ use App\Notifications\CustomResetPassword;
 use App\Notifications\CustomVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Friend;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable, HasApiTokens, SoftDeletes;
+    use Notifiable, HasApiTokens, SoftDeletes, HasFactory;
 
     protected $fillable = [
         'username',
@@ -81,7 +83,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $friends2 = Friend::where('friend_id', $this->id)
             ->where('status', 'accepted')
             ->pluck('user_id');
-        
+
         return $friends1->merge($friends2)->unique()->values();
     }
 }
