@@ -93,7 +93,7 @@ function Comment({
             </button>
             {comment.replies && comment.replies.length > 0 && (
               <button
-                className="text-sm text-blue-500 hover:underline ml-2"
+                className="text-sm text-blue-500 hover:underline ml-2 cursor-pointer"
                 onClick={() => setShowReplies((prev) => !prev)}
               >
                 {showReplies
