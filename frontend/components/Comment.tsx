@@ -3,13 +3,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { AiOutlineLike } from "react-icons/ai";
 import axios from "@/lib/axiosConfig";
 import { Loader2 } from "lucide-react";
-function Comment({ comment: commentData }: { comment: any }) {
-  const [currentComment, setCurrentComment] = useState(commentData);
+
+function Comment({
+  comment,
+  refetchComments,
+  setCommentCount,
+}: {
+  comment: any;
+  refetchComments: () => void;
+  setCommentCount: (prop: any) => void;
+}) {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
 
-  const formattedDate = new Date(currentComment.created_at).toLocaleDateString(
+  const formattedDate = new Date(comment.created_at).toLocaleDateString(
     "en-GB",
     {
       day: "2-digit",
@@ -26,18 +35,19 @@ function Comment({ comment: commentData }: { comment: any }) {
     setLoading(true);
     try {
       await axios.post(
-        `/api/posts/${currentComment.post_id}/comment`,
+        `/api/posts/${comment.post_id}/comment`,
         {
-          post_id: currentComment.post_id,
-          parent_comment_id: currentComment.id,
+          post_id: comment.post_id,
+          parent_comment_id: comment.id,
           content: replyContent,
         },
         { withCredentials: true }
       );
 
-      console.log("Reply posted successfully");
       setReplyContent("");
       setShowReplyInput(false);
+      refetchComments();
+      setCommentCount((prev: any) => prev + 1);
     } catch (err) {
       console.error("Failed to reply", err);
     } finally {
@@ -49,7 +59,7 @@ function Comment({ comment: commentData }: { comment: any }) {
     <div className="flex flex-col p-4 border-gray-300 gap-2">
       <div className="flex justify-between items-center">
         <span className="font-medium text-sm text-gray-800">
-          {currentComment.user.username}
+          {comment.user.username}
         </span>
         <span className="text-xs text-gray-500">{formattedDate}</span>
       </div>
@@ -61,14 +71,14 @@ function Comment({ comment: commentData }: { comment: any }) {
         </Avatar>
 
         <div className="flex flex-col gap-2 flex-1 w-full max-w-full">
-          {currentComment.parent && currentComment.parent.user && (
+          {comment.parent && comment.parent.user && (
             <span className="text-blue-600 font-medium text-sm">
-              @{currentComment.parent.user.username}
+              @{comment.parent.user.username}
             </span>
           )}
 
           <p className="text-sm text-gray-800 break-all w-full max-w-full">
-            {currentComment.content}
+            {comment.content}
           </p>
 
           <div className="flex gap-4 mt-1">
@@ -81,6 +91,16 @@ function Comment({ comment: commentData }: { comment: any }) {
             >
               Trả lời
             </button>
+            {comment.replies && comment.replies.length > 0 && (
+              <button
+                className="text-sm text-blue-500 hover:underline ml-2"
+                onClick={() => setShowReplies((prev) => !prev)}
+              >
+                {showReplies
+                  ? "Ẩn trả lời"
+                  : `Hiện trả lời (${comment.replies.length})`}
+              </button>
+            )}
           </div>
 
           {showReplyInput && (
@@ -88,7 +108,7 @@ function Comment({ comment: commentData }: { comment: any }) {
               <textarea
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
-                placeholder={`Trả lời @${currentComment.user.username}`}
+                placeholder={`Trả lời @${comment.user.username}`}
                 className="w-full resize-none p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 rows={3}
               />
@@ -119,10 +139,15 @@ function Comment({ comment: commentData }: { comment: any }) {
             </div>
           )}
 
-          {currentComment.replies && currentComment.replies.length > 0 && (
+          {comment.replies && comment.replies.length > 0 && showReplies && (
             <div>
-              {currentComment.replies.map((reply: any) => (
-                <Comment key={reply.id} comment={reply} />
+              {comment.replies.map((reply: any) => (
+                <Comment
+                  key={reply.id}
+                  comment={reply}
+                  refetchComments={refetchComments}
+                  setCommentCount={setCommentCount}
+                />
               ))}
             </div>
           )}
