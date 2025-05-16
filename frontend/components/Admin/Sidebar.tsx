@@ -16,6 +16,7 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import Logout from "../Button/Logout";
 
 import {
   DropdownMenu,
@@ -144,7 +145,9 @@ export function AppSidebar() {
                   className="w-[--radix-popper-anchor-width] hover:cursor-pointer hover:bg-gray-200"
                 >
                   <DropdownMenuItem>
-                    <span className="w-55">Log out</span>
+                    <div className="w-55">
+                      <Logout />
+                    </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

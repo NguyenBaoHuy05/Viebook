@@ -10,6 +10,7 @@ use App\Models\PostReact;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -32,16 +33,18 @@ class AdminController extends Controller
         return response()->json($posts);
     }
 
-    public function updateBlock(Request $request, User $user)
+    public function blockUser(Request $request)
     {
+        $user = User::find($request->id);
+        if (!$user) {
+            return response()->json(['error' => 'Người dùng không tồn tại'], 404);
+        }
+
         if ($user->role === 'admin') {
             return response()->json(['error' => 'Không thể block admin'], 403);
         }
-
-        $isBlocked = filter_var($request->input('is_blocked'), FILTER_VALIDATE_BOOLEAN);
-        $user->is_blocked = $isBlocked;
-        $user->save();
-
+        Log::info("block:" . $request->is_blocked);
+        $user->update(['block' => $request->is_blocked]);
         return response()->json(['message' => 'Cập nhật trạng thái thành công']);
     }
 

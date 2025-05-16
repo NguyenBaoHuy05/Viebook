@@ -4,6 +4,7 @@ import axios from "@/lib/axiosConfig";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
+import LoadingPage from "../Modal/LoadingPage";
 
 export default function Logout() {
   const { setUserId } = useUser();
@@ -13,14 +14,13 @@ export default function Logout() {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      toast.loading("Đang đăng xuất");
       await axios.post("/api/logout");
-      toast.dismiss();
       setUserId(null);
       setTimeout(() => {
         router.push("/login");
         toast.success("Đăng xuất thành công!");
       }, 1500);
+      setLoading(false);
     } catch (error: any) {
       console.error("Logout error:", error.response?.data);
       toast.error(
@@ -32,11 +32,14 @@ export default function Logout() {
   };
 
   return (
-    <div
-      onClick={handleLogout}
-      className="cursor-pointer text-black hover:text-blue-200 disabled:opacity-50"
-    >
-      Đăng xuất
-    </div>
+    <>
+      {loading && <LoadingPage isError={loading} />}
+      <div
+        onClick={handleLogout}
+        className="w-full cursor-pointer text-black hover:text-blue-200 disabled:opacity-50"
+      >
+        Đăng xuất
+      </div>
+    </>
   );
 }

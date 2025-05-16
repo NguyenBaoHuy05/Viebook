@@ -18,12 +18,15 @@ interface User {
 
 export default function AdminPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [usersRaw, setUsersRaw] = useState<User[]>([]);
+  const [select, setSelect] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get("/api/admin/users");
+        setUsersRaw(response.data);
         setUsers(response.data);
       } catch (error) {
         toast.error("Không thể tải danh sách người dùng!");
@@ -38,10 +41,16 @@ export default function AdminPage() {
 
   const handleUpdateBlock = async (userId: number, value: string) => {
     try {
-      await axios.put(`/api/admin/users/${userId}/block`, {
+      await axios.put(`/api/admin/users/block`, {
+        id: userId,
         is_blocked: value === "true", // true hoặc false
       });
-      toast.success("Block người dùng thành công!");
+      setUsers(
+        users.map((f) =>
+          f.id === userId ? { ...f, block: value === "true" } : f
+        )
+      );
+      toast.success("Thay đổi chế độ người dùng thành công!");
     } catch (error) {
       toast.error("Không thể block người dùng!");
       console.error(error);
@@ -52,7 +61,27 @@ export default function AdminPage() {
     <>
       {loading && <LoadingPage isError={loading} />}
       <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Quản lý người dùng</h1>
+        <div className="flex mb-2">
+          <h1 className="text-2xl font-bold mb-4">Quản lý người dùng</h1>
+          <select
+            onChange={(e) => {
+              const value = e.target.value;
+              console.log(value);
+              if (value === "block") {
+                setUsers(usersRaw.filter((u) => u.block == true));
+              } else if (value === "unblock") {
+                setUsers(usersRaw.filter((u) => u.block == false));
+              } else {
+                setUsers(usersRaw);
+              }
+            }}
+            className={`border rounded px-2 py-1 ml-auto`}
+          >
+            <option value="all">All</option>
+            <option value="block">Block</option>
+            <option value="unblock">Unblock</option>
+          </select>
+        </div>
         <table className="table-auto w-full border-collapse border border-gray-300">
           <thead>
             <tr>
@@ -86,14 +115,20 @@ export default function AdminPage() {
                     </span>
                   ) : (
                     <select
-                      value={String(user.block)}
-                      onChange={(e) =>
-                        handleUpdateBlock(user.id, e.target.value)
-                      }
-                      className="border rounded px-2 py-1"
+                      value={user.block ? "true" : "false"}
+                      onChange={(e) => {
+                        handleUpdateBlock(user.id, e.target.value);
+                      }}
+                      className={`border rounded px-2 py-1 ${
+                        user.block ? "bg-red-500" : "bg-green-500"
+                      }`}
                     >
-                      <option value="true">Yes</option>
-                      <option value="false">No</option>
+                      <option value="true" className="bg-red-500">
+                        Yes
+                      </option>
+                      <option value="false" className="bg-green-500">
+                        No
+                      </option>
                     </select>
                   )}
                 </td>
@@ -110,15 +145,6 @@ export default function AdminPage() {
                     year: "numeric",
                   })}
                 </td>
-
-                {/* <td className="border border-gray-300 px-4 py-2">
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded"
-                    onClick={() => handleDeleteUser(user.id)}
-                  >
-                    Xóa
-                  </button>
-                </td> */}
               </tr>
             ))}
           </tbody>
@@ -127,11 +153,3 @@ export default function AdminPage() {
     </>
   );
 }
-
-// Bọc bằng ProtectedRoute và export
-// export default function AdminPageWrapper() {
-//   return (
-//       {loading && <LoadingPage isError={false}/>}
-//       <AdminPage />
-//   );
-// }

@@ -22,8 +22,8 @@ function StatCard({ title, value, past }: statCardProp) {
         </p>
         <p className="text-sm text-green-500 mt-1">
           {past !== undefined
-            ? (past >= 0 ? "tăng " : "giảm") +
-              Math.abs(past) +
+            ? (value - past >= 0 ? "tăng " : "giảm ") +
+              Math.abs(value - past) +
               " so với ngày hôm qua"
             : ""}
         </p>
