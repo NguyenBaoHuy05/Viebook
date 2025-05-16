@@ -74,7 +74,7 @@ const People = ({ friends, pending, onSave, onStartConversation }: Props) => {
             {grouped[letter].map((friend) => (
               <div
                 key={friend.id}
-                className="h-15 border-b-2 p-2 flex items-center"
+                className="h-15 border-b-2 p-2 flex items-center z-20"
               >
                 <ImageWithSkeleton
                   src={friend.avatar ?? "https://github.com/shadcn.png"}

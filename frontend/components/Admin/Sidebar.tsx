@@ -145,9 +145,7 @@ export function AppSidebar() {
                   className="w-[--radix-popper-anchor-width] hover:cursor-pointer hover:bg-gray-200"
                 >
                   <DropdownMenuItem>
-                    <div className="w-55">
-                      <Logout />
-                    </div>
+                    <Logout />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

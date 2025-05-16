@@ -31,7 +31,7 @@ function PopoverChat() {
     if (!conversations) handleConversation();
   }, [conversations]);
   return (
-    <div className="fixed right-4 z-20 flex bottom-4">
+    <div className="fixed right-4 z-50 flex bottom-4">
       {selectedConv && isOpen && (
         <Chat
           IDconversation={String(selectedConv.id)}
@@ -43,14 +43,14 @@ function PopoverChat() {
         />
       )}
       {!isOpen && (
-        <Popover>
+        <Popover cl>
           <PopoverTrigger asChild>
             <TbMessageChatbot
               size={32}
               className="cursor-pointer transition-transform hover:scale-130"
             />
           </PopoverTrigger>
-          <PopoverContent className="z-10 w-72 mr-10 p-2 space-y-2 max-h-100 overflow-y-auto [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
+          <PopoverContent className="z-50 w-72 mr-10 p-2 space-y-2 max-h-100 overflow-y-auto [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
             {conversations && conversations.length !== 0 ? (
               conversations.map((conv) => {
                 console.log(conv.participant);

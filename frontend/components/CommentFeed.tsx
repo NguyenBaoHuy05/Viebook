@@ -38,13 +38,13 @@ export default function CommentFeed({
 
   useEffect(() => {
     const channel = echo.channel(`post.${postId}`);
-    channel.listen("CommentCreated", (event: any) => {
+    channel.listen(".CommentCreated", (event: any) => {
       console.log(event.comment);
       setComments((prev) => [event.comment, ...prev]);
     });
 
     return () => {
-      channel.stopListening("CommentCreated");
+      channel.stopListening(".CommentCreated");
     };
   }, [postId]);
 
