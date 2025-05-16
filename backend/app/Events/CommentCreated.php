@@ -29,10 +29,7 @@ class CommentCreated implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'id' => $this->comment->id,
-            'username' => $this->comment->user->name,
-            'content' => $this->comment->content,
-            'created_at' => $this->comment->created_at->toISOString(),
+            'comment' => $this->comment->load(['user', 'replies.user']),
         ];
     }
     public function broadcastAs()

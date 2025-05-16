@@ -26,7 +26,7 @@ function Post({
   const [likeCount, setLikeCount] = useState(post.reactCount);
   const [showComment, setShowComment] = useState(false);
   const [sharedPost, setSharedPost] = useState<iPost | null>(null);
-
+  const [commentCount, setCommentCount] = useState(post.commentCount);
   const handleLike = async () => {
     setIsLiked(!isLiked);
     setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
@@ -141,7 +141,7 @@ function Post({
                   className={showComment ? `text-blue-500` : "text-gray-500"}
                 />
                 <span className="text-gray-600 text-lg font-medium">
-                  {post.commentCount}
+                  {commentCount}
                 </span>
               </button>
 
@@ -227,7 +227,11 @@ function Post({
       </div>
 
       {showComment && (
-        <CommentFeed postId={post.id} setShowComment={setShowComment} />
+        <CommentFeed
+          postId={post.id}
+          setShowComment={setShowComment}
+          setCommentCount={setCommentCount}
+        />
       )}
     </div>
   );

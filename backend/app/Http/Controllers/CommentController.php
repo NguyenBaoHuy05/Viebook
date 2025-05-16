@@ -30,7 +30,6 @@ class CommentController extends Controller
         $topLevelCommentId = $parentCommentId
             ? $this->getTopLevelCommentId($parentCommentId)
             : null;
-
         $comment = Comment::create([
             'user_id' => $request->user()->id,
             'post_id' => $data['post_id'],
@@ -40,7 +39,13 @@ class CommentController extends Controller
         ]);
 
         Post::where('id', $data['post_id'])->increment('comment_count');
-        $comment->load('user');
+        $comment->load([
+            'user',
+            'replies.user',
+            'replies.topLevelComment',
+            'replies.parent.user',
+        ]);
+
         broadcast(new CommentCreated($comment));
 
         return response()->json(['comment' => $comment], 201);

@@ -6,34 +6,40 @@ import echo from "@/lib/echo";
 import axios from "@/lib/axiosConfig";
 import { Loader2 } from "lucide-react";
 import { IoMdClose } from "react-icons/io";
-
+import { useUser } from "@/context/UserContext";
 type Props = {
   postId: string;
   setShowComment: (prop: boolean) => void;
+  setCommentCount: (prop: any) => void;
 };
 
-export default function CommentFeed({ postId, setShowComment }: Props) {
+export default function CommentFeed({
+  postId,
+  setShowComment,
+  setCommentCount,
+}: Props) {
   const [comments, setComments] = useState<any[]>([]);
   const [userComment, setUserComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const { username } = useUser();
+
+  const fetchComments = async () => {
+    try {
+      const res = await axios.get(`/api/posts/${postId}/comments`);
+      setComments(res.data || []);
+    } catch (error) {
+      console.error("Failed to fetch comments:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const res = await axios.get(`/api/posts/${postId}/comments`);
-        console.log("comment ", res);
-        setComments(res.data || []);
-      } catch (error) {
-        console.error("Failed to fetch comments:", error);
-      }
-    };
-
     fetchComments();
   }, [postId]);
 
   useEffect(() => {
     const channel = echo.channel(`post.${postId}`);
     channel.listen("CommentCreated", (event: any) => {
+      console.log(event.comment);
       setComments((prev) => [event.comment, ...prev]);
     });
 
@@ -47,18 +53,7 @@ export default function CommentFeed({ postId, setShowComment }: Props) {
     setLoading(true);
 
     try {
-      const userRes = await axios.get("/api/user");
-      const newComment = {
-        content: userComment,
-        id: postId,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        user: {
-          username: userRes.data.user.username,
-        },
-      };
-
-      await axios.post(
+      const res = await axios.post(
         `/api/posts/${postId}/comment`,
         {
           post_id: postId,
@@ -67,8 +62,11 @@ export default function CommentFeed({ postId, setShowComment }: Props) {
         },
         { withCredentials: true }
       );
-
-      setComments((prev) => [newComment, ...prev]);
+      console.log("Comment created successfully", res);
+      setCommentCount((prev: any) => prev + 1);
+      if (res.data && res.data.comment) {
+        setComments((prev) => [res.data.comment, ...prev]);
+      }
       setUserComment("");
     } catch (error) {
       console.error("Failed to create comment", error);
@@ -90,7 +88,11 @@ export default function CommentFeed({ postId, setShowComment }: Props) {
         >
           <IoMdClose className="h-6 w-6" />
         </button>
-        <CommentSection comments={comments} />
+        <CommentSection
+          comments={comments}
+          refetchComments={fetchComments}
+          setCommentCount={setCommentCount}
+        />
         <div className="w-full px-3 py-3 ">
           <div className="flex items-center gap-2">
             <button

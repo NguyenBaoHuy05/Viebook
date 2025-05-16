@@ -2,7 +2,10 @@ import axios from "@/lib/axiosConfig";
 import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { MdPhotoLibrary } from "react-icons/md";
-import { Globe2, Users, Lock } from "lucide-react";
+import { Globe2, Users, Lock, Loader2, CheckCircle2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const privacyOptions = [
   {
@@ -34,10 +37,12 @@ function CreatePost({
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [privacy, setPrivacy] = useState("public");
+  const [suggestedTitle, setSuggestedTitle] = useState("");
+  const [analyzing, setAnalyzing] = useState(false);
 
   if (!load) return null;
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImage(file);
@@ -46,6 +51,24 @@ function CreatePost({
         setPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      // Phân tích hình ảnh và gợi ý tiêu đề
+      setSuggestedTitle("");
+      setAnalyzing(true);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("http://localhost:8001/analyze-image/", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        setSuggestedTitle(data.vietnamese_title);
+      } catch {
+        setSuggestedTitle("Không thể gợi ý tiêu đề.");
+      } finally {
+        setAnalyzing(false);
+      }
     }
   };
 
@@ -123,6 +146,42 @@ function CreatePost({
             value={data}
           />
 
+          {analyzing && (
+            <Alert className="mb-3 border-blue-200 bg-blue-50 flex items-center gap-2">
+              <Loader2 className="animate-spin h-5 w-5 text-blue-400" />
+              <AlertDescription>Đang gợi ý tiêu đề...</AlertDescription>
+            </Alert>
+          )}
+
+          {suggestedTitle && (
+            <Alert className="mb-3 border-green-200 bg-green-50">
+              <CheckCircle2 className="h-5 w-5 text-green-500" />
+              <AlertTitle>
+                <Badge
+                  variant="outline"
+                  className="text-green-700 border-green-300 bg-green-100 mr-2"
+                >
+                  Gợi ý tiêu đề
+                </Badge>
+              </AlertTitle>
+              <AlertDescription>
+                <span className="text-green-800 font-medium">
+                  {suggestedTitle}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="ml-3 cursor-pointer hover:bg-green-300"
+                    onClick={() => setData(suggestedTitle)}
+                    title="Chèn tiêu đề này vào bài viết"
+                    type="button"
+                  >
+                    Dùng tiêu đề này
+                  </Button>
+                </span>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex gap-2 mb-2">
             {privacyOptions.map((option) => (
               <button
@@ -153,6 +212,7 @@ function CreatePost({
                   onClick={() => {
                     setImage(null);
                     setPreviewUrl(null);
+                    setSuggestedTitle("");
                   }}
                   className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 rounded-full"
                 >
