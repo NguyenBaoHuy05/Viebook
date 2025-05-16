@@ -60,80 +60,76 @@ function Page() {
   return (
     <>
       <div className="mt-25">
-        <div className="grid grid-cols-7">
-          <div className="col-span-1"></div>
-          <div className="col-span-5 grid grid-cols-2 gap-10">
-            <div>
-              <strong>Danh sách bạn bè</strong>
-              {friendList && friendList.length == 0 && (
-                <div className="sticky top-0 h-10 bg-blue-200 px-2 flex items-center font-bold">
-                  Không có bạn bè
-                </div>
-              )}
-              {friendList && (
-                <People
-                  friends={friendList}
-                  pending={false}
-                  onSave={(id, check) => {
-                    if (!check && friendList) {
-                      setFriendList(friendList.filter((f) => f.id !== id));
+        <div className="w-full flex flex-wrap justify-center gap-10">
+          <div className="w-[500px]">
+            <strong>Danh sách bạn bè</strong>
+            {friendList && friendList.length == 0 && (
+              <div className="sticky top-0 h-10 bg-blue-300 px-2 flex items-center font-bold">
+                Không có bạn bè
+              </div>
+            )}
+            {friendList && (
+              <People
+                friends={friendList}
+                pending={false}
+                onSave={(id, check) => {
+                  if (!check && friendList) {
+                    setFriendList(friendList.filter((f) => f.id !== id));
+                  }
+                }}
+                onStartConversation={(id) => {
+                  const handleConversation = async () => {
+                    try {
+                      const res = await axios.post("/api/conversation", {
+                        friend_id: id,
+                      });
+                      console.log("ID", res.data.id);
+                      const result = res.data.id;
+                      setConversation(result);
+                      setFriendChat(friendList.find((f) => f.id == id));
+                    } catch (error) {
+                      console.log("Lỗi: ", error);
                     }
-                  }}
-                  onStartConversation={(id) => {
-                    const handleConversation = async () => {
-                      try {
-                        const res = await axios.post("/api/conversation", {
-                          friend_id: id,
-                        });
-                        console.log("ID", res.data.id);
-                        const result = res.data.id;
-                        setConversation(result);
-                        setFriendChat(friendList.find((f) => f.id == id));
-                      } catch (error) {
-                        console.log("Lỗi: ", error);
-                      }
-                    };
-                    if (id != conversationID && !conversationID)
-                      handleConversation();
-                    else {
-                      toast.warning("Vui lòng xóa hộp thoại");
-                    }
-                  }}
-                />
-              )}
-            </div>
-            <div>
-              <strong>Danh sách chờ kết bạn</strong>
-              {pendingFriendList && pendingFriendList.length == 0 && (
-                <div className="sticky top-0 h-10 bg-blue-200 px-2 flex items-center font-bold">
-                  Không có ai chờ kết bạn
-                </div>
-              )}
-              {pendingFriendList && (
-                <People
-                  friends={pendingFriendList}
-                  pending={true}
-                  onSave={(id, check) => {
-                    if (check && friendList) {
-                      const friend = pendingFriendList.find((f) => f.id === id);
-                      if (friend) {
-                        setFriendList([...friendList, friend]);
-                        setPendingFriendList(
-                          pendingFriendList.filter((f) => f.id !== id)
-                        );
-                      }
-                    } else {
+                  };
+                  if (id != conversationID && !conversationID)
+                    handleConversation();
+                  else {
+                    toast.warning("Vui lòng xóa hộp thoại");
+                  }
+                }}
+              />
+            )}
+          </div>
+          <div className="w-[500px]">
+            <strong>Danh sách chờ kết bạn</strong>
+            {pendingFriendList && pendingFriendList.length == 0 && (
+              <div className="sticky top-0 h-10 bg-blue-300 px-2 flex items-center font-bold">
+                Không có ai chờ kết bạn
+              </div>
+            )}
+            {pendingFriendList && (
+              <People
+                friends={pendingFriendList}
+                pending={true}
+                onSave={(id, check) => {
+                  if (check && friendList) {
+                    const friend = pendingFriendList.find((f) => f.id === id);
+                    if (friend) {
+                      setFriendList([...friendList, friend]);
                       setPendingFriendList(
                         pendingFriendList.filter((f) => f.id !== id)
                       );
                     }
-                  }}
-                  onStartConversation={(id) => {}}
-                />
-              )}
-            </div>
+                  } else {
+                    setPendingFriendList(
+                      pendingFriendList.filter((f) => f.id !== id)
+                    );
+                  }
+                }}
+                onStartConversation={(id) => {}}
+              />
+            )}
           </div>
-          <div className="col-span-1"></div>
         </div>
       </div>
       {conversationID && (

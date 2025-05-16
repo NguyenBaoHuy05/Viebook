@@ -72,97 +72,95 @@ function Header() {
   };
   return (
     <>
-      <div className="relative">
-        <div className=" grid grid-cols-7 py-3 px-5 border-2 bg-white fixed w-screen right-0 top-0 z-3">
-          <div className="col-span-1 flex justify-start items-center gap-4">
-            <svg
-              width="45"
-              height="45"
-              viewBox="0 0 64 64"
-              xmlns="http://www.w3.org/2000/svg"
-              className="cursor-pointer transition-transform hover:scale-100 rounded-full"
-            >
-              <circle cx="32" cy="32" r="32" fill="black" />
+      <div className="mx-auto grid grid-cols-7 py-3 px-5 border-2 bg-white fixed w-screen right-0 top-0 z-3">
+        <div className="col-span-1 flex justify-start items-center gap-4">
+          <svg
+            width="45"
+            height="45"
+            viewBox="0 0 64 64"
+            xmlns="http://www.w3.org/2000/svg"
+            className="cursor-pointer transition-transform hover:scale-100 rounded-full"
+          >
+            <circle cx="32" cy="32" r="32" fill="black" />
 
-              <path
-                d="M20 24 L32 40 L44 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M10 15 q2 5 6 0 q2 -4 4 0"
-                fill="none"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M50 15 q3 5 6 0 q3 -5 6 0"
-                fill="none"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M15 50 q2 3 4 0 q2 -3 4 0"
-                fill="none"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M40 45 q3 3 4 0 q3 -5 6 0"
-                fill="none"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-          <div className="col-span-5 flex justify-center items-center gap-12">
-            <Link href="/home">
-              <IoMdHome
-                size={32}
-                className="cursor-pointer transition-transform hover:scale-130"
-              />
-            </Link>
-            <Link href="/people">
-              <IoPeople
-                size={32}
-                className="cursor-pointer transition-transform hover:scale-130"
-              />
-            </Link>
-            <Link href={`/account/${username}`}>
-              <CgProfile
-                size={32}
-                className="cursor-pointer transition-transform hover:scale-130"
-              />
-            </Link>
-          </div>
+            <path
+              d="M20 24 L32 40 L44 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M10 15 q2 5 6 0 q2 -4 4 0"
+              fill="none"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M50 15 q3 5 6 0 q3 -5 6 0"
+              fill="none"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M15 50 q2 3 4 0 q2 -3 4 0"
+              fill="none"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M40 45 q3 3 4 0 q3 -5 6 0"
+              fill="none"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+        <div className="col-span-5 flex justify-center items-center gap-12">
+          <Link href="/home">
+            <IoMdHome
+              size={32}
+              className="cursor-pointer transition-transform hover:scale-130"
+            />
+          </Link>
+          <Link href="/people">
+            <IoPeople
+              size={32}
+              className="cursor-pointer transition-transform hover:scale-130"
+            />
+          </Link>
+          <Link href={`/account/${username}`}>
+            <CgProfile
+              size={32}
+              className="cursor-pointer transition-transform hover:scale-130"
+            />
+          </Link>
+        </div>
 
-          <div className="z-50 col-span-1 relative flex justify-end items-center gap-4">
-            <PopoverNotifycation />
-            <Popover>
-              <PopoverTrigger asChild>
-                <div onClick={() => setIsSetting(!isSetting)}>
-                  <ImageWithSkeleton
-                    src={avatar ?? "https://github.com/shadcn.png"}
-                    alt="demo"
-                    className="w-8 h-8 hover:scale-130 transition-transform hover:cursor-pointer"
-                    imgClass="rounded-full"
-                  />
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-40 mr-10">
-                <div>
-                  <Logout />
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
+        <div className="z-50 col-span-1 relative flex justify-end items-center gap-4">
+          <PopoverNotifycation />
+          <Popover>
+            <PopoverTrigger asChild>
+              <div onClick={() => setIsSetting(!isSetting)}>
+                <ImageWithSkeleton
+                  src={avatar ?? "https://github.com/shadcn.png"}
+                  alt="demo"
+                  className="w-8 h-8 hover:scale-130 transition-transform hover:cursor-pointer"
+                  imgClass="rounded-full"
+                />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-40 mr-10">
+              <div>
+                <Logout />
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
       <Command

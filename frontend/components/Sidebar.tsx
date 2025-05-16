@@ -230,7 +230,7 @@ const Sidebar: React.FC<SidebarProps> = ({ userInfo, id }) => {
           previewUrl ?? user.profile_picture ?? "https://github.com/shadcn.png"
         }
         alt="demo"
-        className="mt-10 mx-auto absolute w-300 h-100 z-0"
+        className="mt-10 mx-auto absolute max-w-300 h-100 z-0 "
         imgClass="rounded-lg"
       />
       <div className="-mt-25 z-10">

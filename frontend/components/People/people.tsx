@@ -79,7 +79,7 @@ const People = ({ friends, pending, onSave, onStartConversation }: Props) => {
                 <ImageWithSkeleton
                   src={friend.avatar ?? "https://github.com/shadcn.png"}
                   alt={friend.username}
-                  className="w-10 h-10"
+                  className="w-1/10"
                   imgClass="rounded-full"
                 />
                 <strong className="mx-2">{friend.name}</strong>
