@@ -13,6 +13,25 @@ type Props = {
   isOnAccountPage: boolean | false;
 };
 
+function AdYoutube({ title, youtubeId }: { title: string; youtubeId: string }) {
+  return (
+    <div className="rounded-xl border-2 border-blue-200 bg-white-100 p-4 flex flex-col items-center gap-2">
+      <div className="font-bold text-black-700 text-3xl mb-2">{title}</div>
+      <div className="w-full flex justify-center">
+        <iframe
+          width="100%"
+          height="300"
+          src={`https://www.youtube.com/embed/${youtubeId}`}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        ></iframe>
+      </div>
+    </div>
+  );
+}
+
 export default function PostFeed({
   onSelectPost,
   userOwner,
@@ -98,6 +117,36 @@ export default function PostFeed({
     return () => container.removeEventListener("scroll", handleScroll);
   }, [hasMore, loading]);
 
+  // Tạo mảng posts + quảng cáo
+  const postsWithAds = [];
+  const adList = [
+    
+    { title: "Đăng ký kênh YouTube của chúng tôi!", youtubeId: "2C1T_lVw7_w" },
+    { title: "Gennin mạnh nhất Konoha", youtubeId: "lVO1XeXpcUY" },
+    { title: "Học Viện Anime", youtubeId: "I60Ygko8fBg" },
+    { title: "Muse Việt Nam", youtubeId: "qaW6wV42MY" },
+    // Thêm nhiều quảng cáo nếu muốn
+  ];
+  let adIndex = 0;
+  for (let i = 0; i < posts.length; i++) {
+    postsWithAds.push(
+      <Post
+        key={posts[i].id}
+        post={posts[i]}
+        onSelectPost={onSelectPost}
+        setShowModal={setShowModal}
+        isShared={false}
+      />
+    );
+    if ((i + 1) % 5 === 0) {
+      const ad = adList[adIndex % adList.length];
+      postsWithAds.push(
+        <AdYoutube key={`ad-${i}`} title={ad.title} youtubeId={ad.youtubeId} />
+      );
+      adIndex++;
+    }
+  }
+
   return (
     <div
       ref={containerRef}
@@ -105,15 +154,7 @@ export default function PostFeed({
       style={{ maxHeight: "calc(100vh - 100px)" }}
     >
       {userOwner == userId && <CreateAPost />}
-      {posts.map((post) => (
-        <Post
-          key={post.id}
-          post={post}
-          onSelectPost={onSelectPost}
-          setShowModal={setShowModal}
-          isShared={false}
-        />
-      ))}
+      {postsWithAds}
       {loading && (
         <div className="flex items-center justify-center gap-2 p-4">
           <Loader2 className="h-4 w-4 animate-spin" />

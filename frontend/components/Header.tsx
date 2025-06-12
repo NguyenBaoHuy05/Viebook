@@ -143,6 +143,19 @@ function Header() {
         </div>
 
         <div className="z-50 col-span-1 relative flex justify-end items-center gap-4">
+          <Link href="/save">
+            <svg
+              width="24"
+              height="24"
+              // fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              className="text-2xl"
+            >
+              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+            </svg>
+          </Link>
           <PopoverNotifycation />
           <Popover>
             <PopoverTrigger asChild>

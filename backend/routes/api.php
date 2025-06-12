@@ -14,6 +14,7 @@ use App\Http\Controllers\NotificationController;
 use Illuminate\Auth\Events\Verified;
 use App\Models\User;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\SaveController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -81,4 +82,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/statisticsOverview', [AdminController::class, 'statisticsOverview']);
     Route::get('/admin/stats/users-daily', [AdminController::class, 'getCountUserDay']);
     Route::get('/admin/stats/daily-counts', [AdminController::class, 'getCountPostDay']);
+});
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/posts/{post}/save', [SaveController::class, 'toggleSave']);
+    Route::get('/posts/{post}/isSaved', [SaveController::class, 'isSaved']);
+    Route::get('/saved-posts', [SaveController::class, 'getSavedPosts']);
 });
