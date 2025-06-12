@@ -169,3 +169,41 @@
 - **Luồng hoạt động**
   1. Admin xem danh sách user, block user, xem/xóa bài viết, xem thống kê hệ thống.
   2. Frontend gọi API, backend cập nhật dữ liệu tương ứng.
+
+## 9. Lưu bài viết (Save Post)
+
+- **Frontend**
+  - File: `frontend/components/Post.tsx`, `frontend/app/(protected)/(user)/save/page.tsx`, `frontend/components/Header.tsx`
+  - Nút save (icon) trên mỗi bài viết, đổi màu khi đã lưu/chưa lưu, gọi API lưu/xóa lưu.
+  - Trang save: hiển thị danh sách bài đã lưu, giao diện giống trang home, có navigation tới từ Header.
+- **Backend**
+  - File: `backend/app/Http/Controllers/SaveController.php`
+  - Model: `backend/app/Models/Save.php`
+  - Migration: `backend/database/migrations/2025_06_11_000000_create_saves_table.php`
+  - API: `/api/save/toggle` (POST), `/api/saved-posts` (GET), `/api/save/is-saved` (GET)
+  - Xử lý lưu/xóa lưu bài viết, trả về danh sách bài đã lưu, kiểm tra trạng thái đã lưu.
+- **Database**
+  - Bảng: `saves`
+  - Trường: `user_id`, `post_id`, `created_at`
+- **Luồng hoạt động**
+  1. Người dùng nhấn nút save trên bài viết, gọi API lưu/xóa lưu.
+  2. Trang save hiển thị danh sách bài đã lưu, giống trang home.
+  3. Navigation trên Header có link tới trang save.
+
+## 10. Quảng cáo trong feed
+
+- **Frontend**
+  - File: `frontend/components/PostFeed.tsx`
+  - Component: `AdYoutube`
+  - Hiển thị quảng cáo sau mỗi 5 bài post trong feed (home, save...)
+- **Luồng hoạt động**
+  1. Khi render danh sách bài viết, sau mỗi 5 bài sẽ chèn 1 component quảng cáo.
+
+## 11. Breaker (Retry API Backend)
+
+- **Backend**
+  - Các controller: `SaveController`, `FriendController`, `FollowController`, `MessageController`, `CommentController`, `AuthController`, `AdminController`, `AccountController`, `NotificationController`, `PostController`
+  - Tất cả các API public đều bọc breaker: nếu lỗi sẽ retry tối đa 3 lần, sau đó trả về lỗi 500.
+- **Luồng hoạt động**
+  1. Khi có lỗi trong xử lý API, controller sẽ tự động retry tối đa 3 lần trước khi trả lỗi.
+  2. Đảm bảo hệ thống ổn định, tránh lỗi tạm thời gây gián đoạn trải nghiệm người dùng.
