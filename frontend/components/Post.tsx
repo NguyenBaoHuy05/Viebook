@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import { FaCommentAlt } from "react-icons/fa";
 import { FaShare } from "react-icons/fa";
+import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import iPost from "@/interface/post";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axios from "@/lib/axiosConfig";
@@ -27,6 +28,8 @@ function Post({
   const [showComment, setShowComment] = useState(false);
   const [sharedPost, setSharedPost] = useState<iPost | null>(null);
   const [commentCount, setCommentCount] = useState(post.commentCount);
+  const [isSaved, setIsSaved] = useState(false);
+
   const handleLike = async () => {
     setIsLiked(!isLiked);
     setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
@@ -100,6 +103,28 @@ function Post({
     }
   }, [post.sharePostID]);
 
+  useEffect(() => {
+    // Kiểm tra đã save chưa
+    const checkSaved = async () => {
+      try {
+        const res = await axios.get(`/api/posts/${post.id}/isSaved`);
+        setIsSaved(res.data.saved);
+      } catch (err) {
+        setIsSaved(false);
+      }
+    };
+    checkSaved();
+  }, [post.id]);
+
+  const handleSave = async () => {
+    try {
+      const res = await axios.post(`/api/posts/${post.id}/save`);
+      setIsSaved(res.data.saved);
+    } catch (err) {
+      // Xử lý lỗi nếu cần
+    }
+  };
+
   return (
     <div className="flex justify-between mb-4 col-span-3 relative">
       <div className="bg-gray-50 rounded-xl p-4 shadow-[0px_0px_6px_2px_gray] hover:cursor-pointer w-full">
@@ -153,6 +178,18 @@ function Post({
                 <span className="text-gray-600 text-lg font-medium">
                   {post.shareCount}
                 </span>
+              </button>
+
+              <button
+                className="flex items-center gap-3 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+                onClick={handleSave}
+                title={isSaved ? "Đã lưu" : "Lưu bài viết"}
+              >
+                {isSaved ? (
+                  <BsBookmarkFill size={20} className="text-pink-500" />
+                ) : (
+                  <BsBookmark size={20} className="text-gray-400" />
+                )}
               </button>
 
               {userId && userId === post.userId && !isShared && (
