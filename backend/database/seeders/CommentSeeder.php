@@ -25,8 +25,7 @@ class CommentSeeder extends Seeder
         }
 
         foreach ($posts as $post) {
-            // Create 5-15 top-level comments for each post using Factory
-            $numberOfComments = $faker->numberBetween(5, 15);
+            $numberOfComments = $faker->numberBetween(2, 5);
             $topLevelComments = [];
 
             for ($i = 0; $i < $numberOfComments; $i++) {
@@ -46,7 +45,6 @@ class CommentSeeder extends Seeder
                 $post->increment('comment_count');
             }
 
-            // Create some replies to the top-level comments
             if (!empty($topLevelComments) && count($topLevelComments) > 3) {
                 foreach ($topLevelComments as $topComment) {
                     $numberOfReplies = $faker->numberBetween(0, 3);

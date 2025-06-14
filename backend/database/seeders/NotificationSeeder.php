@@ -73,11 +73,11 @@ class NotificationSeeder extends Seeder
             // Don't notify the post owner if they reacted to their own post
             if ($react->user_id !== $postOwnerId) {
                 Notification::create([
-                    'user_id' => $postOwnerId, // The post owner receives the notification
-                    'actor_id' => $react->user_id, // The user who reacted
+                    'user_id' => $postOwnerId,
+                    'actor_id' => $react->user_id,
                     'type' => 'react',
                     'target_type' => PostReact::class,
-                    'target_id' => $react->id, // The reaction itself
+                    'target_id' => $react->id,
                     'is_read' => false,
                 ]);
             }
@@ -87,19 +87,16 @@ class NotificationSeeder extends Seeder
         $sharedPosts = \App\Models\Post::whereNotNull('share_post_id')->get();
         foreach ($sharedPosts as $sharedPost) {
             $originalPost = $sharedPost->sharedPost; // Assuming you have this relationship
-            if ($originalPost && $sharedPost->user_id !== $originalPost->user_id) { // Don't notify if sharing their own post
+            if ($originalPost && $sharedPost->user_id !== $originalPost->user_id) {
                 Notification::create([
-                    'user_id' => $originalPost->user_id, // Original post owner
-                    'actor_id' => $sharedPost->user_id, // User who shared
+                    'user_id' => $originalPost->user_id,
+                    'actor_id' => $sharedPost->user_id,
                     'type' => 'share',
                     'target_type' => \App\Models\Post::class,
-                    'target_id' => $sharedPost->id, // The shared post entry
+                    'target_id' => $sharedPost->id,
                     'is_read' => false,
                 ]);
             }
         }
-
-        // TODO: Add notifications for friend requests (sent and accepted)
-        // This requires looping through the `friends` table entries.
     }
 }

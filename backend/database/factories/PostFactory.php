@@ -25,7 +25,7 @@ class PostFactory extends Factory
         $userId = User::inRandomOrder()->first()?->id ?? User::factory();
 
         // Get a random post ID for sharing, or null
-        $sharePostId = $this->faker->boolean(20) ? Post::inRandomOrder()->first()?->id : null; // 20% chance of being a shared post
+        $sharePostId = $this->faker->boolean(1) ? Post::inRandomOrder()->first()?->id : null; // 20% chance of being a shared post
         $createdAt = $this->faker->dateTimeBetween('-1 year', 'now'); // Post được tạo trong 1 năm trở lại đây
         $updatedAt = $this->faker->dateTimeBetween($createdAt, 'now'); // updated_at sau created_at
         return [
@@ -33,7 +33,7 @@ class PostFactory extends Factory
             'share_post_id' => $sharePostId,
             'privacy' => $this->faker->randomElement(['public', 'private', 'friends', null]), // Allow null as per schema
             'title' => $this->faker->sentence(),
-            'content' => $this->faker->paragraph(rand(3, 8)),
+            'content' => "",
             'type_content' => $this->faker->randomElement(['text', 'image', 'video', null]),
             'react_count' => 0,
             'comment_count' => 0,

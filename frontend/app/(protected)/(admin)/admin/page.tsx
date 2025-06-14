@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import VideoCard from "@/components/Admin/VideoCard";
+import Logo from "@/logo/logo";
 
 function AdminDashboard() {
   return (

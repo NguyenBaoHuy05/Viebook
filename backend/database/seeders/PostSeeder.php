@@ -23,39 +23,32 @@ class PostSeeder extends Seeder
         }
 
         foreach ($users as $user) {
-            // Create 10-20 posts for each user
+            // Tạo 10-20 bài Post
             $numberOfPosts = $faker->numberBetween(10, 20);
             for ($i = 0; $i < $numberOfPosts; $i++) {
                 Post::factory()->create([
                     'user_id' => $user->id,
                     'title' => $faker->sentence(),
-                    'content' => $faker->paragraph(rand(3, 8)),
                     'privacy' => $faker->randomElement(['public', 'private', 'friends']),
                     'type_content' => $faker->randomElement(['text', 'image', 'video', null]),
-                    // share_post_id will be null by default or can be set later
                 ]);
             }
         }
 
-        // Optional: Create some shared posts
         $posts = Post::all();
-        if ($posts->count() > 10) { // Ensure there are enough posts to share
+        if ($posts->count() > 10) {
             $users = User::all();
             foreach ($users as $user) {
-                // Share a few random posts
                 $postsToShare = $posts->random(rand(0, min(5, $posts->count()))); // Share between 0 and 5 posts
                 foreach ($postsToShare as $postToShare) {
-                    // Ensure the user doesn't share their own post
                     if ($user->id !== $postToShare->user_id) {
                         Post::factory()->create([
                             'user_id' => $user->id,
                             'share_post_id' => $postToShare->id,
-                            'title' => 'Shared: ' . $postToShare->title, // Add context
-                            'content' => $faker->sentence(rand(5, 15)), // Optional comment on the share
+                            'title' => 'Shared: ' . $postToShare->title,
                             'privacy' => $faker->randomElement(['public', 'private', 'friends']),
-                            'type_content' => null, // Shared posts often don't have their own type_content like the original
+                            'type_content' => null,
                         ]);
-                        // Update original post's share count (optional, use observer for production)
                         $postToShare->increment('share_count');
                     }
                 }
